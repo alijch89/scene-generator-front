@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Scene Generator web
 
-## Getting Started
+Next.js 16 App Router frontend with dashboard, story creation, searchable
+library, live generation status, story downloads/reader, billing, profile, and
+the complete authentication flow. See the
+[story module design](../docs/story-generation.md#8-nextjs-frontend).
 
-First, run the development server:
+## Security model
+
+Client code calls only same-origin `/api/auth/*` route handlers. Those handlers
+forward requests to NestJS and copy `Set-Cookie`. A successful backend login
+body contains a session ID, but the BFF replaces it with a status message
+before responding to the browser. No browser script can read the HttpOnly SID,
+and access/refresh tokens never reach Next.js or the browser.
+
+`proxy.ts` performs fast cookie-presence redirects for `/profile` and
+`/change-password`; this is an optimistic UX check only. NestJS validates the
+session and permissions. `AuthProvider` uses TanStack React Query for the
+authenticated `GET /auth/me` server state. `apiFetch` deduplicates refresh
+calls, rotates the backend tokens after a 401, and retries once. Reusable
+controls in `components/ui` follow the shadcn/ui structure and use Tailwind.
+
+## Setup
 
 ```bash
+cp .env.example .env.local
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `BACKEND_URL=http://localhost:3001` is server-only.
+- `APP_ORIGIN=http://localhost:3000` must match backend `APP_ORIGIN`.
+- `SESSION_COOKIE_NAME=sid` must match the backend. Use `__Host-sid` with HTTPS
+  in production.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Validation
 
-## Learn More
+```bash
+npm run lint
+npm run build
+docker build -t scene-generator-frontend .
+```
 
-To learn more about Next.js, take a look at the following resources:
+`GET /api/health` is the uncached frontend container liveness endpoint.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Never add token fields to auth context, local/session storage, query strings,
+client-readable cookies, or analytics. Reset tokens necessarily arrive in the
+one-time email link; they are unrelated to session JWTs and expire after use.

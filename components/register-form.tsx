@@ -88,7 +88,7 @@ export function RegisterForm() {
             type="tel"
             dir="ltr"
             autoComplete="tel"
-            placeholder="+98 912 123 4567"
+            placeholder="۰۹۱۲ ۱۲۳ ۴۵۶۷"
             required
             maxLength={20}
           />

@@ -61,7 +61,7 @@ export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
           inputMode="tel"
           dir="ltr"
           autoComplete="tel"
-          placeholder="+98 912 123 4567"
+          placeholder="۰۹۱۲ ۱۲۳ ۴۵۶۷"
           required
           maxLength={20}
         />

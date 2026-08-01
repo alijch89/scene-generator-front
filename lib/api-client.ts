@@ -95,7 +95,7 @@ export async function apiFetch<T>(
   if (!response.ok) {
     const message = Array.isArray(body.message)
       ? body.message.join(". ")
-      : body.message || "The request could not be completed.";
+      : body.message || "انجام درخواست امکان‌پذیر نبود.";
     throw new ApiError(response.status, message, body.correlationId);
   }
   return body;

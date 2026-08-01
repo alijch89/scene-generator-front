@@ -45,7 +45,9 @@ export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
       router.replace(destination);
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Sign in failed.");
+      setError(
+        caught instanceof Error ? caught.message : "ورود به حساب ناموفق بود.",
+      );
     } finally {
       setPending(false);
     }

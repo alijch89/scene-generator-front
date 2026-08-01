@@ -22,7 +22,10 @@ async function forward(
 ) {
   const { resource, path = [] } = await context.params;
   if (!allowedResources.has(resource)) {
-    return Response.json({ message: "Not found" }, { status: 404 });
+    return Response.json(
+      { message: "مسیر درخواستی یافت نشد." },
+      { status: 404 },
+    );
   }
   const backend = process.env.BACKEND_URL ?? "http://localhost:3001";
   const appOrigin = process.env.APP_ORIGIN ?? "http://localhost:3000";
@@ -74,7 +77,7 @@ async function forward(
     });
   } catch {
     return Response.json(
-      { message: "Story service is unavailable" },
+      { message: "سرویس داستان موقتاً در دسترس نیست." },
       { status: 503 },
     );
   }

@@ -32,7 +32,10 @@ async function forward(
   const { path } = await context.params;
   const endpoint = path.join("/");
   if (!allowedPaths.has(endpoint)) {
-    return NextResponse.json({ message: "Not found" }, { status: 404 });
+    return NextResponse.json(
+      { message: "مسیر درخواستی یافت نشد." },
+      { status: 404 },
+    );
   }
   const backend = process.env.BACKEND_URL ?? "http://localhost:3001";
   const appOrigin = process.env.APP_ORIGIN ?? "http://localhost:3000";
@@ -61,10 +64,10 @@ async function forward(
       signal: AbortSignal.timeout(10_000),
     });
     let payload: unknown = await upstream.json().catch(() => ({
-      message: "Authentication service returned an invalid response",
+      message: "پاسخ سرویس احراز هویت معتبر نیست.",
     }));
     if (endpoint === "login" && upstream.ok) {
-      payload = { message: "Signed in" };
+      payload = { message: "با موفقیت وارد حساب کاربری شدید." };
     }
     const response = NextResponse.json(payload, { status: upstream.status });
     for (const value of upstream.headers.getSetCookie()) {
@@ -78,7 +81,7 @@ async function forward(
     return response;
   } catch {
     return NextResponse.json(
-      { message: "Authentication service is unavailable" },
+      { message: "سرویس احراز هویت موقتاً در دسترس نیست." },
       { status: 503 },
     );
   }

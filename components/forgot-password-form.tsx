@@ -35,7 +35,9 @@ export function ForgotPasswordForm() {
       );
       setSuccess(result.message);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Request failed.");
+      setError(
+        caught instanceof Error ? caught.message : "انجام درخواست ناموفق بود.",
+      );
     } finally {
       setPending(false);
     }

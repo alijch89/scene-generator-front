@@ -52,7 +52,6 @@ export function ResetPasswordForm({ token }: { token: string }) {
         <Input
           name="newPassword"
           type="password"
-          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
@@ -64,7 +63,6 @@ export function ResetPasswordForm({ token }: { token: string }) {
         <Input
           name="confirmPassword"
           type="password"
-          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}

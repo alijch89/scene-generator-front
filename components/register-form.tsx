@@ -3,6 +3,7 @@
 import { apiFetch } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { cn } from "@/lib/utils";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -86,7 +87,6 @@ export function RegisterForm() {
           <Input
             name="phoneNumber"
             type="tel"
-            dir="ltr"
             autoComplete="tel"
             placeholder="۰۹۱۲ ۱۲۳ ۴۵۶۷"
             required
@@ -99,15 +99,19 @@ export function RegisterForm() {
         <span className="text-xs font-normal text-[var(--ink-3)]">
           (اختیاری)
         </span>
-        <Input name="email" type="email" dir="ltr" autoComplete="email" maxLength={320} />
+        <Input
+          name="email"
+          type="email"
+          autoComplete="email"
+          maxLength={320}
+        />
       </Label>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Label className="grid gap-2">
-          رمز عبور
-          <Input
+        <div className="grid gap-2">
+          <Label htmlFor="register-password">رمز عبور</Label>
+          <PasswordInput
+            id="register-password"
             name="password"
-            type="password"
-            dir="ltr"
             autoComplete="new-password"
             required
             minLength={12}
@@ -115,19 +119,18 @@ export function RegisterForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </Label>
-        <Label className="grid gap-2">
-          تکرار رمز عبور
-          <Input
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="register-confirm-password">تکرار رمز عبور</Label>
+          <PasswordInput
+            id="register-confirm-password"
             name="confirmPassword"
-            type="password"
-            dir="ltr"
             autoComplete="new-password"
             required
             minLength={12}
             maxLength={128}
           />
-        </Label>
+        </div>
       </div>
       {password && (
         <div className="flex items-center gap-2">

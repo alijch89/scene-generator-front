@@ -50,7 +50,6 @@ export function ForgotPasswordForm() {
         <Input
           name="phoneNumber"
           type="tel"
-          dir="ltr"
           autoComplete="tel"
           placeholder="۰۹۱۲ ۱۲۳ ۴۵۶۷"
           required

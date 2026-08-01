@@ -3,6 +3,7 @@
 import { apiFetch } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "./auth-provider";
 import { ErrorMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
@@ -61,29 +62,27 @@ export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
           name="phoneNumber"
           type="tel"
           inputMode="tel"
-          dir="ltr"
           autoComplete="tel"
           placeholder="۰۹۱۲ ۱۲۳ ۴۵۶۷"
           required
           maxLength={20}
         />
       </Label>
-      <Label className="grid gap-2">
-        <span className="flex justify-between">
-          رمز عبور
+      <div className="grid gap-2">
+        <div className="flex justify-between">
+          <Label htmlFor="login-password">رمز عبور</Label>
           <a href="/forgot-password" className="text-[var(--primary)]">
             فراموش کردم
           </a>
-        </span>
-        <Input
+        </div>
+        <PasswordInput
+          id="login-password"
           name="password"
-          type="password"
-          dir="ltr"
           autoComplete="current-password"
           required
           maxLength={128}
         />
-      </Label>
+      </div>
       <ErrorMessage message={error} />
       <SubmitButton pending={pending}>ورود</SubmitButton>
     </form>

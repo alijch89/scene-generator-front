@@ -25,13 +25,29 @@ interface Details {
   durationMinutes: number;
 }
 
+/** The creation wizard currently supports Persian stories only. */
+const PERSIAN_LANGUAGE = {
+  code: "fa",
+  nativeName: "فارسی",
+} as const;
+
+/** Persian display names for the story topics offered by the catalog. */
+const PERSIAN_TOPIC_NAMES: Record<string, string> = {
+  adventure: "ماجراجویی",
+  animals: "حیوانات",
+  friendship: "دوستی",
+  "space-adventure": "ماجراجویی فضایی",
+  "fairy-tale": "قصهٔ پریان",
+  bedtime: "قصهٔ شب",
+};
+
 /** Initial creation-wizard values before catalogs and user input arrive. */
 const emptyDetails: Details = {
   title: "",
   childName: "",
   childAge: 5,
   topic: "",
-  language: "",
+  language: PERSIAN_LANGUAGE.code,
   durationMinutes: 10,
 };
 
@@ -75,15 +91,15 @@ export default function CreateStoryPage() {
   );
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
-  // Seed topic/language defaults once catalogs arrive, adjusted during
-  // render (React's recommended pattern) rather than in an effect.
+  // Seed the topic default once catalogs arrive, adjusted during render
+  // (React's recommended pattern) rather than in an effect.
   const [catalogsSeeded, setCatalogsSeeded] = useState(false);
   if (catalogs && !catalogsSeeded) {
     setCatalogsSeeded(true);
     setDetails((d) => ({
       ...d,
       topic: d.topic || catalogs.topics[0]?.slug || "",
-      language: d.language || catalogs.languages[0]?.code || "",
+      language: PERSIAN_LANGUAGE.code,
     }));
   }
 
@@ -301,6 +317,7 @@ function StepDetails({
           className="story-input"
           value={details.title}
           maxLength={180}
+          lang="fa"
           placeholder="آوا و فانوس دریایی"
           onChange={(e) => setDetails((d) => ({ ...d, title: e.target.value }))}
         />
@@ -335,24 +352,19 @@ function StepDetails({
         >
           {catalogs.topics.map((topic) => (
             <option key={topic.slug} value={topic.slug}>
-              {topic.displayName}
+              {PERSIAN_TOPIC_NAMES[topic.slug] ?? topic.displayName}
             </option>
           ))}
         </select>
       </Field>
       <div className="grid grid-cols-2 gap-4">
         <Field label="زبان">
-          <select
-            className="story-input"
-            value={details.language}
-            onChange={(e) => setDetails((d) => ({ ...d, language: e.target.value }))}
+          <div
+            className="story-input flex items-center"
+            lang="fa"
           >
-            {catalogs.languages.map((language) => (
-              <option key={language.code} value={language.code}>
-                {language.nativeName}
-              </option>
-            ))}
-          </select>
+            {PERSIAN_LANGUAGE.nativeName}
+          </div>
         </Field>
         <Field label="طول">
           <select
@@ -409,7 +421,6 @@ function StepReview({
   onEditPhoto: () => void;
   onGenerate: () => void;
 }) {
-  const language = catalogs?.languages.find((l) => l.code === details.language);
   const topic = catalogs?.topics.find((t) => t.slug === details.topic);
   return (
     <div className="flex flex-col gap-5">
@@ -436,8 +447,15 @@ function StepReview({
         </div>
         <div className="h-px bg-[var(--border)]" />
         <SummaryRow label="عنوان" value={details.title} />
-        <SummaryRow label="موضوع" value={topic?.displayName ?? "—"} />
-        <SummaryRow label="زبان" value={language?.nativeName ?? "—"} />
+        <SummaryRow
+          label="موضوع"
+          value={
+            topic
+              ? PERSIAN_TOPIC_NAMES[topic.slug] ?? topic.displayName
+              : "—"
+          }
+        />
+        <SummaryRow label="زبان" value={PERSIAN_LANGUAGE.nativeName} />
         <SummaryRow
           label="طول"
           value={`${faDigits(details.durationMinutes)} دقیقه`}

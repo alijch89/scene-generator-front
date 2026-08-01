@@ -96,6 +96,13 @@ textarea {
   font: inherit;
 }
 
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select,
+textarea {
+  direction: rtl;
+  text-align: right;
+}
+
 .story-input {
   min-height: 2.85rem;
   width: 100%;

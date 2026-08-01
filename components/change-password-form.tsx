@@ -1,8 +1,8 @@
 "use client";
 
 import { apiFetch } from "@/lib/api-client";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "./error-message";
@@ -51,41 +51,38 @@ export function ChangePasswordForm() {
 
   return (
     <form className="grid gap-4.5" onSubmit={submit}>
-      <Label className="grid gap-2">
-        رمز عبور فعلی
-        <Input
+      <div className="grid gap-2">
+        <Label htmlFor="change-current-password">رمز عبور فعلی</Label>
+        <PasswordInput
+          id="change-current-password"
           name="currentPassword"
-          type="password"
-          dir="ltr"
           autoComplete="current-password"
           required
           maxLength={128}
         />
-      </Label>
-      <Label className="grid gap-2">
-        رمز عبور تازه
-        <Input
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="change-new-password">رمز عبور تازه</Label>
+        <PasswordInput
+          id="change-new-password"
           name="newPassword"
-          type="password"
-          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
           maxLength={128}
         />
-      </Label>
-      <Label className="grid gap-2">
-        تکرار رمز عبور تازه
-        <Input
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="change-confirm-password">تکرار رمز عبور تازه</Label>
+        <PasswordInput
+          id="change-confirm-password"
           name="confirmPassword"
-          type="password"
-          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
           maxLength={128}
         />
-      </Label>
+      </div>
       <ErrorMessage message={error} />
       <SubmitButton pending={pending}>تغییر رمز عبور</SubmitButton>
     </form>

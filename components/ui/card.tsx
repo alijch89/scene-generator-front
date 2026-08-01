@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+/** Surface container primitive with shared border, spacing, and shadow styles. */
 function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -14,6 +15,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/** Standard horizontal content padding for use inside a `Card`. */
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

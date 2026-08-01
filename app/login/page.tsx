@@ -3,6 +3,11 @@ import { AuthShell } from "@/components/auth-shell";
 import { LoginForm } from "@/components/login-form";
 import { SuccessMessage } from "@/components/error-message";
 
+/**
+ * Renders login with an optional local destination and post-account notices.
+ *
+ * The login form independently validates the `next` path before navigation.
+ */
 export default async function LoginPage({
   searchParams,
 }: {

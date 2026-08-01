@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+/** Ordered onboarding content rendered by the welcome carousel. */
 const SLIDES = [
   {
     icon: "📷",
@@ -28,6 +29,7 @@ const SLIDES = [
   },
 ];
 
+/** Renders the post-registration onboarding carousel and login handoff. */
 export function WelcomeCarousel() {
   const [index, setIndex] = useState(0);
   const router = useRouter();

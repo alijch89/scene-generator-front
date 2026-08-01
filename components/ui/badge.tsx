@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/** Variant-aware badge class generator, exported for composition. */
 const badgeVariants = cva(
   "inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-semibold",
   {
@@ -15,6 +16,7 @@ const badgeVariants = cva(
   },
 );
 
+/** Inline badge primitive with default and outline appearances. */
 function Badge({
   className,
   variant,

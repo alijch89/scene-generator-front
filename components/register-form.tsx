@@ -9,6 +9,11 @@ import { useRouter } from "next/navigation";
 import { ErrorMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
 
+/**
+ * Estimates how many visible password-strength criteria are satisfied.
+ *
+ * This is user guidance only; the backend validation policy is authoritative.
+ */
 function passwordScore(password: string) {
   let score = 0;
   if (password.length >= 12) score++;
@@ -17,9 +22,18 @@ function passwordScore(password: string) {
   return score;
 }
 
+/** Persian labels for visible password-strength tiers. */
 const scoreLabel = ["ضعیف", "متوسط", "خوب"];
+/** Clamps a score to the available label range. */
 const scoreLabelIndex = (score: number) => Math.min(score, scoreLabel.length - 1);
 
+/**
+ * Collects new-account details and submits them to the registration API.
+ *
+ * Browser checks cover password confirmation and terms acknowledgement; the
+ * backend independently normalizes identity fields and enforces password,
+ * uniqueness, and validation rules.
+ */
 export function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -28,6 +42,7 @@ export function RegisterForm() {
   const router = useRouter();
   const score = passwordScore(password);
 
+  /** Validates browser-only confirmation fields and submits registration data. */
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);

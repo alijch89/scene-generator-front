@@ -8,11 +8,20 @@ import { useRouter } from "next/navigation";
 import { ErrorMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
 
+/**
+ * Submits an authenticated password change and returns the user to login.
+ *
+ * Security:
+ * Browser validation confirms the replacement fields match, while the backend
+ * revalidates strength/current credentials, hashes the secret, and revokes
+ * every session.
+ */
 export function ChangePasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const router = useRouter();
 
+  /** Validates confirmation and submits the two required password values. */
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);

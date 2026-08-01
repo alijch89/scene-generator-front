@@ -1,5 +1,11 @@
 import type { ApiErrorBody } from "./types";
 
+/**
+ * Error raised for non-success API responses.
+ *
+ * Carries the HTTP status and optional server correlation ID so UI errors can
+ * be matched with backend logs without exposing response internals.
+ */
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -11,8 +17,15 @@ export class ApiError extends Error {
   }
 }
 
+/** Shared in-flight refresh operation used to collapse concurrent HTTP 401s. */
 let refreshPromise: Promise<boolean> | null = null;
 
+/**
+ * Requests server-side session-token rotation.
+ *
+ * @returns Whether the refresh endpoint returned a successful response.
+ * @sideeffect Reuses one in-flight promise and clears it after settlement.
+ */
 async function refreshSession(): Promise<boolean> {
   if (!refreshPromise) {
     refreshPromise = fetch("/api/auth/refresh", {
@@ -29,6 +42,24 @@ async function refreshSession(): Promise<boolean> {
   return refreshPromise;
 }
 
+/**
+ * Sends a same-origin API request and parses its JSON response.
+ *
+ * Authentication flow:
+ * A qualifying HTTP 401 triggers one shared session refresh followed by exactly
+ * one retry. Authentication bootstrap and recovery endpoints never recurse.
+ *
+ * Security:
+ * Browser cookies are sent only to same-origin Next.js routes. FormData retains
+ * its browser-generated boundary; other request bodies default to JSON.
+ *
+ * @template T Expected success payload.
+ * @param input Same-origin API path.
+ * @param init Standard Fetch request options.
+ * @param retry Whether one automatic refresh/retry remains available.
+ * @returns Parsed success payload.
+ * @throws ApiError For non-success responses after optional retry.
+ */
 export async function apiFetch<T>(
   input: string,
   init: RequestInit = {},

@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { StoryStatus } from "@/lib/types";
 
+/** Visual styles for every backend story status. */
 const styles: Record<StoryStatus, string> = {
   Draft: "bg-[var(--surface-3)] text-[var(--ink-2)]",
   Queued: "bg-[var(--warning-soft)] text-[var(--warning)]",
@@ -11,6 +12,7 @@ const styles: Record<StoryStatus, string> = {
   Expired: "bg-[var(--accent-soft)] text-[var(--accent-ink)]",
 };
 
+/** Persian display labels for every backend story status. */
 const labels: Record<StoryStatus, string> = {
   Draft: "پیش‌نویس",
   Queued: "در صف",
@@ -21,6 +23,7 @@ const labels: Record<StoryStatus, string> = {
   Expired: "منقضی",
 };
 
+/** Renders a localized story status with active-state animation. */
 export function StoryStatusBadge({
   status,
   className,

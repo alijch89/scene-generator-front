@@ -1,7 +1,21 @@
 import { NextRequest } from "next/server";
 
+/** Backend resource roots exposed by the general same-origin proxy. */
 const allowedResources = new Set(["stories", "jobs", "storage", "admin"]);
 
+/**
+ * Forwards an allow-listed resource request to the NestJS API.
+ *
+ * Security:
+ * The route rejects unknown resource roots, reconstructs the trusted backend
+ * origin, forwards only selected headers, disables caching, and relies on the
+ * backend for session authentication, authorization, DTO validation, and
+ * ownership checks. It streams responses so SSE and asset downloads remain
+ * usable without buffering.
+ *
+ * @returns Streaming upstream response, HTTP 404 for disallowed resources, or
+ * HTTP 503 when the backend cannot be reached before its timeout.
+ */
 async function forward(
   request: NextRequest,
   context: { params: Promise<{ resource: string; path?: string[] }> },
@@ -66,7 +80,11 @@ async function forward(
   }
 }
 
+/** Handles proxied read and streaming requests. */
 export const GET = forward;
+/** Handles proxied create/action requests. */
 export const POST = forward;
+/** Handles proxied deletion requests. */
 export const DELETE = forward;
+/** Handles proxied partial-update requests. */
 export const PATCH = forward;

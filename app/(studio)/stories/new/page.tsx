@@ -9,15 +9,23 @@ import { LoaderCircle, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+/** User-entered story attributes retained across the creation wizard. */
 interface Details {
+  /** Story title. */
   title: string;
+  /** Child name used for personalization. */
   childName: string;
+  /** Child age. */
   childAge: number;
+  /** Active topic slug. */
   topic: string;
+  /** Active language code. */
   language: string;
+  /** Requested narrative duration. */
   durationMinutes: number;
 }
 
+/** Initial creation-wizard values before catalogs and user input arrive. */
 const emptyDetails: Details = {
   title: "",
   childName: "",
@@ -27,6 +35,15 @@ const emptyDetails: Details = {
   durationMinutes: 10,
 };
 
+/**
+ * Coordinates the three-step photo, details, and review creation workflow.
+ *
+ * Security:
+ * The selected photo is previewed only through a temporary object URL, then
+ * uploaded to an authenticated endpoint. The backend validates magic bytes,
+ * consumes a user-scoped upload token, revalidates all story fields, and checks
+ * active catalogs before generation.
+ */
 export default function CreateStoryPage() {
   const router = useRouter();
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -77,6 +94,10 @@ export default function CreateStoryPage() {
     details.topic &&
     details.language;
 
+  /**
+   * Uploads the photo, consumes the returned token in story creation, and
+   * navigates to the resulting story.
+   */
   async function generate() {
     if (!photo) return;
     setSubmitting(true);
@@ -161,6 +182,7 @@ export default function CreateStoryPage() {
   );
 }
 
+/** Collects and previews the child photo selected for the new story. */
 function StepUpload({
   photo,
   preview,
@@ -233,6 +255,7 @@ function StepUpload({
   );
 }
 
+/** Collects validated story, child, catalog, language, and duration inputs. */
 function StepDetails({
   details,
   setDetails,
@@ -366,6 +389,7 @@ function StepDetails({
   );
 }
 
+/** Summarizes creation inputs and initiates the two-request generation flow. */
 function StepReview({
   photoPreview,
   details,
@@ -459,6 +483,7 @@ function StepReview({
   );
 }
 
+/** Renders one review label/value pair. */
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between text-sm">
@@ -468,6 +493,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+/** Renders a consistently styled label around an arbitrary form control. */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-2 text-sm font-bold">

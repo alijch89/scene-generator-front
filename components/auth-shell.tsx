@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+/**
+ * Shared accessible layout for registration, login, and password workflows.
+ */
 export function AuthShell({
   title,
   description,

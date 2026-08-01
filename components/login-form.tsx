@@ -9,12 +9,21 @@ import { SubmitButton } from "./submit-button";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+/**
+ * Authenticates credentials, reloads profile state, and performs a safe local
+ * redirect.
+ *
+ * Security:
+ * The destination must be a single-slash local path, preventing open redirects.
+ * The backend owns credential verification, throttling, and cookie issuance.
+ */
 export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const router = useRouter();
   const { reload } = useAuth();
 
+  /** Submits credentials and navigates after the profile query succeeds. */
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);

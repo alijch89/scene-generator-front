@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/** Variant-aware alert class generator. */
 const alertVariants = cva(
   "relative w-full rounded-md border px-4 py-3 text-sm",
   {
@@ -18,6 +19,7 @@ const alertVariants = cva(
   },
 );
 
+/** Accessible alert primitive supporting default, destructive, and success tones. */
 function Alert({
   className,
   variant,

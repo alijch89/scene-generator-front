@@ -11,6 +11,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import Link from "next/link";
 
+/**
+ * Renders the current identity, child summaries, access grants, security actions,
+ * and local display preferences.
+ *
+ * Security:
+ * The page displays only the safe profile contract. Global logout delegates to
+ * the authenticated backend endpoint; page visibility is not an authorization
+ * boundary.
+ */
 export default function ProfilePage() {
   const { user, loading, logout } = useAuth();
   const { data: stories } = useQuery({
@@ -53,6 +62,7 @@ export default function ProfilePage() {
     });
   }
 
+  /** Persists and applies the user's local light/dark preference. */
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
@@ -149,6 +159,7 @@ export default function ProfilePage() {
   );
 }
 
+/** Renders one profile label/value pair with optional left-to-right value text. */
 function Row({ label, value, ltr }: { label: string; value: string; ltr?: boolean }) {
   return (
     <div className="flex justify-between text-sm">
@@ -160,9 +171,11 @@ function Row({ label, value, ltr }: { label: string; value: string; ltr?: boolea
   );
 }
 
-// One-time sync from the theme already applied by the blocking script in
-// the root layout's <head> — an effect is the correct tool here since the
-// current value lives in the DOM/localStorage, not in anything render can see.
+/**
+ * Synchronizes React state once with the theme applied before hydration.
+ *
+ * @param setTheme State setter receiving a recognized DOM theme.
+ */
 function useThemeSync(setTheme: (t: "light" | "dark") => void) {
   const [synced, setSynced] = useState(false);
   if (!synced && typeof document !== "undefined") {

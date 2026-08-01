@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { ChangePasswordForm } from "@/components/change-password-form";
 
+/** Renders the authenticated password-change workflow. */
 export default function ChangePasswordPage() {
   return (
     <AuthShell

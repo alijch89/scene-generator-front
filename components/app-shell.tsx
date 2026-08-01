@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+/** Primary authenticated navigation destinations and their icons. */
 const tabs = [
   { href: "/dashboard", label: "داشبورد", icon: LayoutDashboard },
   { href: "/stories", label: "کتابخانه", icon: BookOpen },
@@ -21,6 +22,9 @@ const tabs = [
   { href: "/profile", label: "حساب من", icon: CircleUserRound },
 ];
 
+/**
+ * Tests whether a navigation tab represents the current pathname.
+ */
 function isTabActive(pathname: string, href: string) {
   if (href === "/stories") {
     return (
@@ -31,6 +35,13 @@ function isTabActive(pathname: string, href: string) {
   return pathname === href;
 }
 
+/**
+ * Renders the authenticated desktop sidebar and mobile tab navigation.
+ *
+ * The shell waits for the profile query before rendering account data. A
+ * missing user renders no protected UI; backend APIs remain the authorization
+ * boundary.
+ */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, loading, logout } = useAuth();

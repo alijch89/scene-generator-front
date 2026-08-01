@@ -7,11 +7,18 @@ import { FormEvent, useState } from "react";
 import { ErrorMessage, SuccessMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
 
+/**
+ * Requests password-recovery instructions for a phone number.
+ *
+ * The backend deliberately returns an indistinguishable accepted message for
+ * matching and unknown accounts to prevent account enumeration.
+ */
 export function ForgotPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  /** Submits the phone number and displays the backend's uniform response. */
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);

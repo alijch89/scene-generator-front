@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { ForgotPasswordForm } from "@/components/forgot-password-form";
 
+/** Renders the account-enumeration-resistant recovery request page. */
 export default function ForgotPasswordPage() {
   return (
     <AuthShell

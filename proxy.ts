@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/** Route prefixes whose pages require the presence of a session cookie. */
 const protectedRoutes = [
   "/profile",
   "/change-password",
@@ -7,6 +8,7 @@ const protectedRoutes = [
   "/stories",
   "/billing",
 ];
+/** Exact guest-only routes that redirect when a session cookie is present. */
 const guestRoutes = [
   "/login",
   "/register",
@@ -15,6 +17,17 @@ const guestRoutes = [
   "/welcome",
 ];
 
+/**
+ * Performs an optimistic session-cookie redirect at the Next.js request edge.
+ *
+ * Security:
+ * Cookie presence is only a user-experience hint, not authentication. Backend
+ * route handlers and Nest guards validate every protected API request. The
+ * `next` parameter preserves only the current local pathname.
+ *
+ * @param request Incoming Next.js request.
+ * @returns Redirect for obvious guest/session mismatches, otherwise continuation.
+ */
 export function proxy(request: NextRequest) {
   const cookieName = process.env.SESSION_COOKIE_NAME ?? "sid";
   const hasSession = Boolean(request.cookies.get(cookieName)?.value);
@@ -30,6 +43,7 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+/** Limits proxy execution to authentication-sensitive page routes. */
 export const config = {
   matcher: [
     "/profile/:path*",

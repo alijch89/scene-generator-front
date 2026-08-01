@@ -25,10 +25,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
+/** Story status endpoint shape used by progress and failure UI. */
 interface StatusResponse {
+  /** Story aggregate UUID. */
   storyId: string;
+  /** Current user-visible state. */
   status: StoryStatus;
+  /** Latest generation job summary, when one exists. */
   job: { id: string; status: string; errorMessage: string | null } | null;
+  /** Ordered lifecycle transition history. */
   history: Array<{
     id: string;
     toStatus: StoryStatus;
@@ -37,6 +42,15 @@ interface StatusResponse {
   }>;
 }
 
+/**
+ * Renders live story progress, generated content, downloads, and lifecycle
+ * actions for one owned story.
+ *
+ * Security:
+ * The dynamic ID is untrusted and every API request validates UUID syntax,
+ * session permission, and story ownership. EventSource messages contain no
+ * authoritative data; they only invalidate ownership-checked queries.
+ */
 export default function StoryDetailsPage({
   params,
 }: {
@@ -91,6 +105,7 @@ export default function StoryDetailsPage({
   const status = statusQuery.data?.status ?? story.status;
   const narration = assets.find((a) => a.assetType === "NarrationAudio");
 
+  /** Starts a new generation job and refreshes story/status queries. */
   async function regenerate() {
     setActionError("");
     try {
@@ -107,6 +122,7 @@ export default function StoryDetailsPage({
     }
   }
 
+  /** Confirms destructive intent, soft-deletes the story, and leaves the detail page. */
   async function remove() {
     if (!window.confirm("این قصه و فایل‌هایش حذف شود؟ این کار قابل بازگشت نیست.")) {
       return;
@@ -253,6 +269,7 @@ export default function StoryDetailsPage({
   );
 }
 
+/** Localized labels for downloadable asset categories. */
 const assetLabels: Record<string, string> = {
   ChildPhoto: "عکس کودک",
   CoverImage: "تصویر جلد",
@@ -260,10 +277,13 @@ const assetLabels: Record<string, string> = {
   NarrationAudio: "فایل صوتی روایت",
   FinalVideo: "ویدئوی نهایی",
 };
+
+/** Maps a backend asset category to a localized label with a safe fallback. */
 function assetTypeLabel(type: string) {
   return assetLabels[type] ?? type;
 }
 
+/** Renders compact story metadata. */
 function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-full border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--ink-2)]">
@@ -272,12 +292,14 @@ function Pill({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Approximate visible progress percentages for active story states. */
 const STAGE_DEGREES: Record<string, number> = {
   Draft: 25,
   Queued: 50,
   Processing: 85,
 };
 
+/** Renders the active generation stage and step-by-step progress indicator. */
 function GenerationProgress({
   status,
   childName,

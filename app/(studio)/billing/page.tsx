@@ -1,17 +1,26 @@
 import { faDigits, STUB_CREDITS } from "@/lib/utils";
 
-// ponytail: no billing provider wired up yet — stub data only, matches
-// the honest "not connected" note below. Swap for a real endpoint when
-// the platform billing module lands.
+/**
+ * Presentation-only credit packs shown until a billing provider is integrated.
+ *
+ * These values must not be treated as an authoritative price source.
+ */
 const PACKS = [
   { credits: 3, perStory: "۳۲٬۷۰۰", price: "۹۸٬۰۰۰", highlight: false },
   { credits: 10, perStory: "۲۴٬۹۰۰", price: "۲۴۹٬۰۰۰", highlight: true },
 ];
+/** Presentation-only purchase history used by the billing placeholder. */
 const HISTORY = [
   { label: "۱۰ اعتبار", date: "۱۲ تیر ۱۴۰۵", amount: "۲۴۹٬۰۰۰" },
   { label: "۳ اعتبار", date: "۲ خرداد ۱۴۰۵", amount: "۹۸٬۰۰۰" },
 ];
 
+/**
+ * Renders the explicitly non-functional billing and credit placeholder.
+ *
+ * No purchase action or payment data is sent; a future billing module must
+ * replace all stub balances, packs, and history.
+ */
 export default function BillingPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-5 px-5 py-8 sm:px-8">

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+/** Formats a media time in `minutes:seconds`, with a safe zero fallback. */
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds)) return "۰:۰۰";
   const m = Math.floor(seconds / 60);
@@ -11,6 +12,13 @@ function formatTime(seconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/**
+ * Renders an accessible controlled audio player with seeking and track reset.
+ *
+ * @param src Same-origin or otherwise trusted audio URL.
+ * @param title Optional visible track label.
+ * @param variant Full-width or compact presentation.
+ */
 export function AudioPlayer({
   src,
   title,
@@ -40,6 +48,7 @@ export function AudioPlayer({
     audioRef.current?.load();
   }, [src]);
 
+  /** Toggles the underlying audio element between play and pause. */
   function toggle() {
     const audio = audioRef.current;
     if (!audio) return;

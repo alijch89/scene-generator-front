@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/** Variant and size class generator shared by button-like controls. */
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/30 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
@@ -31,6 +32,12 @@ const buttonVariants = cva(
   },
 );
 
+/**
+ * Polymorphic button primitive.
+ *
+ * When `asChild` is true, Radix `Slot` applies button styling and behavior to
+ * the single child element, commonly a Next.js link.
+ */
 function Button({
   className,
   variant,

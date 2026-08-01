@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 
+/** Submit button that disables duplicate submission and announces pending state. */
 export function SubmitButton({
   pending,
   children,

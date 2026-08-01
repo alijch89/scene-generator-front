@@ -9,6 +9,12 @@ import { ArrowRight, Expand } from "lucide-react";
 import Link from "next/link";
 import { use, useEffect, useRef, useState } from "react";
 
+/**
+ * Renders an ownership-protected, keyboard-accessible story reader.
+ *
+ * The route parameter is untrusted client input and is forwarded only to
+ * backend endpoints that validate UUID syntax and story ownership.
+ */
 export default function StoryReaderPage({
   params,
 }: {

@@ -9,8 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BookOpen, Clock3, Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
 
+/** Persian medium-date formatter reused across recent story cards. */
 const dateFormat = new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium" });
 
+/** Renders account greeting, placeholder credits, summary counts, and recent stories. */
 export default function DashboardPage() {
   const { user } = useAuth();
   const { data, isPending } = useQuery({

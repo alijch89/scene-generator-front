@@ -1,6 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
+/** Styled native input that preserves all standard HTML input semantics. */
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
     <input

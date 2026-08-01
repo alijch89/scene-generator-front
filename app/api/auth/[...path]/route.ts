@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+/** Authentication endpoint paths exposed through the web application origin. */
 const allowedPaths = new Set([
   "register",
   "login",
@@ -12,6 +13,18 @@ const allowedPaths = new Set([
   "me",
 ]);
 
+/**
+ * Forwards an allow-listed authentication request to the NestJS API.
+ *
+ * Security:
+ * The handler supplies the trusted application origin required by the backend
+ * CSRF guard, forwards only cookie/correlation/client-attribution headers, never
+ * returns a login session ID to browser JavaScript, and relays hardened
+ * `Set-Cookie` headers verbatim. Responses are never cached.
+ *
+ * @returns Sanitized upstream JSON, HTTP 404 for disallowed paths, or HTTP 503
+ * after the ten-second backend timeout.
+ */
 async function forward(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> },
@@ -71,5 +84,7 @@ async function forward(
   }
 }
 
+/** Handles proxied profile reads. */
 export const GET = forward;
+/** Handles proxied authentication mutations. */
 export const POST = forward;

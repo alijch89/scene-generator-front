@@ -10,6 +10,7 @@ import { BookOpen, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+/** Localized labels for the story status filter. */
 const statusLabels: Record<StoryStatus | "", string> = {
   "": "همه",
   Draft: "پیش‌نویس",
@@ -20,6 +21,7 @@ const statusLabels: Record<StoryStatus | "", string> = {
   Cancelled: "لغوشده",
   Expired: "منقضی",
 };
+/** Status subset exposed by the current library filter control. */
 const statuses: Array<StoryStatus | ""> = [
   "",
   "Queued",
@@ -27,8 +29,15 @@ const statuses: Array<StoryStatus | ""> = [
   "Completed",
   "Failed",
 ];
+/** Persian medium-date formatter for story cards. */
 const dateFormat = new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium" });
 
+/**
+ * Renders the authenticated user's searchable, filterable story library.
+ *
+ * Search, status, and pagination are encoded into the same-origin API query;
+ * the backend applies validated, parameterized filters and ownership checks.
+ */
 export default function StoryLibraryPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StoryStatus | "">("");

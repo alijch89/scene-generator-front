@@ -8,6 +8,12 @@ import { useRouter } from "next/navigation";
 import { ErrorMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
 
+/**
+ * Consumes an emailed one-time token to set a replacement password.
+ *
+ * The form disables submission when no token is present. The backend performs
+ * authoritative token, expiry, single-use, and password-strength validation.
+ */
 export function ResetPasswordForm({ token }: { token: string }) {
   const [error, setError] = useState<string | null>(
     token ? null : "این پیوند بازیابی ناقص است.",
@@ -15,6 +21,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   const [pending, setPending] = useState(false);
   const router = useRouter();
 
+  /** Verifies confirmation locally and submits token plus replacement password. */
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);

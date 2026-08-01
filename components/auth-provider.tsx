@@ -11,15 +11,27 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 
+/** Authentication state and actions exposed to client components. */
 interface AuthContextValue {
+  /** Current safe profile, or `null` when unauthenticated. */
   user: UserProfile | null;
+  /** Whether the initial profile request is pending. */
   loading: boolean;
+  /** Refetches the current profile after authentication changes. */
   reload: () => Promise<void>;
+  /** Revokes the current or all account sessions. */
   logout: (allDevices?: boolean) => Promise<void>;
 }
 
+/** Nullable context used to detect consumers outside the provider. */
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * Loads the current profile and exposes session actions application-wide.
+ *
+ * Logout clears cached identity and navigates to login even when the revocation
+ * request fails, preventing stale authenticated UI from remaining visible.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -57,6 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/**
+ * Reads the current authentication context.
+ *
+ * @throws Error When called outside `AuthProvider`.
+ */
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

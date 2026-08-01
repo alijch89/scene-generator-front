@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+/** Renders the public landing page and account entry calls to action. */
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[var(--bg)] px-6 py-8 sm:px-12">

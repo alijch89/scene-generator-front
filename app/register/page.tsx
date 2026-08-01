@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { RegisterForm } from "@/components/register-form";
 
+/** Renders the new-account registration page. */
 export default function RegisterPage() {
   return (
     <AuthShell

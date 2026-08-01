@@ -5,10 +5,13 @@ import { ChangePasswordForm } from "@/components/change-password-form";
 export default function ChangePasswordPage() {
   return (
     <AuthShell
-      eyebrow="Account security"
-      title="Change your password"
-      description="All active sessions, including this one, will be revoked when your password changes."
-      footer={<Link href="/profile">← Back to profile</Link>}
+      title="تغییر رمز عبور"
+      description="با تغییر رمز عبور، همهٔ نشست‌های فعال از جمله همین دستگاه لغو می‌شوند."
+      footer={
+        <Link href="/profile" className="font-bold text-[var(--primary)]">
+          ← بازگشت به حساب من
+        </Link>
+      }
     >
       <ChangePasswordForm />
     </AuthShell>

@@ -10,10 +10,13 @@ export default async function ResetPasswordPage({
   const { token = "" } = await searchParams;
   return (
     <AuthShell
-      eyebrow="Secure reset"
-      title="Choose a new password"
-      description="This one-time link expires quickly and becomes unusable after submission."
-      footer={<Link href="/login">← Return to sign in</Link>}
+      title="یک رمز عبور تازه انتخاب کنید"
+      description="این پیوند یک‌بارمصرف به‌زودی منقضی می‌شود و پس از استفاده دیگر کار نمی‌کند."
+      footer={
+        <Link href="/login" className="font-bold text-[var(--primary)]">
+          ← بازگشت به ورود
+        </Link>
+      }
     >
       <ResetPasswordForm token={token} />
     </AuthShell>

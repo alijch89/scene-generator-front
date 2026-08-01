@@ -1,8 +1,8 @@
 "use client";
 
-import { StoryStatusBadge } from "@/components/story-status";
+import { AudioPlayer } from "@/components/audio-player";
+import { ErrorMessage } from "@/components/error-message";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { apiFetch } from "@/lib/api-client";
 import {
   assetUrl,
@@ -11,14 +11,14 @@ import {
   type StoryPage,
   type StoryStatus,
 } from "@/lib/types";
+import { faDigits } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
+  ArrowRight,
   BookOpen,
-  Clock3,
   Download,
-  LoaderCircle,
   RefreshCw,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
@@ -82,13 +82,14 @@ export default function StoryDetailsPage({
   if (storyQuery.isPending || !story) {
     return (
       <div className="grid min-h-[70vh] place-items-center">
-        <LoaderCircle className="size-7 animate-spin text-[var(--sage)]" />
+        <span className="size-8 animate-spin rounded-full border-2 border-[var(--primary)] border-t-transparent" />
       </div>
     );
   }
   const pages = pagesQuery.data ?? [];
   const assets = assetsQuery.data ?? [];
   const status = statusQuery.data?.status ?? story.status;
+  const narration = assets.find((a) => a.assetType === "NarrationAudio");
 
   async function regenerate() {
     setActionError("");
@@ -102,12 +103,12 @@ export default function StoryDetailsPage({
         queryClient.invalidateQueries({ queryKey: ["story-status", id] }),
       ]);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : "Could not regenerate.");
+      setActionError(error instanceof Error ? error.message : "بازسازی ممکن نشد.");
     }
   }
 
   async function remove() {
-    if (!window.confirm("Delete this story and its assets? This cannot be undone.")) {
+    if (!window.confirm("این قصه و فایل‌هایش حذف شود؟ این کار قابل بازگشت نیست.")) {
       return;
     }
     await apiFetch(`/api/stories/${id}`, { method: "DELETE" });
@@ -115,145 +116,222 @@ export default function StoryDetailsPage({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-12 lg:py-10">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6 px-5 py-7 sm:px-8">
       <Link
         href="/stories"
-        className="inline-flex items-center gap-2 text-sm font-bold text-[var(--muted)] hover:text-[var(--ink)]"
+        className="flex w-fit items-center gap-2 text-sm font-bold text-[var(--ink-3)]"
       >
-        <ArrowLeft className="size-4" /> Story library
+        <ArrowRight className="size-4" /> کتابخانه
       </Link>
-      <section className="mt-6 grid gap-7 lg:grid-cols-[0.85fr_1.15fr]">
-        <div
-          className="grid min-h-[390px] place-items-center overflow-hidden rounded-2xl bg-[#e6ddcf] bg-cover bg-center shadow-sm"
-          style={
-            story.coverImageUrl
-              ? { backgroundImage: `url("${assetUrl(story.coverImageUrl)}")` }
-              : undefined
-          }
-        >
-          {!story.coverImageUrl && (
-            <BookOpen className="size-16 text-[#9b806e]" />
-          )}
-        </div>
-        <div className="flex flex-col justify-center">
-          <StoryStatusBadge status={status} className="self-start" />
-          <p className="eyebrow mt-6">{story.topic.replaceAll("-", " ")}</p>
-          <h1 className="font-[var(--font-serif)] text-4xl leading-tight sm:text-5xl">
-            {story.title}
-          </h1>
-          <p className="mt-4 text-[var(--muted)]">
-            A {story.durationMinutes}-minute {story.language.toUpperCase()} story
-            created for {story.childName}, age {story.childAge}.
+
+      {["Draft", "Queued", "Processing"].includes(status) && (
+        <GenerationProgress status={status} childName={story.childName} />
+      )}
+
+      {status === "Failed" && (
+        <div className="rounded-2xl bg-[var(--error-soft)] p-5 text-sm text-[var(--error)]">
+          <strong>ساخت قصه متوقف شد.</strong>
+          <p className="m-0 mt-1">
+            {statusQuery.data?.job?.errorMessage ??
+              "سرویس ساخت قصه نتوانست این تلاش را کامل کند."}
           </p>
-          {["Draft", "Queued", "Processing"].includes(status) && (
-            <GenerationProgress status={status} />
-          )}
-          {status === "Failed" && (
-            <div className="mt-6 rounded-xl bg-red-50 p-4 text-sm text-red-900">
-              <strong>Generation paused.</strong>
-              <p className="mt-1">
-                {statusQuery.data?.job?.errorMessage ??
-                  "The generation service could not finish this attempt."}
-              </p>
+        </div>
+      )}
+
+      {["Completed", "Failed", "Cancelled", "Expired"].includes(status) && (
+        <section className="flex flex-col gap-5">
+          <div
+            className="grid aspect-[3/4] w-full max-w-[280px] place-self-center place-items-center overflow-hidden rounded-3xl bg-[var(--surface-2)] shadow-[var(--shadow-4)]"
+            style={
+              story.coverImageUrl
+                ? {
+                    backgroundImage: `url("${assetUrl(story.coverImageUrl)}")`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }
+                : undefined
+            }
+          >
+            {!story.coverImageUrl && (
+              <BookOpen className="size-14 text-[var(--ink-3)]" />
+            )}
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="m-0 text-2xl font-extrabold">{story.title}</h1>
+            <div className="flex flex-wrap justify-center gap-2">
+              <Pill>{faDigits(story.childAge)} ساله</Pill>
+              <Pill>{faDigits(pages.length)} صفحه</Pill>
+              <Pill>{story.language.toUpperCase()}</Pill>
             </div>
+          </div>
+
+          {narration && status === "Completed" && (
+            <AudioPlayer
+              src={assetUrl(narration.publicUrl)!}
+              title="روایت کامل"
+              variant="compact"
+            />
           )}
+
           {actionError && (
-            <p className="mt-4 text-sm text-red-800">{actionError}</p>
+            <ErrorMessage message={actionError} />
           )}
-          <div className="mt-7 flex flex-wrap gap-3">
+
+          <div className="flex flex-wrap justify-center gap-3">
             {status === "Completed" && pages.length > 0 && (
               <Button asChild size="lg">
                 <Link href={`/stories/${id}/read`}>
-                  <BookOpen /> Read story
+                  <BookOpen /> شروع خواندن
                 </Link>
               </Button>
             )}
-            {["Completed", "Failed", "Cancelled", "Expired"].includes(status) && (
-              <Button variant="outline" onClick={() => void regenerate()}>
-                <RefreshCw /> Regenerate
-              </Button>
-            )}
+            <Button variant="outline" onClick={() => void regenerate()}>
+              <RefreshCw /> بازسازی
+            </Button>
             <Button variant="ghost" onClick={() => void remove()}>
-              <Trash2 /> Delete
+              <Trash2 /> حذف
             </Button>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      <section className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card className="gap-5 p-6 shadow-none">
+      <section className="grid gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
           <div className="flex items-center justify-between">
-            <h2 className="font-[var(--font-serif)] text-2xl">Story pages</h2>
-            <span className="text-sm text-[var(--muted)]">{pages.length} pages</span>
+            <h2 className="m-0 text-lg font-bold">صفحه‌های قصه</h2>
+            <span className="text-sm text-[var(--ink-3)]">
+              {faDigits(pages.length)} صفحه
+            </span>
           </div>
           {pages.length ? (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {pages.slice(0, 6).map((page) => (
                 <Link
                   key={page.id}
                   href={`/stories/${id}/read?page=${page.pageNumber}`}
-                  className="rounded-lg border border-[var(--line)] bg-white p-4 hover:border-[var(--sage)]"
+                  className="rounded-xl border border-[var(--border)] p-3 hover:border-[var(--primary)]"
                 >
-                  <span className="text-xs font-bold text-[var(--clay)]">
-                    PAGE {page.pageNumber}
+                  <span className="text-xs font-bold text-[var(--accent)]">
+                    صفحهٔ {faDigits(page.pageNumber)}
                   </span>
-                  <h3 className="mt-1 truncate font-[var(--font-serif)] text-lg">
-                    {page.pageTitle || `Chapter ${page.pageNumber}`}
+                  <h3 className="m-0 mt-1 truncate text-sm font-semibold">
+                    {page.pageTitle || `فصل ${faDigits(page.pageNumber)}`}
                   </h3>
                 </Link>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-[var(--muted)]">
-              Pages will appear as soon as generation finishes.
+            <p className="m-0 text-sm text-[var(--ink-3)]">
+              صفحه‌ها به‌محض اتمام ساخت نمایش داده می‌شوند.
             </p>
           )}
-        </Card>
-        <Card className="gap-4 p-6 shadow-none">
-          <h2 className="font-[var(--font-serif)] text-2xl">Downloads</h2>
+        </div>
+        <div className="flex flex-col gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5">
+          <h2 className="m-0 text-lg font-bold">دانلودها</h2>
           {assets.length ? (
-            <div className="grid gap-2">
+            <div className="flex flex-col gap-2">
               {assets.map((asset) => (
                 <a
                   key={asset.id}
                   href={assetUrl(asset.publicUrl)}
                   download
-                  className="flex items-center justify-between rounded-lg border border-[var(--line)] bg-white p-3 text-sm font-semibold hover:border-[var(--sage)]"
+                  className="flex items-center justify-between rounded-xl border border-[var(--border)] p-3 text-sm font-semibold hover:border-[var(--primary)]"
                 >
-                  <span>{asset.assetType.replace(/([A-Z])/g, " $1").trim()}</span>
-                  <Download className="size-4 text-[var(--sage)]" />
+                  <span>{assetTypeLabel(asset.assetType)}</span>
+                  <Download className="size-4 text-[var(--primary)]" />
                 </a>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-[var(--muted)]">No assets are ready yet.</p>
+            <p className="m-0 text-sm text-[var(--ink-3)]">
+              هنوز فایلی برای دانلود آماده نیست.
+            </p>
           )}
-        </Card>
+        </div>
       </section>
     </div>
   );
 }
 
-function GenerationProgress({ status }: { status: StoryStatus }) {
-  const active = status === "Draft" ? 0 : status === "Queued" ? 1 : 2;
-  const labels = ["Draft saved", "Waiting in queue", "Creating pages"];
+const assetLabels: Record<string, string> = {
+  ChildPhoto: "عکس کودک",
+  CoverImage: "تصویر جلد",
+  PageImage: "تصویر صفحه",
+  NarrationAudio: "فایل صوتی روایت",
+  FinalVideo: "ویدئوی نهایی",
+};
+function assetTypeLabel(type: string) {
+  return assetLabels[type] ?? type;
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-7 rounded-xl border border-[var(--line)] bg-white/60 p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm font-bold">
-        <Clock3 className="size-4 text-[var(--clay)]" />
-        We&apos;re building the story in the background
+    <span className="rounded-full border border-[var(--border)] px-3 py-1.5 text-xs text-[var(--ink-2)]">
+      {children}
+    </span>
+  );
+}
+
+const STAGE_DEGREES: Record<string, number> = {
+  Draft: 25,
+  Queued: 50,
+  Processing: 85,
+};
+
+function GenerationProgress({
+  status,
+  childName,
+}: {
+  status: StoryStatus;
+  childName: string;
+}) {
+  const active = status === "Draft" ? 0 : status === "Queued" ? 1 : 2;
+  const steps = ["نوشتن قصه", "در صف ساخت", "تصویرسازی و روایت صوتی"];
+  const degree = STAGE_DEGREES[status] ?? 25;
+  return (
+    <div className="flex flex-col items-center gap-6 py-6 text-center">
+      <div
+        className="grid size-[132px] place-items-center rounded-full"
+        style={{
+          background: `conic-gradient(var(--primary) 0 ${degree * 3.6}deg, var(--surface-3) ${degree * 3.6}deg 360deg)`,
+        }}
+      >
+        <div className="grid size-[108px] place-items-center rounded-full bg-[var(--bg)] text-2xl font-extrabold">
+          {faDigits(degree)}٪
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        {labels.map((label, index) => (
-          <div key={label}>
-            <div
-              className={`h-1.5 rounded-full ${
-                index <= active ? "bg-[var(--sage)]" : "bg-black/10"
+      <div className="flex flex-col gap-1.5">
+        <h1 className="m-0 text-2xl font-extrabold">
+          در حال ساخت قصهٔ {childName}
+        </h1>
+        <p className="m-0 text-[15px] leading-loose text-[var(--ink-2)]">
+          می‌توانید برنامه را ببندید؛ وقتی آماده شد خبرتان می‌کنیم.
+        </p>
+      </div>
+      <div className="flex w-full flex-col gap-3.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 text-start">
+        {steps.map((label, index) => (
+          <div key={label} className="flex items-center gap-3">
+            <span
+              className={`grid size-[22px] shrink-0 place-items-center rounded-full text-[11px] ${
+                index < active
+                  ? "bg-[var(--success)] text-white"
+                  : index === active
+                    ? "border-2 border-[var(--primary)]"
+                    : "border-2 border-dashed border-[var(--border-strong)]"
               }`}
-            />
-            <span className="mt-2 block text-[11px] text-[var(--muted)]">
+            >
+              {index < active ? "✓" : ""}
+            </span>
+            <span
+              className={`text-sm ${
+                index <= active ? "text-[var(--ink)]" : "text-[var(--ink-3)]"
+              }`}
+            >
               {label}
             </span>
+            {index === active && (
+              <Sparkles className="ms-auto size-4 animate-pulse text-[var(--accent)]" />
+            )}
           </div>
         ))}
       </div>

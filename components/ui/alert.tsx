@@ -7,9 +7,11 @@ const alertVariants = cva(
   {
     variants: {
       variant: {
-        default: "border-[var(--line)] bg-white/60 text-[var(--ink)]",
-        destructive: "border-[#edc9be] bg-[#f8e7e2] text-[var(--error)]",
-        success: "border-[#c8ddce] bg-[#e4efe7] text-[var(--success)]",
+        default: "border-[var(--border)] bg-[var(--surface)] text-[var(--ink)]",
+        destructive:
+          "border-[var(--error)]/30 bg-[var(--error-soft)] text-[var(--error)]",
+        success:
+          "border-[var(--success)]/30 bg-[var(--success-soft)] text-[var(--success)]",
       },
     },
     defaultVariants: { variant: "default" },

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { LoginForm } from "@/components/login-form";
+import { SuccessMessage } from "@/components/error-message";
 
 export default async function LoginPage({
   searchParams,
@@ -9,24 +10,26 @@ export default async function LoginPage({
 }) {
   const query = await searchParams;
   const notice = query.registered
-    ? "Account created. You can sign in now."
+    ? "حساب شما ساخته شد. حالا می‌توانید وارد شوید."
     : query.reset
-      ? "Password reset. Sign in with your new password."
+      ? "رمز عبور تغییر کرد. با رمز تازه وارد شوید."
       : query.changed
-        ? "Password changed. Sign in again on this device."
+        ? "رمز عبور تغییر کرد. دوباره وارد شوید."
         : null;
   return (
     <AuthShell
-      eyebrow="Welcome back"
-      title="Sign in to your studio"
-      description="Continue shaping the scenes and stories waiting for you."
+      title="خوش برگشتید"
+      description="قصه‌های در انتظار شما همین‌جا ادامه پیدا می‌کنند."
       footer={
-        <p>
-          New to Scene Studio? <Link href="/register">Create an account</Link>
-        </p>
+        <>
+          حساب ندارید؟{" "}
+          <Link href="/register" className="font-bold text-[var(--primary)]">
+            ثبت‌نام
+          </Link>
+        </>
       }
     >
-      {notice && <p className="form-message success-message">{notice}</p>}
+      <SuccessMessage message={notice} />
       <LoginForm nextPath={query.next} />
     </AuthShell>
   );

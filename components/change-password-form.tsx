@@ -18,7 +18,7 @@ export function ChangePasswordForm() {
     const form = new FormData(event.currentTarget);
     const newPassword = String(form.get("newPassword"));
     if (newPassword !== form.get("confirmPassword")) {
-      setError("New passwords do not match.");
+      setError("رمز عبور تازه و تکرار آن یکسان نیستند.");
       return;
     }
     setPending(true);
@@ -34,29 +34,31 @@ export function ChangePasswordForm() {
       router.replace("/login?changed=1");
       router.refresh();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Change failed.");
+      setError(caught instanceof Error ? caught.message : "تغییر رمز ناموفق بود.");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <form className="auth-form" onSubmit={submit}>
+    <form className="grid gap-4.5" onSubmit={submit}>
       <Label className="grid gap-2">
-        Current password
+        رمز عبور فعلی
         <Input
           name="currentPassword"
           type="password"
+          dir="ltr"
           autoComplete="current-password"
           required
           maxLength={128}
         />
       </Label>
       <Label className="grid gap-2">
-        New password
+        رمز عبور تازه
         <Input
           name="newPassword"
           type="password"
+          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
@@ -64,10 +66,11 @@ export function ChangePasswordForm() {
         />
       </Label>
       <Label className="grid gap-2">
-        Confirm new password
+        تکرار رمز عبور تازه
         <Input
           name="confirmPassword"
           type="password"
+          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
@@ -75,7 +78,7 @@ export function ChangePasswordForm() {
         />
       </Label>
       <ErrorMessage message={error} />
-      <SubmitButton pending={pending}>Change password</SubmitButton>
+      <SubmitButton pending={pending}>تغییر رمز عبور</SubmitButton>
     </form>
   );
 }

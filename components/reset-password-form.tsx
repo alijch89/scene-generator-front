@@ -10,7 +10,7 @@ import { SubmitButton } from "./submit-button";
 
 export function ResetPasswordForm({ token }: { token: string }) {
   const [error, setError] = useState<string | null>(
-    token ? null : "This reset link is incomplete.",
+    token ? null : "این پیوند بازیابی ناقص است.",
   );
   const [pending, setPending] = useState(false);
   const router = useRouter();
@@ -20,7 +20,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
     const form = new FormData(event.currentTarget);
     const password = String(form.get("newPassword"));
     if (password !== form.get("confirmPassword")) {
-      setError("Passwords do not match.");
+      setError("رمز عبور و تکرار آن یکسان نیستند.");
       return;
     }
     setPending(true);
@@ -32,19 +32,20 @@ export function ResetPasswordForm({ token }: { token: string }) {
       });
       router.replace("/login?reset=1");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Reset failed.");
+      setError(caught instanceof Error ? caught.message : "بازیابی ناموفق بود.");
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <form className="auth-form" onSubmit={submit}>
+    <form className="grid gap-4.5" onSubmit={submit}>
       <Label className="grid gap-2">
-        New password
+        رمز عبور تازه
         <Input
           name="newPassword"
           type="password"
+          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
@@ -52,21 +53,22 @@ export function ResetPasswordForm({ token }: { token: string }) {
         />
       </Label>
       <Label className="grid gap-2">
-        Confirm new password
+        تکرار رمز عبور تازه
         <Input
           name="confirmPassword"
           type="password"
+          dir="ltr"
           autoComplete="new-password"
           required
           minLength={12}
           maxLength={128}
         />
       </Label>
-      <p className="field-hint">
-        Use upper and lowercase letters, a number, and a symbol.
+      <p className="text-xs leading-relaxed text-[var(--ink-3)]">
+        از حروف بزرگ و کوچک، یک عدد و یک نماد استفاده کنید.
       </p>
       <ErrorMessage message={error} />
-      <SubmitButton pending={pending || !token}>Set new password</SubmitButton>
+      <SubmitButton pending={pending || !token}>ثبت رمز تازه</SubmitButton>
     </form>
   );
 }

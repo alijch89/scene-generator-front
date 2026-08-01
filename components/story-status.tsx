@@ -2,13 +2,23 @@ import { cn } from "@/lib/utils";
 import type { StoryStatus } from "@/lib/types";
 
 const styles: Record<StoryStatus, string> = {
-  Draft: "bg-stone-200 text-stone-700",
-  Queued: "bg-amber-100 text-amber-800",
-  Processing: "bg-blue-100 text-blue-800",
-  Completed: "bg-emerald-100 text-emerald-800",
-  Failed: "bg-red-100 text-red-800",
-  Cancelled: "bg-stone-200 text-stone-700",
-  Expired: "bg-orange-100 text-orange-800",
+  Draft: "bg-[var(--surface-3)] text-[var(--ink-2)]",
+  Queued: "bg-[var(--warning-soft)] text-[var(--warning)]",
+  Processing: "bg-[var(--primary-soft)] text-[var(--primary)]",
+  Completed: "bg-[var(--success-soft)] text-[var(--success)]",
+  Failed: "bg-[var(--error-soft)] text-[var(--error)]",
+  Cancelled: "bg-[var(--surface-3)] text-[var(--ink-2)]",
+  Expired: "bg-[var(--accent-soft)] text-[var(--accent-ink)]",
+};
+
+const labels: Record<StoryStatus, string> = {
+  Draft: "پیش‌نویس",
+  Queued: "در صف",
+  Processing: "در حال ساخت",
+  Completed: "آماده",
+  Failed: "ناموفق",
+  Cancelled: "لغوشده",
+  Expired: "منقضی",
 };
 
 export function StoryStatusBadge({
@@ -29,7 +39,7 @@ export function StoryStatusBadge({
       {(status === "Queued" || status === "Processing") && (
         <span className="size-1.5 animate-pulse rounded-full bg-current" />
       )}
-      {status}
+      {labels[status]}
     </span>
   );
 }

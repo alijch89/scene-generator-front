@@ -4,9 +4,9 @@ const allowedResources = new Set(["stories", "jobs", "storage", "admin"]);
 
 async function forward(
   request: NextRequest,
-  context: { params: Promise<{ resource: string; path: string[] }> },
+  context: { params: Promise<{ resource: string; path?: string[] }> },
 ) {
-  const { resource, path } = await context.params;
+  const { resource, path = [] } = await context.params;
   if (!allowedResources.has(resource)) {
     return Response.json({ message: "Not found" }, { status: 404 });
   }
@@ -28,8 +28,9 @@ async function forward(
   }
   const hasBody = !["GET", "HEAD"].includes(request.method);
   try {
+    const suffix = path.length ? `/${path.join("/")}` : "";
     const upstream = await fetch(
-      `${backend}/api/v1/${resource}/${path.join("/")}${query}`,
+      `${backend}/api/v1/${resource}${suffix}${query}`,
       {
         method: request.method,
         headers,

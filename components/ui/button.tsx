@@ -4,18 +4,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-[var(--sage)]/30 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]/30 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--sage)] text-white shadow-sm hover:bg-[var(--sage-dark)]",
+          "bg-[var(--primary)] text-[var(--primary-ink)] shadow-sm hover:bg-[var(--primary-hover)]",
         destructive:
-          "bg-[#f4e5df] text-[var(--error)] hover:bg-[#ecd4cc]",
+          "bg-[var(--error-soft)] text-[var(--error)] hover:brightness-95",
         outline:
-          "border border-[var(--line)] bg-transparent hover:bg-white/60",
-        ghost: "hover:bg-black/5",
-        link: "text-[var(--clay)] underline-offset-4 hover:underline",
+          "border border-[var(--border)] bg-transparent hover:bg-[var(--surface-2)]",
+        ghost: "hover:bg-[var(--surface-2)]",
+        link: "text-[var(--accent)] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

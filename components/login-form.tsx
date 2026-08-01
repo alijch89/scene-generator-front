@@ -43,13 +43,14 @@ export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
   }
 
   return (
-    <form className="auth-form" onSubmit={submit}>
+    <form className="grid gap-4.5" onSubmit={submit}>
       <Label className="grid gap-2">
-        Mobile number
+        شمارهٔ موبایل
         <Input
           name="phoneNumber"
           type="tel"
           inputMode="tel"
+          dir="ltr"
           autoComplete="tel"
           placeholder="+98 912 123 4567"
           required
@@ -57,20 +58,23 @@ export function LoginForm({ nextPath = "/profile" }: { nextPath?: string }) {
         />
       </Label>
       <Label className="grid gap-2">
-        <span className="label-row">
-          Password
-          <a href="/forgot-password">Forgot password?</a>
+        <span className="flex justify-between">
+          رمز عبور
+          <a href="/forgot-password" className="text-[var(--primary)]">
+            فراموش کردم
+          </a>
         </span>
         <Input
           name="password"
           type="password"
+          dir="ltr"
           autoComplete="current-password"
           required
           maxLength={128}
         />
       </Label>
       <ErrorMessage message={error} />
-      <SubmitButton pending={pending}>Sign in</SubmitButton>
+      <SubmitButton pending={pending}>ورود</SubmitButton>
     </form>
   );
 }

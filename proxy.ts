@@ -7,7 +7,13 @@ const protectedRoutes = [
   "/stories",
   "/billing",
 ];
-const guestRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
+const guestRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/welcome",
+];
 
 export function proxy(request: NextRequest) {
   const cookieName = process.env.SESSION_COOKIE_NAME ?? "sid";
@@ -35,5 +41,6 @@ export const config = {
     "/register",
     "/forgot-password",
     "/reset-password",
+    "/welcome",
   ],
 };

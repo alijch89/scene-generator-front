@@ -4,11 +4,22 @@ import { StoryStatusBadge } from "@/components/story-status";
 import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api-client";
 import { assetUrl, type StoryList, type StoryStatus } from "@/lib/types";
+import { faDigits } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+const statusLabels: Record<StoryStatus | "", string> = {
+  "": "همه",
+  Draft: "پیش‌نویس",
+  Queued: "در صف",
+  Processing: "در حال ساخت",
+  Completed: "آماده",
+  Failed: "ناموفق",
+  Cancelled: "لغوشده",
+  Expired: "منقضی",
+};
 const statuses: Array<StoryStatus | ""> = [
   "",
   "Queued",
@@ -16,6 +27,7 @@ const statuses: Array<StoryStatus | ""> = [
   "Completed",
   "Failed",
 ];
+const dateFormat = new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium" });
 
 export default function StoryLibraryPage() {
   const [search, setSearch] = useState("");
@@ -33,128 +45,143 @@ export default function StoryLibraryPage() {
     queryKey: ["stories", "library", search, status, page],
     queryFn: () => apiFetch<StoryList>(`/api/stories?${query}`),
   });
+  const childNames = useMemo(
+    () => [...new Set((data?.items ?? []).map((s) => s.childName))],
+    [data],
+  );
+
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-12 lg:py-11">
-      <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+    <div className="mx-auto flex max-w-3xl flex-col gap-5 px-5 py-8 sm:px-8">
+      <header className="flex items-center justify-between gap-4">
         <div>
-          <p className="eyebrow">All your adventures</p>
-          <h1 className="font-[var(--font-serif)] text-4xl">Story library</h1>
-          <p className="mt-2 text-[var(--muted)]">
-            {data?.pagination.total ?? 0} stories made with care.
+          <h1 className="m-0 text-2xl font-extrabold">کتابخانه</h1>
+          <p className="m-0 mt-1 text-sm text-[var(--ink-3)]">
+            {faDigits(data?.pagination.total ?? 0)} قصه با عشق ساخته شده
           </p>
         </div>
-        <Button asChild>
+        <Button asChild size="sm">
           <Link href="/stories/new">
-            <Plus /> New story
+            <Plus /> قصهٔ تازه
           </Link>
         </Button>
       </header>
 
-      <div className="mt-8 flex flex-col gap-3 rounded-xl border border-[var(--line)] bg-[var(--card)] p-3 sm:flex-row">
-        <label className="flex flex-1 items-center gap-2 rounded-lg border border-[var(--line)] bg-white px-3">
-          <Search className="size-4 text-[var(--muted)]" />
-          <input
-            className="h-11 w-full bg-transparent text-sm outline-none"
-            placeholder="Search title or child's name"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-              setPage(1);
-            }}
-          />
-        </label>
-        <select
-          className="h-11 rounded-lg border border-[var(--line)] bg-white px-3 text-sm"
-          value={status}
+      <label className="flex items-center gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-3.5 py-3 text-[15px] text-[var(--ink-3)]">
+        <Search className="size-4" />
+        <input
+          className="h-6 w-full bg-transparent text-[var(--ink)] outline-none"
+          placeholder="جست‌وجو در قصه‌ها"
+          value={search}
           onChange={(event) => {
-            setStatus(event.target.value as StoryStatus | "");
+            setSearch(event.target.value);
             setPage(1);
           }}
-        >
-          {statuses.map((value) => (
-            <option key={value} value={value}>
-              {value || "Every status"}
-            </option>
+        />
+      </label>
+
+      {childNames.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {["", ...childNames].map((name) => (
+            <button
+              key={name || "all"}
+              onClick={() => {
+                setSearch(name);
+                setPage(1);
+              }}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold ${
+                search === name
+                  ? "bg-[var(--surface)] shadow-[var(--shadow-1)]"
+                  : "text-[var(--ink-3)]"
+              }`}
+            >
+              {name || "همه"}
+            </button>
           ))}
-        </select>
-      </div>
+        </div>
+      )}
+
+      <select
+        className="h-11 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+        value={status}
+        onChange={(event) => {
+          setStatus(event.target.value as StoryStatus | "");
+          setPage(1);
+        }}
+      >
+        {statuses.map((value) => (
+          <option key={value} value={value}>
+            {statusLabels[value]}
+          </option>
+        ))}
+      </select>
 
       {isPending ? (
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div key={item} className="h-72 animate-pulse rounded-xl bg-black/5" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="h-60 animate-pulse rounded-2xl bg-black/5" />
           ))}
         </div>
       ) : data?.items.length ? (
         <>
-          <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {data.items.map((story) => (
               <Link
                 key={story.id}
                 href={`/stories/${story.id}`}
-                className="group overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--card)] transition hover:-translate-y-1 hover:shadow-lg"
+                className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)]"
               >
                 <div
-                  className="grid h-44 place-items-center bg-[#e9e1d3] bg-cover bg-center"
+                  className="grid aspect-[3/4] place-items-center bg-[var(--surface-2)] bg-cover bg-center"
                   style={
                     story.coverImageUrl
-                      ? {
-                          backgroundImage: `url("${assetUrl(story.coverImageUrl)}")`,
-                        }
+                      ? { backgroundImage: `url("${assetUrl(story.coverImageUrl)}")` }
                       : undefined
                   }
                 >
                   {!story.coverImageUrl && (
-                    <BookOpen className="size-9 text-[#9b806e]" />
+                    <BookOpen className="size-9 text-[var(--ink-3)]" />
                   )}
                 </div>
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <h2 className="line-clamp-2 font-[var(--font-serif)] text-xl">
+                <div className="flex flex-col gap-2 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h2 className="m-0 line-clamp-2 text-[15px] font-semibold">
                       {story.title}
                     </h2>
                     <StoryStatusBadge status={story.status} />
                   </div>
-                  <p className="mt-3 text-sm text-[var(--muted)]">
-                    {story.childName} · {story.topic.replaceAll("-", " ")}
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
-                    {new Intl.DateTimeFormat(undefined, {
-                      dateStyle: "medium",
-                    }).format(new Date(story.createdAt))}
+                  <p className="m-0 text-xs text-[var(--ink-3)]">
+                    {story.childName} · {dateFormat.format(new Date(story.createdAt))}
                   </p>
                 </div>
               </Link>
             ))}
           </div>
-          <div className="mt-8 flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3">
             <Button
               variant="outline"
               disabled={page === 1}
               onClick={() => setPage((value) => value - 1)}
             >
-              Previous
+              قبلی
             </Button>
-            <span className="text-sm text-[var(--muted)]">
-              {page} / {data.pagination.totalPages}
+            <span className="text-sm text-[var(--ink-3)]">
+              {faDigits(page)} / {faDigits(data.pagination.totalPages)}
             </span>
             <Button
               variant="outline"
               disabled={page >= data.pagination.totalPages}
               onClick={() => setPage((value) => value + 1)}
             >
-              Next
+              بعدی
             </Button>
           </div>
         </>
       ) : (
-        <div className="mt-14 text-center">
-          <BookOpen className="mx-auto size-9 text-[var(--clay)]" />
-          <h2 className="mt-4 font-[var(--font-serif)] text-2xl">
-            No stories found
-          </h2>
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            Try a different search or create something new.
+        <div className="mt-6 flex flex-col items-center gap-3 text-center">
+          <BookOpen className="size-9 text-[var(--accent)]" />
+          <h2 className="m-0 text-xl font-bold">قصه‌ای پیدا نشد</h2>
+          <p className="m-0 text-sm text-[var(--ink-3)]">
+            جست‌وجوی دیگری امتحان کنید یا قصهٔ تازه بسازید.
           </p>
         </div>
       )}

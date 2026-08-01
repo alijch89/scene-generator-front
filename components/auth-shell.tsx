@@ -1,49 +1,40 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
 
 export function AuthShell({
-  eyebrow,
   title,
   description,
   children,
   footer,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
   return (
-    <main className="auth-page">
-      <section className="brand-panel">
-        <Link href="/" className="brand">
-          <span className="brand-mark">S</span>
-          <span>Scene Studio</span>
+    <main className="grid min-h-screen place-items-center bg-[var(--bg)] px-5 py-8">
+      <div className="flex w-full max-w-[440px] flex-col gap-5">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="grid size-8.5 place-items-center rounded-xl bg-[var(--primary)] text-[var(--primary-ink)]">
+            ✦
+          </span>
+          <span className="text-sm font-bold">سازندهٔ صحنه</span>
         </Link>
-        <div className="brand-copy">
-          <p className="eyebrow">Create without friction</p>
-          <h2>Stories begin with a safe place to imagine.</h2>
-          <p>
-            Your workspace, projects, and creative identity stay protected
-            behind backend-owned sessions.
+        <div className="flex flex-col gap-2">
+          <h1 className="m-0 text-[27px] font-extrabold leading-snug">
+            {title}
+          </h1>
+          <p className="m-0 text-[15px] leading-loose text-[var(--ink-2)]">
+            {description}
           </p>
         </div>
-        <p className="security-note">
-          <span aria-hidden>◆</span> Credentials never enter browser storage
-        </p>
-      </section>
-      <section className="form-panel">
-        <Card className="form-card border-0 bg-transparent py-0 shadow-none">
-          <CardContent className="px-0">
-            <p className="eyebrow">{eyebrow}</p>
-            <h1>{title}</h1>
-            <p className="lede">{description}</p>
-            {children}
-            {footer && <div className="form-footer">{footer}</div>}
-          </CardContent>
-        </Card>
-      </section>
+        {children}
+        {footer && (
+          <p className="m-0 text-center text-sm text-[var(--ink-2)]">
+            {footer}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

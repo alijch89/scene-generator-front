@@ -5,10 +5,13 @@ import { ForgotPasswordForm } from "@/components/forgot-password-form";
 export default function ForgotPasswordPage() {
   return (
     <AuthShell
-      eyebrow="Account recovery"
-      title="Find your way back"
-      description="Enter your mobile number. If a recovery email is attached, we’ll send a short-lived reset link."
-      footer={<Link href="/login">← Return to sign in</Link>}
+      title="بازیابی حساب"
+      description="شمارهٔ موبایل خود را وارد کنید. اگر ایمیل بازیابی ثبت شده باشد، پیوندی کوتاه‌مدت برایتان می‌فرستیم."
+      footer={
+        <Link href="/login" className="font-bold text-[var(--primary)]">
+          ← بازگشت به ورود
+        </Link>
+      }
     >
       <ForgotPasswordForm />
     </AuthShell>

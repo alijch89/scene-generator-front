@@ -35,12 +35,13 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form className="auth-form" onSubmit={submit}>
+    <form className="grid gap-4.5" onSubmit={submit}>
       <Label className="grid gap-2">
-        Mobile number
+        شمارهٔ موبایل
         <Input
           name="phoneNumber"
           type="tel"
+          dir="ltr"
           autoComplete="tel"
           placeholder="+98 912 123 4567"
           required
@@ -49,7 +50,7 @@ export function ForgotPasswordForm() {
       </Label>
       <ErrorMessage message={error} />
       <SuccessMessage message={success} />
-      <SubmitButton pending={pending}>Send reset instructions</SubmitButton>
+      <SubmitButton pending={pending}>ارسال راهنمای بازیابی</SubmitButton>
     </form>
   );
 }

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { cn } from "@/lib/utils";
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ErrorMessage } from "./error-message";
 import { SubmitButton } from "./submit-button";
@@ -155,8 +156,23 @@ export function RegisterForm() {
           onChange={(e) => setAgreed(e.target.checked)}
           className="mt-1 size-4 accent-[var(--primary)]"
         />
-        با <a href="#">قوانین</a> و{" "}
-        <a href="#">سیاست حریم خصوصی کودکان</a> موافقم.
+        <span>
+          با{" "}
+          <Link
+            href="/terms"
+            className="font-bold text-[var(--primary)] underline decoration-[var(--primary-border)] underline-offset-4 hover:text-[var(--primary-hover)]"
+          >
+            قوانین
+          </Link>{" "}
+          و{" "}
+          <Link
+            href="/children-privacy-policy"
+            className="font-bold text-[var(--primary)] underline decoration-[var(--primary-border)] underline-offset-4 hover:text-[var(--primary-hover)]"
+          >
+            سیاست حریم خصوصی کودکان
+          </Link>{" "}
+          موافقم.
+        </span>
       </label>
       <ErrorMessage message={error} />
       <SubmitButton pending={pending}>ساخت حساب</SubmitButton>

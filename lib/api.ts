@@ -1,0 +1,64 @@
+export const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
+
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+    readonly body?: unknown,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+type RequestOptions = Omit<RequestInit, 'body'> & {
+  body?: unknown;
+  /** Server components pass the incoming Cookie header through here. */
+  cookie?: string;
+};
+
+export async function request<T>(
+  path: string,
+  { body, cookie, headers, ...init }: RequestOptions = {},
+): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    ...init,
+    // The session cookie has to survive the :3000 → :3001 hop.
+    credentials: 'include',
+    cache: init.cache ?? 'no-store',
+    headers: {
+      ...(body === undefined ? {} : { 'content-type': 'application/json' }),
+      ...(cookie ? { cookie } : {}),
+      ...headers,
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+
+  if (res.status === 204) return undefined as T;
+
+  const payload = await res.json().catch(() => undefined);
+
+  if (!res.ok) {
+    const message =
+      (payload as { message?: string | string[] })?.message ?? res.statusText;
+    throw new ApiError(
+      res.status,
+      Array.isArray(message) ? message.join('، ') : message,
+      payload,
+    );
+  }
+
+  return payload as T;
+}
+
+export const api = {
+  get: <T>(path: string, opts?: RequestOptions) =>
+    request<T>(path, { ...opts, method: 'GET' }),
+  post: <T>(path: string, body?: unknown, opts?: RequestOptions) =>
+    request<T>(path, { ...opts, method: 'POST', body }),
+  patch: <T>(path: string, body?: unknown, opts?: RequestOptions) =>
+    request<T>(path, { ...opts, method: 'PATCH', body }),
+  delete: <T>(path: string, opts?: RequestOptions) =>
+    request<T>(path, { ...opts, method: 'DELETE' }),
+};

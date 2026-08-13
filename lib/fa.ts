@@ -17,8 +17,8 @@ export const faNum = (n: number) => numberFmt.format(n);
 export const faDigits = (v: number | string) =>
   String(v).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
 
-/** 490000 → "۴۹۰٬۰۰۰ تومان". Amounts are stored in ریال. */
-export const faPrice = (rial: number) => `${faNum(rial)} تومان`;
+/** The API stores ریال; the country prices in تومان. 490000 → "۴۹٬۰۰۰ تومان" */
+export const faPrice = (rial: number) => `${faNum(Math.round(rial / 10))} تومان`;
 
 /** Jalali. Date → "۲۲ مرداد ۱۴۰۵" */
 export const faDate = (d: Date | string) =>
@@ -43,6 +43,7 @@ if (process.env.NODE_ENV !== 'production') {
   // ones the design specifies rather than trusting the ICU build.
   console.assert(faNum(190000) === '۱۹۰٬۰۰۰', 'faNum grouping separator');
   console.assert(faDigits(2026) === '۲۰۲۶', 'faDigits');
+  console.assert(faPrice(490_000) === '۴۹٬۰۰۰ تومان', 'faPrice ریال→تومان');
   console.assert(faDuration(360) === '۶:۰۰', 'faDuration');
   console.assert(faPercent(62) === '۶۲٪', 'faPercent');
 }

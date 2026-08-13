@@ -1,26 +1,383 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* The theme toggle stamps data-theme on <html>, not a .dark class. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------
+   1. Design tokens, verbatim from the Claude Design files.
+   Namespaced --sh-* because the design's --muted and --accent mean different
+   things than shadcn's same-named variables (text colour vs. surface).
+   --------------------------------------------------------------------------- */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* parent-facing — light */
+  --sh-bg: #fff6ea;
+  --sh-bg2: #fbe7d2;
+  --sh-surface: #ffffff;
+  --sh-elev: #fff2e0;
+  --sh-border: #f0dbbe;
+  --sh-ink: #2a1a3e;
+  --sh-muted: #7a6690;
+  --sh-primary: #7a3e9d;
+  --sh-primary-fg: #ffffff;
+  --sh-accent: #f4703a;
+  --sh-gold: #f2a81d;
+  --sh-teal: #1f9e96;
+  --sh-pink: #e0559a;
+  --sh-info: #1e6e9e;
+  --sh-success: #2e9e6b;
+  --sh-warning: #c9860a;
+  --sh-error: #d6453c;
+  --sh-sky1: #f3e2fb;
+  --sh-sky2: #fde4cc;
+  --sh-shadow: 0 8px 24px rgba(74, 38, 110, 0.1);
+  --sh-shadow-lg: 0 22px 54px rgba(74, 38, 110, 0.2);
+}
+
+[data-theme='dark'] {
+  /* parent-facing — dark */
+  --sh-bg: #140e24;
+  --sh-bg2: #1e1436;
+  --sh-surface: #241a3c;
+  --sh-elev: #2f2250;
+  --sh-border: #42325f;
+  --sh-ink: #f8f0e6;
+  --sh-muted: #b09fc9;
+  --sh-primary: #c79bf5;
+  --sh-primary-fg: #1a1327;
+  --sh-accent: #ff9e63;
+  --sh-gold: #ffcf5c;
+  --sh-teal: #4fd6c9;
+  --sh-pink: #ff89bc;
+  --sh-info: #5fb3de;
+  --sh-success: #5fd09a;
+  --sh-warning: #f0c158;
+  --sh-error: #ff8a80;
+  --sh-sky1: #2b1f4c;
+  --sh-sky2: #3e2749;
+  --sh-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --sh-shadow-lg: 0 22px 54px rgba(0, 0, 0, 0.6);
+}
+
+/* The admin panel is a separate visual language. Set data-surface="admin" on
+   the (admin) layout root and everything inside — shadcn components included —
+   picks up the cool palette with no component changes. */
+[data-surface='admin'] {
+  --sh-bg: #f4f5f8;
+  --sh-bg2: #eceef4;
+  --sh-surface: #ffffff;
+  --sh-elev: #f8f9fb;
+  --sh-border: #dfe2ea;
+  --sh-ink: #181c26;
+  --sh-muted: #5f6779;
+  --sh-primary: #3b4ca8;
+  --sh-primary-fg: #ffffff;
+  --sh-accent: #7a4fa8;
+  --sh-success: #1f7a4d;
+  --sh-warning: #9a6a05;
+  --sh-error: #b3352c;
+  --sh-info: #1e6e9e;
+  --sh-shadow:
+    0 1px 2px rgba(20, 25, 40, 0.06), 0 4px 14px rgba(20, 25, 40, 0.05);
+  --sh-shadow-lg: 0 8px 28px rgba(20, 25, 40, 0.12);
+  /* admin uses tighter corners than the storybook side */
+  --radius: 0.625rem;
+}
+
+[data-theme='dark'] [data-surface='admin'],
+[data-surface='admin'][data-theme='dark'] {
+  --sh-bg: #0f1218;
+  --sh-bg2: #141922;
+  --sh-surface: #171b24;
+  --sh-elev: #1e232e;
+  --sh-border: #2b3140;
+  --sh-ink: #edf0f5;
+  --sh-muted: #98a1b3;
+  --sh-primary: #8093f0;
+  --sh-primary-fg: #0f1218;
+  --sh-accent: #b58ce8;
+  --sh-success: #4fbf87;
+  --sh-warning: #e0b04a;
+  --sh-error: #f0817a;
+  --sh-info: #5fb3de;
+  --sh-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 6px 18px rgba(0, 0, 0, 0.35);
+  --sh-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+   2. shadcn's variable contract, aliased onto the design tokens.
+   Because these are aliases, swapping palette (theme or admin surface) moves
+   every shadcn component with it.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --radius: 1rem;
+
+  --background: var(--sh-bg);
+  --foreground: var(--sh-ink);
+  --card: var(--sh-surface);
+  --card-foreground: var(--sh-ink);
+  --popover: var(--sh-surface);
+  --popover-foreground: var(--sh-ink);
+  --primary: var(--sh-primary);
+  --primary-foreground: var(--sh-primary-fg);
+  --secondary: var(--sh-elev);
+  --secondary-foreground: var(--sh-ink);
+  --muted: var(--sh-elev);
+  --muted-foreground: var(--sh-muted);
+  /* shadcn --accent is a hover surface, not the design's orange. */
+  --accent: var(--sh-elev);
+  --accent-foreground: var(--sh-ink);
+  --destructive: var(--sh-error);
+  --destructive-foreground: var(--sh-primary-fg);
+  --border: var(--sh-border);
+  --input: var(--sh-border);
+  /* the design focuses with the accent colour at 3px */
+  --ring: var(--sh-accent);
+
+  --chart-1: var(--sh-primary);
+  --chart-2: var(--sh-accent);
+  --chart-3: var(--sh-teal);
+  --chart-4: var(--sh-gold);
+  --chart-5: var(--sh-pink);
+
+  --sidebar: var(--sh-bg2);
+  --sidebar-foreground: var(--sh-ink);
+  --sidebar-primary: var(--sh-primary);
+  --sidebar-primary-foreground: var(--sh-primary-fg);
+  --sidebar-accent: var(--sh-elev);
+  --sidebar-accent-foreground: var(--sh-ink);
+  --sidebar-border: var(--sh-border);
+  --sidebar-ring: var(--sh-accent);
+}
+
+[data-surface='admin'] {
+  /* admin focuses with primary at 2px, not the accent */
+  --ring: var(--sh-primary);
+  --chart-2: var(--sh-info);
 }
 
 @theme inline {
+  /* design tokens as utilities: bg-surface, text-ink, text-muted, border-border… */
+  --color-bg: var(--sh-bg);
+  --color-bg2: var(--sh-bg2);
+  --color-surface: var(--sh-surface);
+  --color-elev: var(--sh-elev);
+  --color-ink: var(--sh-ink);
+  --color-muted: var(--sh-muted);
+  --color-brand: var(--sh-primary);
+  --color-brand-fg: var(--sh-primary-fg);
+  --color-warm: var(--sh-accent);
+  --color-gold: var(--sh-gold);
+  --color-teal: var(--sh-teal);
+  --color-pink: var(--sh-pink);
+  --color-info: var(--sh-info);
+  --color-success: var(--sh-success);
+  --color-warning: var(--sh-warning);
+  --color-error: var(--sh-error);
+
+  /* shadcn contract */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+
+  --shadow-card: var(--sh-shadow);
+  --shadow-card-lg: var(--sh-shadow-lg);
+
+  --font-sans: var(--font-vazirmatn), system-ui, sans-serif;
+  --font-display: var(--font-baloo), var(--font-vazirmatn), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ---------------------------------------------------------------------------
+   3. Base rules carried over from the design's shared <style> block.
+   --------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    background: var(--sh-bg);
+    color: var(--sh-ink);
+  }
+
+  body {
+    font-family: var(--font-vazirmatn), system-ui, sans-serif;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  [data-surface='admin'] :focus-visible {
+    outline-width: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--sh-primary) 30%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes spinIt {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+/* The landing hero cycles photo → character → book through this. */
+@keyframes stageStep {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  28%,
+  72% {
+    opacity: 1;
+    transform: none;
+  }
+  88%,
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+/* The primary-button fill, used by every call to action in the design. */
+@utility gradient-brand {
+  background-image: linear-gradient(
+    140deg,
+    var(--sh-primary),
+    var(--sh-accent)
+  );
+}
+
+@keyframes auroraShift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(3%, -4%) scale(1.08);
+  }
+}
+
+/* The soft moving glow behind the parent-facing pages. Admin has none. */
+.aurora::before {
+  content: '';
+  position: fixed;
+  inset: -20vh -10vw;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      38vw 38vw at 12% 8%,
+      color-mix(in srgb, var(--sh-primary) 16%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      34vw 34vw at 88% 12%,
+      color-mix(in srgb, var(--sh-accent) 15%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      40vw 40vw at 72% 92%,
+      color-mix(in srgb, var(--sh-teal) 12%, transparent),
+      transparent 62%
+    );
+  animation: auroraShift 22s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* The same thing, asked for by hand on تنظیمات → کاهش حرکت. */
+[data-motion='reduce'] *,
+[data-motion='reduce'] *::before,
+[data-motion='reduce'] *::after {
+  animation: none !important;
+  transition: none !important;
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { FavoriteButton, StoryMenu } from '@/components/app/story-actions';
+import { DownloadButton } from '@/components/app/story-media';
 import { faDateShort, faDigits, faDuration } from '@/lib/fa';
 import { STATUS_LABEL, THEME_LABEL, coverFor } from '@/lib/story-art';
 import type { StoryDto } from '@/lib/types';
@@ -123,22 +124,50 @@ export function StoryCard({ story }: { story: StoryDto }) {
               >
                 خواندن
               </Link>
-              {/* ponytail: ▶ play and ⤓ download arrive with the reader and the
-                  stored video in phase 5 — dead buttons help nobody. */}
+              <Link
+                href={`/stories/${story.id}/read?play=1`}
+                aria-label="پخش روایت"
+                className="rounded-xl border border-border bg-elev px-3 py-2.5 text-[12.5px] text-ink hover:no-underline"
+              >
+                ▶
+              </Link>
+              <DownloadButton
+                storyId={story.id}
+                className="rounded-xl border border-border bg-elev px-3 py-2.5 text-[12.5px]"
+              >
+                <span aria-label="دانلود" role="img">
+                  ⤓
+                </span>
+              </DownloadButton>
               <StoryMenu story={story} />
             </div>
+          </>
+        ) : story.status === 'AWAITING_PAYMENT' || story.status === 'DRAFT' ? (
+          <>
+            <span className="mb-3 block text-[12px] text-muted">
+              {story.childName} · {THEME_LABEL[story.theme]} · ساخت پس از پرداخت
+              شروع می‌شود
+            </span>
+            <Link
+              href={`/stories/${story.id}/pay`}
+              className="block w-full rounded-xl bg-linear-to-br from-brand to-warm p-2.5 text-center text-[12.5px] font-bold text-brand-fg hover:no-underline"
+            >
+              ادامهٔ پرداخت
+            </Link>
           </>
         ) : (
           <>
             <span className="mb-3 block text-[12px] text-muted">
-              {story.childName} · {THEME_LABEL[story.theme]} ·{' '}
-              {story.status === 'AWAITING_PAYMENT'
-                ? 'در انتظار پرداخت'
-                : 'به‌زودی آماده می‌شود'}
+              {story.childName} · {THEME_LABEL[story.theme]} · به‌زودی آماده
+              می‌شود
             </span>
-            <span className="block h-1.5 overflow-hidden rounded bg-border">
-              <span className="block h-full w-1/3 animate-[shimmer_1.4s_linear_infinite] bg-[length:400%_100%] bg-warm" />
-            </span>
+            <Link
+              href={`/stories/${story.id}/generating`}
+              aria-label="دیدن مرحلهٔ ساخت"
+              className="block h-1.5 overflow-hidden rounded bg-border"
+            >
+              <span className="block h-full w-1/3 animate-[shimmer_1.4s_linear_infinite] bg-warm bg-size-[400%_100%]" />
+            </Link>
           </>
         )}
       </div>

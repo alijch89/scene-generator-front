@@ -58,6 +58,51 @@ export interface StoryDto {
   readyAt: string | null;
 }
 
+export type OrderStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+
+export type JobStage =
+  | 'CHARACTER'
+  | 'WRITING'
+  | 'ILLUSTRATION'
+  | 'NARRATION'
+  | 'BINDING';
+
+export type JobStatus = 'QUEUED' | 'RUNNING' | 'DONE' | 'FAILED';
+
+export interface OrderDto {
+  id: string;
+  storyId: string;
+  /** ریال — render with faPrice, which converts to تومان. */
+  amount: number;
+  currency: string;
+  status: OrderStatus;
+  paymentRef: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  storyTitle?: string | null;
+  storyStatus?: StoryStatus | null;
+}
+
+/** POST /stories — the wizard's final step returns the story and its payment link. */
+export interface CreatedStory {
+  story: StoryDto;
+  order: OrderDto;
+  payUrl: string;
+}
+
+export interface StoryPageDto {
+  index: number;
+  text: string;
+}
+
+export interface StoryProgressDto {
+  status: StoryStatus;
+  failureReason: string | null;
+  orderId: string | null;
+  percent: number;
+  stages: { stage: JobStage; status: JobStatus; error: string | null }[];
+}
+
 export interface NotificationDto {
   id: string;
   type: string;

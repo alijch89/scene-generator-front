@@ -60,4 +60,15 @@ export async function serverCookieHeader(): Promise<string | undefined> {
 export const sapi = {
   get: async <T>(path: string) =>
     request<T>(path, { method: 'GET', cookie: await serverCookieHeader() }),
+  /**
+   * Only for idempotent server-side calls made while rendering — re-requesting
+   * a payment link, for instance. Real writes belong in client components,
+   * which already hold the cookie.
+   */
+  post: async <T>(path: string, body?: unknown) =>
+    request<T>(path, {
+      method: 'POST',
+      body,
+      cookie: await serverCookieHeader(),
+    }),
 };

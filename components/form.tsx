@@ -34,7 +34,7 @@ export function Alert({
     <div
       role="alert"
       className={cn(
-        'mb-4 flex items-start gap-3 rounded-[14px] border px-4 py-3.5',
+        'mb-4 flex items-start gap-3 rounded-2xl border px-4 py-3.5',
         TONES[tone].box,
       )}
     >
@@ -58,7 +58,7 @@ export function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-[7px]">
+    <label className="flex flex-col gap-1.75">
       <span className="flex items-center text-[13.5px] font-bold">{label}</span>
       {children}
       {hint ? <span className="text-xs text-muted">{hint}</span> : null}
@@ -76,7 +76,7 @@ export function Input({
       {...props}
       aria-invalid={invalid || undefined}
       className={cn(
-        'rounded-[14px] border bg-surface px-[15px] py-[13px] text-[14.5px] text-ink',
+        'rounded-2xl border bg-surface px-3.75 py-3.25 text-[14.5px] text-ink',
         'transition-colors placeholder:text-muted/70',
         'focus:border-brand focus:outline-none focus:ring-4 focus:ring-[color-mix(in_srgb,var(--sh-primary)_18%,transparent)]',
         invalid ? 'border-error' : 'border-border',
@@ -125,7 +125,7 @@ export function Toggle({
       <input
         {...props}
         type="checkbox"
-        className="size-5 accent-[var(--sh-primary)]"
+        className="size-5 accent-brand"
       />
     </label>
   );
@@ -146,7 +146,7 @@ export function SubmitButton({
       type={props.type ?? 'submit'}
       disabled={loading || props.disabled}
       className={cn(
-        'flex items-center justify-center gap-2.5 rounded-[15px] p-[15px]',
+        'flex items-center justify-center gap-2.5 rounded-[15px] p-3.75',
         'bg-linear-to-br from-brand to-warm text-[15.5px] font-bold text-brand-fg shadow-card',
         'transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-[.985]',
         loading && 'opacity-75',
@@ -156,7 +156,7 @@ export function SubmitButton({
       {loading ? (
         <span
           aria-hidden
-          className="size-[15px] animate-[spinIt_.8s_linear_infinite] rounded-full border-2 border-white/40 border-t-white"
+          className="size-3.75 animate-[spinIt_.8s_linear_infinite] rounded-full border-2 border-white/40 border-t-white"
         />
       ) : null}
       {loading ? (loadingLabel ?? children) : children}
@@ -188,7 +188,7 @@ export function Notice({
       <span
         aria-hidden
         className={cn(
-          'mx-auto mb-[18px] grid size-14 place-items-center rounded-[18px] border text-[22px]',
+          'mx-auto mb-4.5 grid size-14 place-items-center rounded-[18px] border text-[22px]',
           ring,
         )}
       >

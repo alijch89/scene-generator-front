@@ -30,11 +30,11 @@ function Cover({
       {/* Painted cover art, as in the design — no illustration file yet. */}
       <span
         aria-hidden
-        className="absolute end-[14%] top-[14%] size-8 rounded-full bg-[#FFF3D6] opacity-80"
+        className="absolute inset-e-[14%] top-[14%] size-8 rounded-full bg-[#FFF3D6] opacity-80"
       />
       <span
         aria-hidden
-        className="absolute bottom-0 -start-[10%] -end-[10%] h-[32%] rounded-t-[50%] bg-[rgba(20,16,50,.55)]"
+        className="absolute bottom-0 inset-s-[-10%] inset-e-[-10%] h-[32%] rounded-t-[50%] bg-[rgba(20,16,50,.55)]"
       />
       {children}
     </span>
@@ -83,14 +83,14 @@ export function StoryCard({ story }: { story: StoryDto }) {
       <Cover story={story} height={140}>
         <span
           className={cn(
-            'absolute end-2.5 top-2.5 rounded-full px-2.5 py-1 text-[11px] font-semibold',
+            'absolute inset-e-2.5 top-2.5 rounded-full px-2.5 py-1 text-[11px] font-semibold',
             BADGE[story.status],
           )}
         >
           {STATUS_LABEL[story.status]}
         </span>
         {ready ? (
-          <FavoriteButton story={story} className="absolute start-2.5 top-2.5" />
+          <FavoriteButton story={story} className="absolute inset-s-2.5 top-2.5" />
         ) : null}
       </Cover>
 

@@ -193,7 +193,7 @@ export function ChildInterestsEditor({ child }: { child: ChildDto }) {
     interests.some((value, i) => value !== child.interests[i]);
 
   return (
-    <div className="max-w-160 rounded-[22px] border border-border bg-surface p-[22px] shadow-card">
+    <div className="max-w-160 rounded-[22px] border border-border bg-surface p-5.5 shadow-card">
       <p className="mb-4 text-[14px] leading-[1.9] text-muted">
         علاقه‌ها به قصه شکل می‌دهند. هر زمان می‌توانید عوض کنید.
       </p>
@@ -225,7 +225,7 @@ export function ChildInterestsEditor({ child }: { child: ChildDto }) {
             setBusy(false);
           }
         }}
-        className="mt-4 rounded-[14px] bg-linear-to-br from-brand to-warm px-5 py-3 text-[14px] font-bold text-brand-fg disabled:opacity-50"
+        className="mt-4 rounded-2xl bg-linear-to-br from-brand to-warm px-5 py-3 text-[14px] font-bold text-brand-fg disabled:opacity-50"
       >
         {busy ? 'در حال ذخیره…' : 'ذخیرهٔ علاقه‌ها'}
       </button>

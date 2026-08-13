@@ -82,7 +82,7 @@ export function ChangePasswordForm() {
   const [feedback, setFeedback] = useState<Feedback>(null);
 
   return (
-    <details className="rounded-[14px] border border-border bg-elev px-4 py-3.5">
+    <details className="rounded-2xl border border-border bg-elev px-4 py-3.5">
       <summary className="cursor-pointer text-[14px] font-semibold">
         تغییر گذرواژه
       </summary>
@@ -175,7 +175,7 @@ export function SessionList({ sessions }: { sessions: SessionDto[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-[14px] border border-border bg-elev px-4 py-3.5">
+      <div className="rounded-2xl border border-border bg-elev px-4 py-3.5">
         <p className="mb-2.5 text-[14px] font-semibold">نشست‌های فعال</p>
         <ul className="flex flex-col gap-2">
           {sessions.map((session) => (
@@ -216,7 +216,7 @@ export function SessionList({ sessions }: { sessions: SessionDto[] }) {
           router.replace('/login');
           router.refresh();
         }}
-        className="rounded-[14px] border border-error bg-surface px-4 py-3.5 text-right text-[14px] font-semibold text-error"
+        className="rounded-2xl border border-error bg-surface px-4 py-3.5 text-right text-[14px] font-semibold text-error"
       >
         خروج از همهٔ دستگاه‌ها
       </button>

@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    // Required for forbidden() / unauthorized() and their file conventions,
+    // which the DAL uses to reject cross-role access.
+    authInterrupts: true,
+  },
 };
 
 export default nextConfig;

@@ -22,7 +22,9 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
 
   return (
     <div className="aurora grid min-h-full grid-cols-1 md:grid-cols-[232px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col gap-4 overflow-y-auto border-e border-border bg-bg2 px-3.5 py-5 md:flex">
+      {/* print:hidden throughout — the only printable page in here is the
+          invoice, and it should come out as a document, not a screenshot. */}
+      <aside className="sticky top-0 hidden h-screen flex-col gap-4 overflow-y-auto border-e border-border bg-bg2 px-3.5 py-5 md:flex print:hidden">
         <Link
           href="/"
           className="mb-2 flex items-center gap-2.5 text-ink hover:no-underline"
@@ -44,7 +46,7 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-[color-mix(in_srgb,var(--sh-bg)_90%,transparent)] px-5 py-3.5 backdrop-blur-md">
+        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-[color-mix(in_srgb,var(--sh-bg)_90%,transparent)] px-5 py-3.5 backdrop-blur-md print:hidden">
           <MobileNav />
           <HeaderTitle />
 

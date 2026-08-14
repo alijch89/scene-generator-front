@@ -44,6 +44,8 @@ export function proxy(req: NextRequest) {
   const isAdminArea = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
   const isParentArea = startsWith(pathname, PARENT_PREFIXES);
   const isAuthArea = startsWith(pathname, AUTH_PREFIXES);
+  const isExpiredLogin =
+    pathname === '/login' && req.nextUrl.searchParams.get('reason') === 'expired';
 
   if (!hasSession && (isAdminArea || isParentArea)) {
     const url = req.nextUrl.clone();
@@ -53,6 +55,16 @@ export function proxy(req: NextRequest) {
     url.searchParams.set('reason', 'expired');
     url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
+  }
+
+  // A server-rendered request can discover that this cookie is stale after
+  // proxy.ts has let it through. Let the login page clear it and show the
+  // session-expired message instead of bouncing the user in a redirect loop.
+  if (hasSession && isExpiredLogin) {
+    const response = NextResponse.next();
+    response.cookies.delete(SESSION_COOKIE);
+    response.cookies.delete(ROLE_HINT_COOKIE);
+    return response;
   }
 
   if (hasSession && isAuthArea) {

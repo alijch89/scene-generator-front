@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { unstable_rethrow } from 'next/navigation';
 import { HeaderTitle, MobileNav, SidebarNav } from '@/components/app/nav';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,7 +14,11 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
   // A bare count, so the bell costs one cheap query and no rows.
   const { count } = await sapi
     .get<{ count: number }>('/notifications/unread')
-    .catch(() => ({ count: 0 }));
+    .catch((err) => {
+      // Do not turn a redirect caused by an expired session into a 0 badge.
+      unstable_rethrow(err);
+      return { count: 0 };
+    });
 
   return (
     <div className="aurora grid min-h-full grid-cols-1 md:grid-cols-[232px_minmax(0,1fr)]">

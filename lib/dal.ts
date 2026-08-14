@@ -54,21 +54,41 @@ export async function serverCookieHeader(): Promise<string | undefined> {
 }
 
 /**
+ * A session can expire after the layout has validated it but before a page's
+ * data request reaches the API. Keep that ordinary case out of error
+ * boundaries and send the user through the existing sign-in flow instead.
+ */
+async function withSessionExpiryRedirect<T>(requestPromise: Promise<T>) {
+  try {
+    return await requestPromise;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      redirect('/login?reason=expired');
+    }
+    throw err;
+  }
+}
+
+/**
  * `api` with this request's session attached. Server components read through
  * it; writes stay in client components, which have the cookie already.
  */
 export const sapi = {
   get: async <T>(path: string) =>
-    request<T>(path, { method: 'GET', cookie: await serverCookieHeader() }),
+    withSessionExpiryRedirect(
+      request<T>(path, { method: 'GET', cookie: await serverCookieHeader() }),
+    ),
   /**
    * Only for idempotent server-side calls made while rendering — re-requesting
    * a payment link, for instance. Real writes belong in client components,
    * which already hold the cookie.
    */
   post: async <T>(path: string, body?: unknown) =>
-    request<T>(path, {
-      method: 'POST',
-      body,
-      cookie: await serverCookieHeader(),
-    }),
+    withSessionExpiryRedirect(
+      request<T>(path, {
+        method: 'POST',
+        body,
+        cookie: await serverCookieHeader(),
+      }),
+    ),
 };

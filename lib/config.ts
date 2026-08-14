@@ -10,7 +10,7 @@
 
 /** تومان — what the marketing pages print. */
 export const STORY_PRICE = Number(
-  process.env.NEXT_PUBLIC_STORY_PRICE ?? 49_000,
+  process.env.NEXT_PUBLIC_STORY_PRICE ?? 490_000,
 );
 
 /** ریال — the unit the API stores and `faPrice` expects. */

@@ -45,6 +45,7 @@ const STEPS = [
 /** The landing shows the first six; /features lists all twelve. */
 const FEATURED_THEMES = THEMES.slice(0, 6);
 
+/** Static public landing page assembled from reusable marketing primitives. */
 export default function LandingPage() {
   return (
     <main>
@@ -255,3 +256,7 @@ export default function LandingPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the public landing hero, product benefits, themes, process, pricing, and calls to action.
+ */

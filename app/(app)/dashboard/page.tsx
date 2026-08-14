@@ -14,6 +14,7 @@ import { THEME_LABEL, VOICE_LABEL, coverFor } from '@/lib/story-art';
 import type { ChildDto, StoryDto } from '@/lib/types';
 
 /** «عصر بخیر» / «صبح بخیر» — the design greets by time of day. */
+/** Returns a time-of-day Persian greeting for the server render. */
 function greeting() {
   const hour = Number(
     new Intl.DateTimeFormat('en-US', {
@@ -28,6 +29,7 @@ function greeting() {
   return 'شب بخیر';
 }
 
+/** Server page that loads the parent's dashboard datasets concurrently. */
 export default async function DashboardPage() {
   const [user, children, { items: stories }, reading] = await Promise.all([
     verifySession(),
@@ -201,3 +203,7 @@ export default async function DashboardPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the parent dashboard with greeting, children, recent stories, and continue-reading state.
+ */

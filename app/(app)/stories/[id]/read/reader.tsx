@@ -1,3 +1,8 @@
+/**
+ * @file reader.tsx
+ * @description Implements client-side video playback, page turns, progress persistence, and keyboard navigation.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -11,6 +16,7 @@ import type { StoryDto, StoryPageDto } from '@/lib/types';
 const SPEEDS = [0.75, 1, 1.25, 1.5];
 const SPEED_LABEL = ['۰٫۷۵×', '۱×', '۱٫۲۵×', '۱٫۵×'];
 
+/** Coordinates narrated-video playback with page navigation and reading progress. */
 export function Reader({
   story,
   pages,
@@ -43,6 +49,7 @@ export function Reader({
     if (video.current) video.current.playbackRate = speed;
   }, [speed]);
 
+  /** Starts or pauses the native video element while keeping local state aligned. */
   function toggle() {
     const el = video.current;
     if (!el) return;

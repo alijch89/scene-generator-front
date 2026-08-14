@@ -1,3 +1,8 @@
+/**
+ * @file interests-picker.tsx
+ * @description Provides the controlled interest-chip picker used by child profile forms and tabs.
+ */
+
 'use client';
 
 import { useState } from 'react';

@@ -1,3 +1,8 @@
+/**
+ * @file status-badge.tsx
+ * @description Renders semantic status pills shared by warm parent and cool administrator palettes.
+ */
+
 import type { StatusTone } from '@/lib/orders';
 import { cn } from '@/lib/utils';
 
@@ -17,6 +22,7 @@ const TONE: Record<StatusTone, string> = {
   neutral: 'text-muted bg-elev border border-border',
 };
 
+/** Renders a text-and-icon status pill so meaning is not conveyed by color alone. */
 export function StatusBadge({
   tone,
   icon,

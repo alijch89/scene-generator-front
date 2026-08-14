@@ -1,3 +1,8 @@
+/**
+ * @file retry-story.tsx
+ * @description Provides the administrator action for retrying eligible paid story generation.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';

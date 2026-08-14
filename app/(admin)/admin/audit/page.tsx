@@ -19,6 +19,7 @@ export const metadata: Metadata = { title: 'گزارش رخدادها' };
 
 const PER_PAGE = 40;
 
+/** Server page that retrieves retained audit events using URL-driven filters. */
 export default async function AdminAuditPage({
   searchParams,
 }: PageProps<'/admin/audit'>) {
@@ -140,3 +141,7 @@ export default async function AdminAuditPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the searchable, paginated administrator audit trail and retention notice.
+ */

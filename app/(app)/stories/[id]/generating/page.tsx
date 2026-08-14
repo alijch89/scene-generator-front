@@ -7,6 +7,7 @@ import { ProgressWatch } from './progress-watch';
 
 export const metadata: Metadata = { title: 'در حال ساخت قصه' };
 
+/** Server page that supplies the dynamic story identifier and initial status to the progress watcher. */
 export default async function GeneratingPage({
   params,
 }: PageProps<'/stories/[id]/generating'>) {
@@ -32,3 +33,7 @@ export default async function GeneratingPage({
 
   return <ProgressWatch story={story} child={child} initial={progress} />;
 }
+/**
+ * @file page.tsx
+ * @description Loads one owned story and renders its client-polled five-stage generation progress.
+ */

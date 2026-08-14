@@ -1,3 +1,8 @@
+/**
+ * @file ui.tsx
+ * @description Provides reusable warm parent-application cards, links, avatars, empty states, and skeletons.
+ */
+
 import Link from 'next/link';
 import { API_URL } from '@/lib/api';
 import { faDigits } from '@/lib/fa';
@@ -23,6 +28,7 @@ export function Card({
   );
 }
 
+/** Renders a parent-page heading with optional lead copy and actions. */
 export function PageTitle({
   title,
   lead,
@@ -66,6 +72,7 @@ export function PrimaryLink({
   );
 }
 
+/** Renders an outlined secondary navigation action. */
 export function SecondaryLink({
   className,
   ...props
@@ -101,6 +108,7 @@ export function PillLink({
   );
 }
 
+/** Renders an illustrated empty-state panel with an optional action. */
 export function EmptyState({
   icon,
   title,
@@ -199,6 +207,7 @@ export function Skeleton({
   );
 }
 
+/** Renders one read-only child-interest chip. */
 export function InterestChip({ children }: { children: React.ReactNode }) {
   return (
     <span className="rounded-full border border-border bg-elev px-2.5 py-1.5 text-[11.5px]">

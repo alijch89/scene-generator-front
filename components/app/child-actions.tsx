@@ -1,3 +1,8 @@
+/**
+ * @file child-actions.tsx
+ * @description Implements destructive child actions and editable story preferences and interests.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -15,6 +20,7 @@ import type {
   StoryLength,
 } from '@/lib/types';
 
+/** Opens a type-to-confirm flow that permanently deletes a child profile. */
 export function DeleteChildButton({
   child,
   triggerLabel = 'حذف',
@@ -92,6 +98,7 @@ export function ChildPrefsForm({ child }: { child: ChildDto }) {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /** Persists a partial preference or interest update for the child profile. */
   async function save(patch: Partial<ChildDto>) {
     setError(null);
     try {

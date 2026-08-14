@@ -1,3 +1,8 @@
+/**
+ * @file page.tsx
+ * @description Implements token-based password replacement and invalid/expired-link routing.
+ */
+
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -5,6 +10,7 @@ import { Suspense, useState } from 'react';
 import { Alert, Field, Input, SubmitButton } from '@/components/form';
 import { ApiError, api } from '@/lib/api';
 
+/** Reads the reset token, validates matching passwords, and submits the replacement. */
 function ResetForm() {
   const router = useRouter();
   const token = useSearchParams().get('token') ?? '';
@@ -15,6 +21,7 @@ function ResetForm() {
 
   const mismatch = confirm.length > 0 && confirm !== password;
 
+  /** Validates and submits matching replacement passwords with the URL token. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (mismatch) return;
@@ -97,6 +104,7 @@ function ResetForm() {
   );
 }
 
+/** Provides a suspense boundary for the search-parameter-dependent reset form. */
 export default function ResetPasswordPage() {
   return (
     <Suspense>

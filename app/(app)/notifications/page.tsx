@@ -16,6 +16,7 @@ const ICON: Record<string, { glyph: string; tone: string }> = {
   product_news: { glyph: '✧', tone: 'text-brand' },
 };
 
+/** Server page that retrieves and renders the parent's newest notifications. */
 export default async function NotificationsPage() {
   const { items, unread } = await sapi.get<{
     items: NotificationDto[];
@@ -80,3 +81,7 @@ export default async function NotificationsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders parent notifications, unread semantics, and the mark-all-read action.
+ */

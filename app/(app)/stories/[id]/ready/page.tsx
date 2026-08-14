@@ -12,6 +12,7 @@ import type { ChildDto, StoryDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'قصه آماده است' };
 
+/** Server page that loads one dynamic owned story and its reader pages. */
 export default async function ReadyPage({
   params,
 }: PageProps<'/stories/[id]/ready'>) {
@@ -110,3 +111,7 @@ export default async function ReadyPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders a completed story preview with video, metadata, reading, download, and favorite actions.
+ */

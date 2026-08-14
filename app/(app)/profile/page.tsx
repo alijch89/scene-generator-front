@@ -10,6 +10,7 @@ import type { SessionDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'پروفایل' };
 
+/** Server page that loads the current account and active session metadata. */
 export default async function ProfilePage() {
   const [user, sessions] = await Promise.all([
     verifySession(),
@@ -46,3 +47,7 @@ export default async function ProfilePage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders parent profile editing, password changes, and active-session management.
+ */

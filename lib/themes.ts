@@ -1,4 +1,7 @@
 /**
+ * @file themes.ts
+ * @description Defines the public marketing adventure cards and their visual treatments.
+ *
  * The twelve ready-made adventures the site advertises ("دوازده ماجرا").
  * The design names the first six; the rest keep the same voice. The wizard's
  * theme step in phase 5 reads this same list, so `id` is what the API stores.

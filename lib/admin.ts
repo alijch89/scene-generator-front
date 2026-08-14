@@ -17,11 +17,13 @@ import type {
  * state is never conveyed by colour alone.
  */
 
+/** Persian display labels for account roles. */
 export const ROLE_LABEL: Record<'ADMIN' | 'PARENT', string> = {
   ADMIN: 'مدیر',
   PARENT: 'والد',
 };
 
+/** Label, icon, and tone for each user access state. */
 export const USER_STATUS: Record<
   UserStatus,
   { icon: string; label: string; tone: StatusTone }
@@ -37,6 +39,7 @@ export const UNVERIFIED = {
   tone: 'warning' as StatusTone,
 };
 
+/** Administrator label, icon, and tone for each story lifecycle state. */
 export const STORY_STATUS: Record<
   StoryStatus,
   { icon: string; label: string; tone: StatusTone }
@@ -48,6 +51,7 @@ export const STORY_STATUS: Record<
   FAILED: { icon: '✕', label: 'ناموفق', tone: 'error' },
 };
 
+/** Administrator label, icon, and tone for each generation-job state. */
 export const JOB_STATUS: Record<
   JobStatus,
   { icon: string; label: string; tone: StatusTone }
@@ -62,6 +66,7 @@ export const JOB_STATUS: Record<
  * The five pipeline stages under the names the design's خط تولید strip gives
  * them, which are the operator's words rather than the parent's.
  */
+/** Administrator-facing names for the five generation stages. */
 export const STAGE_ADMIN_LABEL: Record<JobStage, string> = {
   CHARACTER: 'ساخت شخصیت',
   WRITING: 'تولید متن',
@@ -116,6 +121,7 @@ export const MODERATION_REASON: Record<
   },
 };
 
+/** Resolves a moderation reason code, preserving unknown codes as neutral text. */
 export const moderationReason = (code: string) =>
   MODERATION_REASON[code] ?? {
     label: 'پرچم',
@@ -274,3 +280,7 @@ export const SETTINGS_FORM: {
     ],
   },
 ];
+/**
+ * @file admin.ts
+ * @description Centralizes administrator labels, status semantics, audit links, and settings-form metadata.
+ */

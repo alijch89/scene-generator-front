@@ -1,7 +1,13 @@
+/**
+ * @file form.tsx
+ * @description Provides accessible client-side fields, alerts, toggles, and submission controls shared by product forms.
+ */
+
 'use client';
 
 import { cn } from '@/lib/utils';
 
+/** Semantic feedback tones supported by the shared form alert. */
 export type Tone = 'error' | 'warning' | 'neutral' | 'success';
 
 const TONES: Record<Tone, { box: string; icon: string }> = {
@@ -46,6 +52,7 @@ export function Alert({
   );
 }
 
+/** Renders a label, optional hint, and associated form control. */
 export function Field({
   label,
   hint,
@@ -66,6 +73,7 @@ export function Field({
   );
 }
 
+/** Renders a consistently styled text input. */
 export function Input({
   invalid,
   className,
@@ -86,6 +94,7 @@ export function Input({
   );
 }
 
+/** Renders a consistently styled native select control. */
 export function Select({
   className,
   ...props
@@ -131,6 +140,7 @@ export function Toggle({
   );
 }
 
+/** Renders a submit button with disabled and busy feedback states. */
 export function SubmitButton({
   loading,
   children,

@@ -4,6 +4,7 @@ import { Notice } from '@/components/form';
 
 export const metadata: Metadata = { title: 'گذرواژه عوض شد · شهرزاد قصه‌گو' };
 
+/** Displays the terminal password-changed success state. */
 export default function PasswordChangedPage() {
   return (
     <Notice icon="✓" tone="success" title="گذرواژه عوض شد">
@@ -19,3 +20,7 @@ export default function PasswordChangedPage() {
     </Notice>
   );
 }
+/**
+ * @file page.tsx
+ * @description Confirms successful password replacement and links back to login.
+ */

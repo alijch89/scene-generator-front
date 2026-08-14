@@ -27,6 +27,7 @@ const FILTERS: { value: string; label: string }[] = [
  * review on the other. Which item is open lives in the URL, so a reviewer can
  * send a colleague the exact card they are looking at.
  */
+/** Server page that lists moderation items and optionally loads one selected detail. */
 export default async function AdminModerationPage({
   searchParams,
 }: PageProps<'/admin/moderation'>) {
@@ -248,3 +249,7 @@ export default async function AdminModerationPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the administrator moderation queue, review context, and decision controls.
+ */

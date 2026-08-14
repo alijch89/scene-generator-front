@@ -28,10 +28,12 @@ const TABS = [
   { id: 'privacy', label: 'داده و حریم خصوصی' },
 ] as const;
 
+/** Supported child-detail tabs selected through the URL query string. */
 type Tab = (typeof TABS)[number]['id'];
 
 export const metadata: Metadata = { title: 'پروندهٔ کودک' };
 
+/** Server page that loads one owned child and its stories for the selected tab. */
 export default async function ChildPage({
   params,
   searchParams,
@@ -157,3 +159,7 @@ export default async function ChildPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders one child profile with stories, interests, generation preferences, privacy, and destructive actions.
+ */

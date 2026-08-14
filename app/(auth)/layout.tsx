@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
  * the form well on the other. Collapses to stacked below ~680px because the
  * grid is auto-fit with a 340px minimum.
  */
+/** Shared public layout for all account authentication pages. */
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
     <div className="grid min-h-svh grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
@@ -61,3 +62,7 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
     </div>
   );
 }
+/**
+ * @file layout.tsx
+ * @description Renders the centered, public authentication shell around login and recovery routes.
+ */

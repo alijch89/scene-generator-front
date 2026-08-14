@@ -26,6 +26,7 @@ const SECTIONS = [
   },
 ];
 
+/** Static terms-of-use page for the per-story service. */
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-[760px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -49,3 +50,7 @@ export default function TermsPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the public terms governing parent accounts, payments, generated content, and acceptable use.
+ */

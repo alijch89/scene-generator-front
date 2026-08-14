@@ -30,6 +30,7 @@ const PER_PAGE = 25;
 const STATUSES = Object.keys(STORY_STATUS) as StoryStatus[];
 const THEMES = Object.keys(THEME_LABEL) as StoryTheme[];
 
+/** Server page that retrieves a URL-filtered page of story summaries. */
 export default async function AdminStoriesPage({
   searchParams,
 }: PageProps<'/admin/stories'>) {
@@ -207,3 +208,7 @@ export default async function AdminStoriesPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the searchable and filterable cross-family administrator story table.
+ */

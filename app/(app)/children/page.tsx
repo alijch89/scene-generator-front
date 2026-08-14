@@ -16,6 +16,7 @@ import type { ChildDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'کودکان' };
 
+/** Server page that loads and displays all child profiles owned by the parent. */
 export default async function ChildrenPage() {
   const children = await sapi.get<ChildDto[]>('/children');
 
@@ -101,3 +102,7 @@ export default async function ChildrenPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the parent's child-profile collection and add-child entry point.
+ */

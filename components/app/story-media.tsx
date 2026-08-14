@@ -1,3 +1,8 @@
+/**
+ * @file story-media.tsx
+ * @description Builds ownership-protected story video stream and attachment URLs.
+ */
+
 import { API_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -27,5 +32,6 @@ export function DownloadButton({
 }
 
 /** Credentialed, so the poster and stream stay private to the family. */
+/** Builds the credentialed API URL consumed by the native video player. */
 export const videoSrc = (storyId: string) =>
   `${API_URL}/stories/${storyId}/video`;

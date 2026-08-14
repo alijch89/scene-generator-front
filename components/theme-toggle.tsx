@@ -1,3 +1,8 @@
+/**
+ * @file theme-toggle.tsx
+ * @description Renders the client control that toggles and persists light/dark theme state.
+ */
+
 'use client';
 
 import { useTheme } from '@/app/providers';

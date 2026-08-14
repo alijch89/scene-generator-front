@@ -1,5 +1,11 @@
+/**
+ * @file forbidden.tsx
+ * @description Renders the App Router boundary used when an authenticated role lacks access.
+ */
+
 import Link from "next/link";
 
+/** Displays a role-mismatch explanation and a safe route back to the public site. */
 export default function Forbidden() {
   return (
     <main className="flex min-h-full flex-col items-center justify-center gap-4 p-8 text-center">

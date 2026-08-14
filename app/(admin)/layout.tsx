@@ -4,6 +4,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { AdminNav } from '@/components/admin/nav';
 import { requireAdmin, sapi } from '@/lib/dal';
 
+/** Server layout that validates the administrator session before rendering admin routes. */
 export default async function AdminLayout({ children }: LayoutProps<'/'>) {
   const user = await requireAdmin();
 
@@ -62,3 +63,7 @@ export default async function AdminLayout({ children }: LayoutProps<'/'>) {
     </div>
   );
 }
+/**
+ * @file layout.tsx
+ * @description Enforces administrator access and renders the cool-palette admin shell and navigation.
+ */

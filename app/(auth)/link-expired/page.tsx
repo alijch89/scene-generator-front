@@ -4,6 +4,7 @@ import { Notice } from '@/components/form';
 
 export const metadata: Metadata = { title: 'لینک منقضی شده · شهرزاد قصه‌گو' };
 
+/** Displays the expired-link notice and routes the visitor to request another. */
 export default function LinkExpiredPage() {
   return (
     <Notice icon="⏳" tone="warning" title="این لینک منقضی شده">
@@ -25,3 +26,7 @@ export default function LinkExpiredPage() {
     </Notice>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders guidance when an authentication or recovery link is no longer valid.
+ */

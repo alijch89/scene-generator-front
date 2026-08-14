@@ -8,6 +8,7 @@ import { WizardForm } from './wizard-form';
 
 export const metadata: Metadata = { title: 'ساخت قصهٔ تازه' };
 
+/** Server page that verifies child availability and supplies optional initial selection. */
 export default async function WizardPage({
   searchParams,
 }: PageProps<'/wizard'>) {
@@ -40,3 +41,7 @@ export default async function WizardPage({
     />
   );
 }
+/**
+ * @file page.tsx
+ * @description Loads parent child profiles and renders the four-step story creation wizard.
+ */

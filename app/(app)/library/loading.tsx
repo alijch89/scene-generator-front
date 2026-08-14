@@ -23,3 +23,7 @@ export default function LibraryLoading() {
     </section>
   );
 }
+/**
+ * @file loading.tsx
+ * @description Renders the route-level shimmer fallback while the story library loads.
+ */

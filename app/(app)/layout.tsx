@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { requireParent, sapi } from '@/lib/dal';
 import { faDigits } from '@/lib/fa';
 
+/** Server layout that validates a parent session before rendering product routes. */
 export default async function ParentLayout({ children }: LayoutProps<'/'>) {
   // The real gate. proxy.ts already bounced anonymous and admin traffic, but
   // that was only a cookie read — this validates against the API.
@@ -95,3 +96,7 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
     </div>
   );
 }
+/**
+ * @file layout.tsx
+ * @description Enforces parent access and renders the responsive parent application shell.
+ */

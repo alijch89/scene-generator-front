@@ -1,3 +1,8 @@
+/**
+ * @file settings-form.tsx
+ * @description Implements validated administrator editing and reset of operational settings.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -36,6 +41,7 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
     'story.price': String(Math.round(Number(values['story.price'] || 0) * 10)),
   });
 
+  /** Converts display units, submits changed settings, and refreshes server data. */
   async function save() {
     setBusy(true);
     setError(null);
@@ -65,6 +71,7 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
     }
   }
 
+  /** Restores backend defaults after explicit administrator confirmation. */
   async function reset() {
     setBusy(true);
     setError(null);

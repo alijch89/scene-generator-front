@@ -17,6 +17,7 @@ export const metadata: Metadata = { title: 'صورت‌حساب' };
  * again, so there is no card to keep. Every row here is one story that was
  * bought once, at the price on the day it was bought.
  */
+/** Server page that loads the parent's order history and paid totals. */
 export default async function TransactionsPage() {
   const { items, summary } = await sapi.get<TransactionsDto>('/orders');
 
@@ -133,3 +134,7 @@ export default async function TransactionsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders parent transaction totals, history, order status, and invoice/payment actions.
+ */

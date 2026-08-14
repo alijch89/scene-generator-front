@@ -11,6 +11,7 @@ import { verifySession } from '@/lib/dal';
 
 export const metadata: Metadata = { title: 'تنظیمات' };
 
+/** Server page that loads current account preferences for client-side settings forms. */
 export default async function SettingsPage() {
   const user = await verifySession();
 
@@ -53,3 +54,7 @@ export default async function SettingsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders notification, display, data-export, and account-deletion settings.
+ */

@@ -30,6 +30,7 @@ const CHANNELS = [
 const fieldClass =
   'rounded-[13px] border border-border bg-elev px-3.5 py-3 text-sm text-ink';
 
+/** Static contact page for support, business hours, and common inquiry routing. */
 export default function ContactPage() {
   return (
     <main className="mx-auto max-w-[940px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -128,3 +129,7 @@ export default function ContactPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders public contact channels and the informational contact form.
+ */

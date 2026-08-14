@@ -1,3 +1,8 @@
+/**
+ * @file ui.tsx
+ * @description Provides reusable cards and headings for public marketing and policy pages.
+ */
+
 import { cn } from '@/lib/utils';
 
 /** The surface card the marketing pages repeat ~25 times. */

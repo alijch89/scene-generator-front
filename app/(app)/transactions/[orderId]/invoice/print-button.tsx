@@ -1,3 +1,8 @@
+/**
+ * @file print-button.tsx
+ * @description Provides the browser print action used by the parent invoice page.
+ */
+
 'use client';
 
 /**

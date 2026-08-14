@@ -1,3 +1,8 @@
+/**
+ * @file story-actions.tsx
+ * @description Implements client-side favorite toggling and the contextual story action menu.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';

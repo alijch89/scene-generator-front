@@ -1,3 +1,8 @@
+/**
+ * @file moderation-decision.tsx
+ * @description Implements administrator approval/rejection controls and confirmation for destructive review outcomes.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -22,6 +27,7 @@ export function ModerationDecision({ item }: { item: AdminModerationDetail }) {
 
   const isStory = item.targetType === 'STORY';
 
+  /** Submits an approval or rejection after required destructive confirmation. */
   async function decide(decision: 'approve' | 'reject') {
     setBusy(true);
     setError(null);

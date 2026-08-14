@@ -1,3 +1,8 @@
+/**
+ * @file confirm-delete.tsx
+ * @description Provides the reusable type-to-confirm interaction for irreversible parent actions.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -53,6 +58,7 @@ export function ConfirmDelete({
 
   const matches = typed.trim() === confirmWord;
 
+  /** Executes the destructive callback only after the confirmation word matches. */
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!matches) return;

@@ -1,3 +1,8 @@
+/**
+ * @file error.tsx
+ * @description Renders the client error boundary for failed story-library data requests.
+ */
+
 'use client';
 
 /** «کتابخانه بار نشد» — the design's error state, wired to Next's reset(). */

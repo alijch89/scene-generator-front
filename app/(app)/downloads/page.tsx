@@ -18,6 +18,7 @@ export const metadata: Metadata = { title: 'دانلودها' };
  * tray, and nothing server-side can observe it. Add a service worker only if
  * offline playback is ever asked for.
  */
+/** Server page that loads the parent's story library for download-state rendering. */
 export default async function DownloadsPage() {
   const { items } = await sapi.get<{ items: StoryDto[] }>(
     '/stories?status=READY',
@@ -76,3 +77,7 @@ export default async function DownloadsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders downloadable ready stories and explanatory in-progress and failed states.
+ */

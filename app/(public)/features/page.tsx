@@ -43,6 +43,7 @@ const FEATURES = [
   },
 ];
 
+/** Static marketing page describing story personalization and parent controls. */
 export default function FeaturesPage() {
   return (
     <main className="mx-auto max-w-[1080px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -89,3 +90,7 @@ export default function FeaturesPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the complete public feature inventory and product trust statements.
+ */

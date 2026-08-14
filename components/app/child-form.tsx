@@ -1,3 +1,8 @@
+/**
+ * @file child-form.tsx
+ * @description Implements reusable add/edit child forms with validation and progressive photo upload.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -38,6 +43,7 @@ function ChildForm({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  /** Validates a selected local photo before retaining its preview. */
   function pickPhoto(file: File | undefined) {
     if (!file) return;
     const problem = photoError(file);
@@ -52,6 +58,7 @@ function ChildForm({
     setPreview(URL.createObjectURL(file));
   }
 
+  /** Creates or updates the profile, then uploads a selected photo with progress. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
@@ -259,6 +266,7 @@ export function AddChildButton({
   );
 }
 
+/** Opens the shared child form pre-populated for an existing profile. */
 export function EditChildButton({ child }: { child: ChildDto }) {
   const [open, setOpen] = useState(false);
 

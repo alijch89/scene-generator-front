@@ -1,3 +1,8 @@
+/**
+ * @file wizard-form.tsx
+ * @description Implements the client-side child, theme, style, preview, story creation, and payment handoff flow.
+ */
+
 'use client';
 
 import { useState } from 'react';
@@ -43,6 +48,7 @@ const HINTS = [
 const ring = (on: boolean) =>
   on ? 'outline outline-3 outline-brand outline-offset-[3px]' : '';
 
+/** Manages all four wizard steps and redirects to the returned payment URL. */
 export function WizardForm({
   childProfiles,
   initialChildId,
@@ -81,6 +87,7 @@ export function WizardForm({
     (step === 1 && !childId) ||
     (step === 2 && theme === 'OWN' && ownIdea.trim().length < 10);
 
+  /** Validates the final selection, creates the story/order, and starts payment. */
   async function submit() {
     setBusy(true);
     setError(null);

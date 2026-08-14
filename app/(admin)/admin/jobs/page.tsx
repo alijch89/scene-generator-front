@@ -28,6 +28,7 @@ const time = new Intl.DateTimeFormat('fa-IR', {
   minute: '2-digit',
 });
 
+/** Server page that retrieves pipeline and job data from validated URL filters. */
 export default async function AdminJobsPage({
   searchParams,
 }: PageProps<'/admin/jobs'>) {
@@ -229,3 +230,7 @@ export default async function AdminJobsPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders live generation-pipeline stage counts and paginated job diagnostics.
+ */

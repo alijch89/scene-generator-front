@@ -19,6 +19,7 @@ export const metadata: Metadata = { title: 'پرونده‌های کودکان' 
 
 const PER_PAGE = 25;
 
+/** Server page that retrieves and renders the searchable child-profile table. */
 export default async function AdminChildrenPage({
   searchParams,
 }: PageProps<'/admin/children'>) {
@@ -155,3 +156,7 @@ export default async function AdminChildrenPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders privacy-limited child-profile metadata across parent accounts.
+ */

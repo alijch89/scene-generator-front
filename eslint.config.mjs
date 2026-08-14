@@ -1,3 +1,5 @@
+/** @file eslint.config.mjs Composes Next.js core-vitals and TypeScript lint rules. */
+
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";

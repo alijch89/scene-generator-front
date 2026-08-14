@@ -20,30 +20,35 @@ export const THEME_LABEL: Record<StoryTheme, string> = {
   OWN: 'ایدهٔ خودم',
 };
 
+/** Detailed story-length labels used by the wizard. */
 export const LENGTH_LABEL: Record<StoryLength, string> = {
   SHORT: '۵ صفحه · حدود ۳ دقیقه',
   MEDIUM: '۱۰ صفحه · حدود ۶ دقیقه',
   LONG: '۱۶ صفحه · حدود ۱۰ دقیقه',
 };
 
+/** Compact story-length labels used by cards and tables. */
 export const LENGTH_SHORT_LABEL: Record<StoryLength, string> = {
   SHORT: 'کوتاه',
   MEDIUM: 'متوسط',
   LONG: 'بلند',
 };
 
+/** Parent-facing labels for supported story tones. */
 export const TONE_LABEL: Record<StoryTone, string> = {
   CALM: 'گرم و آرام',
   FUNNY: 'شاد و بازیگوش',
   BRAVE: 'پرهیجان',
 };
 
+/** Parent-facing labels for illustration styles. */
 export const STYLE_LABEL: Record<IllustrationStyle, string> = {
   WATERCOLOR: 'آبرنگ',
   CLASSIC: 'کتاب کلاسیک',
   PAPERCUT: 'کاغذ بُرشی',
 };
 
+/** Parent-facing labels for narrator voices. */
 export const VOICE_LABEL: Record<NarratorVoice, string> = {
   MARYAM: 'مریم',
   BABAK: 'بابک',
@@ -69,6 +74,7 @@ export const THEME_COVER: Record<StoryTheme, string> = {
 /** A story that never finished gets the design's flat, colourless cover. */
 export const FAILED_COVER = 'linear-gradient(160deg,#3C3550,#57506B)';
 
+/** Parent-facing labels for story lifecycle states. */
 export const STATUS_LABEL: Record<StoryStatus, string> = {
   DRAFT: 'پیش‌نویس',
   AWAITING_PAYMENT: 'در انتظار پرداخت',
@@ -77,6 +83,7 @@ export const STATUS_LABEL: Record<StoryStatus, string> = {
   FAILED: 'ناموفق',
 };
 
+/** Selects the failed or theme-specific deterministic cover gradient. */
 export const coverFor = (theme: StoryTheme, status: StoryStatus) =>
   status === 'FAILED' ? FAILED_COVER : THEME_COVER[theme];
 
@@ -160,3 +167,7 @@ export const WIZARD_THEMES: {
 /** Deterministic gradient for a child's avatar when there is no photo. */
 export const AVATAR_GRADIENT =
   'linear-gradient(140deg,var(--sh-primary),var(--sh-accent))';
+/**
+ * @file story-art.ts
+ * @description Centralizes story labels, gradients, progress stages, and wizard adventure choices.
+ */

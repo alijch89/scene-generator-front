@@ -1,8 +1,14 @@
+/**
+ * @file site-nav.tsx
+ * @description Defines public-site navigation and highlights the current marketing route.
+ */
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+/** Ordered marketing links displayed in the public header. */
 export const PUBLIC_NAV = [
   { href: '/features', label: 'ویژگی‌ها' },
   { href: '/how', label: 'چطور کار می‌کند' },

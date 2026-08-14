@@ -1,3 +1,8 @@
+/**
+ * @file nav.tsx
+ * @description Defines the grouped administrator navigation and live moderation badge.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -51,6 +56,7 @@ const GROUPS: {
   },
 ];
 
+/** Renders grouped administrator links and the live moderation badge. */
 export function AdminNav({
   pendingModeration,
 }: {

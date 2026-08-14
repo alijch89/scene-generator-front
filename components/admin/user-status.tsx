@@ -1,3 +1,8 @@
+/**
+ * @file user-status.tsx
+ * @description Implements confirmed administrator suspension and reactivation of user accounts.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -18,6 +23,7 @@ export function UserStatusButton({ user }: { user: AdminUserDetailDto }) {
 
   const suspending = user.status === 'ACTIVE';
 
+  /** Sends the inverse account state and refreshes the audited detail view. */
   async function apply() {
     setBusy(true);
     setError(null);

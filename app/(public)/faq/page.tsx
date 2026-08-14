@@ -38,6 +38,7 @@ const QUESTIONS = [
   },
 ];
 
+/** Static FAQ page using native details disclosures. */
 export default function FaqPage() {
   return (
     <main className="mx-auto max-w-[800px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -72,3 +73,7 @@ export default function FaqPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders accessible public frequently asked questions for the per-story product model.
+ */

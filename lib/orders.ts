@@ -1,5 +1,6 @@
 import type { OrderStatus } from './types';
 
+/** Visual-semantic tones supported by shared status badges. */
 export type StatusTone = 'success' | 'error' | 'warning' | 'neutral';
 
 /**
@@ -29,6 +30,7 @@ export const ORDER_STATUS: Record<
  * What the row's action offers. Only a paid order has an invoice; every other
  * state is an unfinished purchase, so it points back at the payment page.
  */
+/** Returns the action label associated with an order state, when one exists. */
 export const orderAction = (status: OrderStatus) =>
   status === 'PAID'
     ? { label: 'دریافت فاکتور', kind: 'invoice' as const }
@@ -43,3 +45,7 @@ export const PAYMENT_EVENT_LABEL: Record<string, string> = {
   'payment.failed': 'بانک پرداخت را رد کرد',
   'payment.cancelled': 'پرداخت لغو شد',
 };
+/**
+ * @file orders.ts
+ * @description Maps payment states and events to parent-facing labels, tones, and actions.
+ */

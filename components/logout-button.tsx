@@ -1,3 +1,8 @@
+/**
+ * @file logout-button.tsx
+ * @description Renders a client-side logout control that closes the current session and refreshes routing state.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -5,6 +10,7 @@ import { useState } from 'react';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
+/** Logs out the current browser session and returns the visitor to the public home page. */
 export function LogoutButton({ className }: { className?: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);

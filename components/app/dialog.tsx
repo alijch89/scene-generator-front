@@ -1,3 +1,8 @@
+/**
+ * @file dialog.tsx
+ * @description Wraps the native dialog element with controlled lifecycle and accessible heading primitives.
+ */
+
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -52,6 +57,7 @@ export function Modal({
   );
 }
 
+/** Renders the title, optional description, and close control for a modal. */
 export function ModalHeader({
   title,
   onClose,

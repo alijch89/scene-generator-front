@@ -15,6 +15,7 @@ export const metadata: Metadata = { title: 'پرداخت (نمونهٔ توسع�
  * is handed the signed callback URL exactly the way a gateway is, and it can
  * settle nothing on its own — the signature does that.
  */
+/** Server page that displays a mock bank checkout for the signed callback URL. */
 export default async function MockPaymentPage({
   params,
   searchParams,
@@ -91,3 +92,7 @@ export default async function MockPaymentPage({
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the development-only payment stand-in after validating callback and order context.
+ */

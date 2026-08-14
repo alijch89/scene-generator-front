@@ -1,6 +1,13 @@
+/**
+ * @file api.ts
+ * @description Provides the shared credentialed JSON client used by browser and server code.
+ */
+
+/** Public backend base URL, configurable through NEXT_PUBLIC_API_URL. */
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
+/** HTTP error that preserves response status and the parsed backend payload. */
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -12,12 +19,22 @@ export class ApiError extends Error {
   }
 }
 
+/** RequestInit variant that serializes JSON bodies and optionally forwards a cookie. */
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
   /** Server components pass the incoming Cookie header through here. */
   cookie?: string;
 };
 
+/**
+ * Sends a non-cached, credentialed API request and parses its JSON response.
+ *
+ * @typeParam T - Expected successful response shape.
+ * @param path - API path beginning with a slash.
+ * @param options - Fetch options plus an optional JSON body and server cookie.
+ * @returns The parsed response, or undefined for a 204 response.
+ * @throws {ApiError} When the API returns a non-success status.
+ */
 export async function request<T>(
   path: string,
   { body, cookie, headers, ...init }: RequestOptions = {},
@@ -52,6 +69,7 @@ export async function request<T>(
   return payload as T;
 }
 
+/** Browser-oriented GET, POST, PATCH, and DELETE convenience methods. */
 export const api = {
   get: <T>(path: string, opts?: RequestOptions) =>
     request<T>(path, { ...opts, method: 'GET' }),

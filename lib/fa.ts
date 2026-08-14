@@ -1,4 +1,7 @@
 /**
+ * @file fa.ts
+ * @description Formats numbers, prices, durations, relative times, and Jalali dates for Persian UI surfaces.
+ *
  * Persian formatting. Intl already knows the Persian calendar and the ٬ / ٫
  * separators the design uses, so there is nothing to hand-roll here.
  */

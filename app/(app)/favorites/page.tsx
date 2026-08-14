@@ -6,6 +6,7 @@ import type { StoryDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'علاقه‌مندی‌ها' };
 
+/** Server page that requests favorite-only story summaries. */
 export default async function FavoritesPage() {
   const { items } = await sapi.get<{ items: StoryDto[] }>(
     '/stories?favorite=true',
@@ -46,3 +47,7 @@ export default async function FavoritesPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders stories the parent has explicitly marked as favorites.
+ */

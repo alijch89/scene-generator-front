@@ -1,10 +1,17 @@
+/**
+ * @file upload.ts
+ * @description Validates and uploads private child photos while reporting browser progress.
+ */
+
 import { API_URL } from './api';
 
 /** «حداکثر ۱۰ مگابایت، JPG یا PNG» — checked here so the drawer can say so
  *  before spending the upload, and again by the API which is the real limit. */
 export const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+/** MIME types accepted by both browser validation and the upload endpoint. */
 export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+/** Returns a localized validation message, or null when a photo is uploadable. */
 export function photoError(file: File): string | null {
   if (!PHOTO_TYPES.includes(file.type)) {
     return 'فقط JPG یا PNG بفرستید.';

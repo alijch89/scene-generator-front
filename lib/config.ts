@@ -1,4 +1,7 @@
 /**
+ * @file config.ts
+ * @description Exposes public pricing configuration in display and API storage units.
+ *
  * The single static per-story price. There are no plans and no credit packs —
  * you pay for the story you make.
  *

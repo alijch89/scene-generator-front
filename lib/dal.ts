@@ -38,13 +38,16 @@ export async function verifySession(): Promise<UserDto> {
   return user;
 }
 
+/** Requires a valid session whose role belongs to the accepted role set. */
 export async function requireRole(...roles: Role[]): Promise<UserDto> {
   const user = await verifySession();
   if (!roles.includes(user.role)) forbidden();
   return user;
 }
 
+/** Requires an authenticated administrator or renders the forbidden boundary. */
 export const requireAdmin = () => requireRole('ADMIN');
+/** Requires an authenticated parent or renders the forbidden boundary. */
 export const requireParent = () => requireRole('PARENT');
 
 /** Forwards the caller's session cookie to the API from a server component. */
@@ -92,3 +95,7 @@ export const sapi = {
       }),
     ),
 };
+/**
+ * @file dal.ts
+ * @description Implements server-only session verification, role gates, cookie forwarding, and authenticated API reads.
+ */

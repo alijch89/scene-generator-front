@@ -1,3 +1,8 @@
+/**
+ * @file progress-watch.tsx
+ * @description Polls story progress, renders five stage states, and routes terminal outcomes.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -18,6 +23,7 @@ import { cn } from '@/lib/utils';
  */
 const POLL_MS = 1500;
 
+/** Polls generation state until ready/failed and renders the ordered stages. */
 export function ProgressWatch({
   story,
   child,

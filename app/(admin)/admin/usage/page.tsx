@@ -18,6 +18,7 @@ export const metadata: Metadata = { title: 'مصرف مدل‌ها' };
 
 const RANGES: AdminRange[] = ['24h', '7d', '30d'];
 
+/** Formats a numeric seconds value for the Persian administrator UI. */
 const seconds = (value: number) =>
   `${faDigits(value.toLocaleString('en-US', { maximumFractionDigits: 1 }))} ثانیه`;
 
@@ -27,6 +28,7 @@ const seconds = (value: number) =>
  * itemise any of that, so this measures the thing we can actually see and act
  * on: how each stage of our own pipeline behaves.
  */
+/** Server page that retrieves pipeline usage metrics for a selected URL range. */
 export default async function AdminUsagePage({
   searchParams,
 }: PageProps<'/admin/usage'>) {
@@ -160,3 +162,7 @@ export default async function AdminUsagePage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders generation-pipeline volume, latency, failure, retry, and slow-stage metrics.
+ */

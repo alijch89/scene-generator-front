@@ -7,6 +7,7 @@ import type { ChildDto, StoryDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'قصه‌های من' };
 
+/** Server page that converts URL filters into an ownership-scoped story request. */
 export default async function LibraryPage({
   searchParams,
 }: PageProps<'/library'>) {
@@ -98,3 +99,7 @@ export default async function LibraryPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the parent's searchable and filterable story library, including its empty state.
+ */

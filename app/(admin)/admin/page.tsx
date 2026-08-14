@@ -30,6 +30,7 @@ const RANGE_LABEL: Record<AdminRange, string> = {
 };
 
 /** One card, with the design's label / figure / movement stack. */
+/** Renders one headline dashboard metric and its comparison delta. */
 function Card({
   label,
   value,
@@ -60,6 +61,7 @@ function Card({
   );
 }
 
+/** Displays one compact label/value row within a dashboard panel. */
 function Line({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex text-[12.5px]">
@@ -69,6 +71,7 @@ function Line({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+/** Server page that retrieves operational metrics using the selected URL range. */
 export default async function AdminDashboardPage({
   searchParams,
 }: PageProps<'/admin'>) {
@@ -274,3 +277,7 @@ export default async function AdminDashboardPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the administrator operations dashboard for a selectable comparison window.
+ */

@@ -24,6 +24,7 @@ const FAQ = [
   },
 ];
 
+/** Server page that expands the help topic selected by search parameters. */
 export default async function HelpPage({ searchParams }: PageProps<'/help'>) {
   const { q } = await searchParams;
   const search = typeof q === 'string' ? q.trim() : '';
@@ -90,3 +91,7 @@ export default async function HelpPage({ searchParams }: PageProps<'/help'>) {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders parent help topics, support guidance, and optional topic focus from the URL.
+ */

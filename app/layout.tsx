@@ -1,3 +1,8 @@
+/**
+ * @file layout.tsx
+ * @description Defines Persian RTL document metadata, fonts, pre-hydration theme state, and global providers.
+ */
+
 import type { Metadata } from 'next';
 import { Baloo_Bhaijaan_2, Vazirmatn } from 'next/font/google';
 import './globals.css';
@@ -38,6 +43,7 @@ const themeScript = `
 }catch(e){document.documentElement.dataset.theme='light';}})();
 `;
 
+/** Root layout that establishes the HTML document and global client providers. */
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html

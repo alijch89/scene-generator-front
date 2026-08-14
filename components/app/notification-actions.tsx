@@ -1,9 +1,15 @@
+/**
+ * @file notification-actions.tsx
+ * @description Provides client-side actions for updating notification read state.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 
+/** Marks every parent notification read, then refreshes server-rendered data. */
 export function MarkAllReadButton() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);

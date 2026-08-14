@@ -1,3 +1,8 @@
+/**
+ * @file nav.tsx
+ * @description Defines parent navigation metadata and responsive sidebar, mobile, and header-title components.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -26,9 +31,11 @@ const TITLES: Record<string, string> = Object.fromEntries(
   NAV.flat().map((item) => [item.href, item.label]),
 );
 
+/** Determines whether a navigation link owns the current path. */
 const isActive = (pathname: string, href: string) =>
   pathname === href || pathname.startsWith(`${href}/`);
 
+/** Renders grouped parent links in full or compact form. */
 function NavList({ compact }: { compact?: boolean }) {
   const pathname = usePathname();
 
@@ -67,6 +74,7 @@ function NavList({ compact }: { compact?: boolean }) {
   );
 }
 
+/** Renders the full desktop parent navigation. */
 export function SidebarNav() {
   return <NavList />;
 }
@@ -75,6 +83,7 @@ export function SidebarNav() {
  * Mobile disclosure. <details> gives the open/close state, keyboard support
  * and Escape-free simplicity with no JS of our own.
  */
+/** Renders the compact mobile parent navigation. */
 export function MobileNav() {
   return (
     <details className="group relative md:hidden">

@@ -24,6 +24,7 @@ const STEPS = [
   },
 ];
 
+/** Static public walkthrough of the end-to-end product flow. */
 export default function HowItWorksPage() {
   return (
     <main className="mx-auto max-w-[900px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -63,3 +64,7 @@ export default function HowItWorksPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Explains the child-profile, story-wizard, payment, generation, and reading workflow.
+ */

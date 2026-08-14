@@ -6,6 +6,7 @@ import type { AdminSettingsDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'تنظیمات سیستم' };
 
+/** Server page that retrieves all effective system settings. */
 export default async function AdminSettingsPage() {
   await requireAdmin();
 
@@ -18,3 +19,7 @@ export default async function AdminSettingsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Loads effective operational settings and delegates editing to the client settings form.
+ */

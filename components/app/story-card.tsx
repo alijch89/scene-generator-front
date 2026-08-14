@@ -1,3 +1,8 @@
+/**
+ * @file story-card.tsx
+ * @description Renders compact and full parent story cards for ready, generating, unpaid, and failed states.
+ */
+
 import Link from 'next/link';
 import { FavoriteButton, StoryMenu } from '@/components/app/story-actions';
 import { DownloadButton } from '@/components/app/story-media';
@@ -14,6 +19,7 @@ const BADGE: Record<string, string> = {
   DRAFT: 'bg-[rgba(20,12,36,.5)] text-[#FFF6E6]',
 };
 
+/** Renders the deterministic cover, status badge, and optional favorite action. */
 function Cover({
   story,
   height,

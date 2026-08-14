@@ -7,6 +7,7 @@ import { Reader } from './reader';
 
 export const metadata: Metadata = { title: 'خواندن قصه' };
 
+/** Server page that retrieves the dynamic story and reader-visible page text concurrently. */
 export default async function ReadPage({
   params,
   searchParams,
@@ -26,3 +27,7 @@ export default async function ReadPage({
 
   return <Reader story={story} pages={pages} autoPlay={play === '1'} />;
 }
+/**
+ * @file page.tsx
+ * @description Loads a ready owned story and its pages for the interactive video-and-book reader.
+ */

@@ -35,6 +35,7 @@ const REASSURANCES = [
   },
 ];
 
+/** Static public pricing page driven by the frontend display-price configuration. */
 export default function PricingPage() {
   return (
     <main className="mx-auto max-w-[1080px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -106,3 +107,7 @@ export default function PricingPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the single per-story price and explicitly explains the no-subscription model.
+ */

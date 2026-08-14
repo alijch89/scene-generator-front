@@ -1,5 +1,11 @@
+/**
+ * @file unauthorized.tsx
+ * @description Renders the App Router boundary used when authentication is required.
+ */
+
 import Link from 'next/link';
 
+/** Prompts an unauthenticated visitor to enter the login flow. */
 export default function Unauthorized() {
   return (
     <main className="flex min-h-full flex-col items-center justify-center gap-4 p-8 text-center">

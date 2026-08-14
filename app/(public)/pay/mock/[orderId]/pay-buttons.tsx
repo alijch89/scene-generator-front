@@ -1,3 +1,8 @@
+/**
+ * @file pay-buttons.tsx
+ * @description Provides development controls that navigate to signed success, failure, and cancellation callbacks.
+ */
+
 'use client';
 
 import { useState } from 'react';

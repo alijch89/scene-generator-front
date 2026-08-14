@@ -20,6 +20,7 @@ export const metadata: Metadata = { title: 'جزئیات کار' };
  * what the service actually said — the three things an operator needs before
  * deciding whether re-running is worth it.
  */
+/** Server page that retrieves generation diagnostics for a dynamic story identifier. */
 export default async function AdminStoryJobsPage({
   params,
 }: PageProps<'/admin/stories/[id]/jobs'>) {
@@ -168,3 +169,7 @@ export default async function AdminStoryJobsPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders one story's complete generation history, payment eligibility, failures, and retry action.
+ */

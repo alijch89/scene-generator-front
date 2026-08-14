@@ -9,6 +9,7 @@ import { sapi } from '@/lib/dal';
  * Safe on a GET: the API hands back the existing unpaid order rather than
  * opening a second one, and refuses outright once the story is paid for.
  */
+/** Server redirect page used by retry-payment actions for an existing story. */
 export default async function PayPage({ params }: PageProps<'/stories/[id]/pay'>) {
   const { id } = await params;
 
@@ -25,3 +26,7 @@ export default async function PayPage({ params }: PageProps<'/stories/[id]/pay'>
 
   redirect(payUrl);
 }
+/**
+ * @file page.tsx
+ * @description Re-fetches an owned story payment URL on the server and redirects the browser to it.
+ */

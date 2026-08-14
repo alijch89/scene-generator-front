@@ -1,3 +1,8 @@
+/**
+ * @file ui.tsx
+ * @description Provides dense administrator headers, panels, tables, filters, pagination, charts, and metrics.
+ */
+
 import Link from 'next/link';
 import {
   faDateNumeric,
@@ -37,6 +42,7 @@ export function AdminHeader({
   );
 }
 
+/** Displays one administrator metric with optional supporting text. */
 export function StatCard({
   label,
   value,
@@ -66,6 +72,7 @@ export function StatCard({
   );
 }
 
+/** Lays out responsive administrator statistic cards. */
 export function StatGrid({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-3.5 grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
@@ -74,6 +81,7 @@ export function StatGrid({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Renders a bordered administrator content panel. */
 export function Panel({
   title,
   children,
@@ -397,6 +405,7 @@ export function FilterBar({
   );
 }
 
+/** Renders the shared administrator search field used in GET filter forms. */
 export function SearchInput(
   props: React.InputHTMLAttributes<HTMLInputElement>,
 ) {

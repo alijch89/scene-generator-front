@@ -21,6 +21,7 @@ const EXPORTS = [
   { kind: 'moderation', label: 'گزارش بازبینی محتوا (CSV)' },
 ];
 
+/** Displays one report metric as a labelled row. */
 function Line({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex text-[12.5px]">
@@ -30,6 +31,7 @@ function Line({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+/** Server page that retrieves and renders aggregate product reports. */
 export default async function AdminReportsPage() {
   await requireAdmin();
 
@@ -126,3 +128,7 @@ export default async function AdminReportsPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders story-theme distribution, family behavior metrics, and report export links.
+ */

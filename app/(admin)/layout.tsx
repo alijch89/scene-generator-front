@@ -1,26 +1,17 @@
 import Link from 'next/link';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { requireAdmin } from '@/lib/dal';
-
-/** Sidebar order from Admin.dc.html, with اشتراک‌ها repurposed as سفارش‌ها. */
-const NAV = [
-  { href: '/admin', label: 'داشبورد' },
-  { href: '/admin/reports', label: 'گزارش‌ها' },
-  { href: '/admin/users', label: 'کاربران' },
-  { href: '/admin/children', label: 'پرونده‌های کودکان' },
-  { href: '/admin/stories', label: 'قصه‌ها' },
-  { href: '/admin/moderation', label: 'بازبینی محتوا' },
-  { href: '/admin/jobs', label: 'صف تولید' },
-  { href: '/admin/usage', label: 'مصرف مدل‌ها' },
-  { href: '/admin/payments', label: 'پرداخت‌ها' },
-  { href: '/admin/orders', label: 'سفارش‌ها' },
-  { href: '/admin/audit', label: 'گزارش رخدادها' },
-  { href: '/admin/settings', label: 'تنظیمات سیستم' },
-];
+import { AdminNav } from '@/components/admin/nav';
+import { requireAdmin, sapi } from '@/lib/dal';
 
 export default async function AdminLayout({ children }: LayoutProps<'/'>) {
   const user = await requireAdmin();
+
+  // The sidebar badge is a real count, so an operator can see work arriving
+  // without opening the page. A queue that cannot be read is not a queue.
+  const { pending } = await sapi
+    .get<{ pending: number }>('/admin/moderation/count')
+    .catch(() => ({ pending: 0 }));
 
   return (
     // data-surface swaps the whole palette — including every shadcn component
@@ -29,34 +20,42 @@ export default async function AdminLayout({ children }: LayoutProps<'/'>) {
       data-surface="admin"
       className="grid min-h-full grid-cols-1 bg-bg text-ink md:grid-cols-[218px_minmax(0,1fr)]"
     >
-      <aside className="sticky top-0 hidden h-screen flex-col gap-3 overflow-y-auto border-e border-border bg-surface px-3 py-5 md:flex">
-        <div className="mb-2 px-2">
-          <strong className="block font-display text-[15px]">پنل مدیریت</strong>
-          <span className="text-[11px] text-muted">شهرزاد قصه‌گو</span>
+      <aside className="sticky top-0 hidden h-screen flex-col gap-1 overflow-y-auto border-e border-border bg-surface px-3 py-5 md:flex">
+        <div className="mb-2 flex items-center gap-2.25 px-2">
+          <span
+            aria-hidden
+            className="grid size-7 place-items-center rounded-lg bg-brand text-[12px] font-bold text-brand-fg"
+          >
+            قص
+          </span>
+          <span className="flex flex-col">
+            <strong className="text-[14px]">پنل مدیریت</strong>
+            <span className="text-[11px] text-muted">شهرزاد قصه‌گو</span>
+          </span>
         </div>
-        <nav>
-          <ul className="flex flex-col gap-0.5">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="block rounded-lg px-3 py-2 text-right text-[13.5px] text-ink hover:bg-elev hover:no-underline"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+
+        <AdminNav pendingModeration={pending} />
+
+        <Link
+          href="/dashboard"
+          className="mt-auto rounded-lg border border-border bg-elev px-3 py-2.5 text-center text-[12.5px] font-semibold text-ink hover:no-underline"
+        >
+          نمای والدین ←
+        </Link>
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-surface px-5 py-3">
-          <span className="ms-auto text-[13px] text-muted">{user.fullName}</span>
-          <ThemeToggle className="size-9 rounded-lg" />
+        <header className="sticky top-0 z-20 flex flex-wrap items-center gap-3 border-b border-border bg-surface px-5 py-2.5">
+          <span className="rounded-md border border-border bg-elev px-2.25 py-0.75 text-[11px] text-muted">
+            محیط عملیاتی
+          </span>
+          <span className="ms-auto text-[12px] font-semibold">
+            {user.fullName} · مدیر
+          </span>
+          <ThemeToggle className="size-8.5 rounded-lg" />
           <LogoutButton />
         </header>
-        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6">
+        <main className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6">
           {children}
         </main>
       </div>

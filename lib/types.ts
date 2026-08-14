@@ -83,6 +83,66 @@ export interface OrderDto {
   storyStatus?: StoryStatus | null;
 }
 
+/** GET /orders — صورت‌حساب, the parent's own transaction history. */
+export interface TransactionsDto {
+  items: OrderDto[];
+  summary: { paidCount: number; paidTotal: number };
+}
+
+/** One row of the admin پرداخت‌ها table. */
+export interface AdminPaymentDto {
+  id: string;
+  storyId: string;
+  storyTitle: string | null;
+  storyStatus: StoryStatus | null;
+  amount: number;
+  currency: string;
+  status: OrderStatus;
+  paymentRef: string | null;
+  paidAt: string | null;
+  createdAt: string;
+  user: { id: string; fullName: string; email: string } | null;
+}
+
+export interface AdminPaymentDetailDto extends AdminPaymentDto {
+  childName: string | null;
+  failureReason: string | null;
+  events: { id: string; event: string; ip: string | null; createdAt: string }[];
+}
+
+export interface AdminPaymentsPageDto {
+  total: number;
+  page: number;
+  pageCount: number;
+  items: AdminPaymentDto[];
+}
+
+/** The four cards above the payments table, month to date. */
+export interface AdminPaymentStatsDto {
+  from: string | null;
+  revenue: number;
+  paidCount: number;
+  failedCount: number;
+  /** Failed as a share of what the bank actually ruled on. */
+  failureRate: number;
+  cancelledCount: number;
+  pendingCount: number;
+  pendingAmount: number;
+}
+
+/** GET /admin/orders — the سفارش‌ها lifecycle overview. */
+export interface AdminOrdersOverviewDto {
+  orderTotal: number;
+  statuses: Record<OrderStatus, { count: number; amount: number }>;
+  stories: Record<StoryStatus, number>;
+  conversion: number;
+  needsAction: {
+    stalePending: number;
+    recentFailed: number;
+    paidButFailed: number;
+  };
+}
+
 /** POST /stories — the wizard's final step returns the story and its payment link. */
 export interface CreatedStory {
   story: StoryDto;

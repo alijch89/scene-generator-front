@@ -22,6 +22,8 @@ const timeFmt = new Intl.DateTimeFormat('fa-IR', {
   hour: '2-digit',
   minute: '2-digit',
 });
+const relativeFmt = new Intl.RelativeTimeFormat('fa-IR', { numeric: 'auto' });
+const weekdayFmt = new Intl.DateTimeFormat('fa-IR', { weekday: 'long' });
 /** Latin digits on purpose — this one is arithmetic, not display. */
 const persianDayFmt = new Intl.DateTimeFormat('en-u-ca-persian', {
   day: 'numeric',
@@ -82,6 +84,43 @@ export const faCompactPrice = (rial: number) => {
   return `${rateFmt.format(millions)} م.ت`;
 };
 
+/** "۸۷ ثانیه" / "۱۱ دقیقه" — how long a job or a generation took. */
+export const faElapsed = (ms: number) => {
+  const seconds = Math.round(ms / 1000);
+  if (seconds < 90) return `${faDigits(seconds)} ثانیه`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 90) return `${faDigits(minutes)} دقیقه`;
+  return `${rateFmt.format(minutes / 60)} ساعت`;
+};
+
+/** "۱۰ دقیقه پیش". Null-safe, because «آخرین فعالیت» is often empty. */
+export const faAgo = (d: Date | string | null | undefined) => {
+  if (!d) return '—';
+  const then = typeof d === 'string' ? new Date(d) : d;
+  const seconds = Math.round((Date.now() - then.getTime()) / 1000);
+
+  const [value, unit]: [number, Intl.RelativeTimeFormatUnit] =
+    seconds < 60
+      ? [seconds, 'second']
+      : seconds < 3600
+        ? [Math.round(seconds / 60), 'minute']
+        : seconds < 86_400
+          ? [Math.round(seconds / 3600), 'hour']
+          : seconds < 2_592_000
+            ? [Math.round(seconds / 86_400), 'day']
+            : [Math.round(seconds / 2_592_000), 'month'];
+
+  return relativeFmt.format(-value, unit);
+};
+
+/** Jalali weekday initial — ش ی د س چ پ ج, the design's bar-chart axis. */
+export const faWeekdayShort = (d: Date | string) =>
+  weekdayFmt.format(typeof d === 'string' ? new Date(d) : d).slice(0, 1);
+
+/** "۲۰ تا ۲۲" — the reports page's peak-hour band. */
+export const faHourBand = (hour: number) =>
+  `${faDigits(hour)} تا ${faDigits((hour + 2) % 24)}`;
+
 /**
  * Midnight on the first of the current Jalali month, as a JS Date.
  *
@@ -109,6 +148,9 @@ if (process.env.NODE_ENV !== 'production') {
   console.assert(faAmount(1_449_700) === '۱۴۴٬۹۷۰', 'faAmount ریال→تومان');
   console.assert(faCompactPrice(8_420_000_000) === '۸۴۲٫۰ م.ت', 'faCompactPrice');
   console.assert(faCompactPrice(490_000) === faPrice(490_000), 'faCompactPrice small');
+  console.assert(faElapsed(87_000) === '۸۷ ثانیه', 'faElapsed seconds');
+  console.assert(faElapsed(660_000) === '۱۱ دقیقه', 'faElapsed minutes');
+  console.assert(faAgo(null) === '—', 'faAgo empty');
   // The first of a Jalali month is the first of a Jalali month, whichever day
   // it is asked on.
   console.assert(

@@ -1,5 +1,11 @@
 import Link from 'next/link';
-import { faDigits } from '@/lib/fa';
+import {
+  faDateNumeric,
+  faDigits,
+  faNum,
+  faRate,
+  faWeekdayShort,
+} from '@/lib/fa';
 import { cn } from '@/lib/utils';
 
 /**
@@ -73,7 +79,8 @@ export function Panel({
   children,
   className,
 }: {
-  title: string;
+  /** Omitted when the panel's content carries its own heading. */
+  title?: string;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -84,7 +91,9 @@ export function Panel({
         className,
       )}
     >
-      <strong className="mb-4 block text-[13px]">{title}</strong>
+      {title ? (
+        <strong className="mb-4 block text-[13px]">{title}</strong>
+      ) : null}
       {children}
     </section>
   );
@@ -216,5 +225,187 @@ export function TableEmpty({ children }: { children: React.ReactNode }) {
     <p className="border-t border-border px-3.5 py-10 text-center text-[13px] text-muted">
       {children}
     </p>
+  );
+}
+
+/**
+ * «▲ ۳٫۲٪ نسبت به دورهٔ قبل». The arrow carries the direction so the figure
+ * still reads without colour, and `invert` is for the measures where up is bad.
+ */
+export function Delta({
+  value,
+  suffix,
+  invert,
+}: {
+  value: number;
+  suffix?: string;
+  /** Set on failure counts and the like, where a rise is the bad news. */
+  invert?: boolean;
+}) {
+  // Under a tenth of a percent the arrow would be noise dressed as signal.
+  if (Math.abs(value) < 0.05) {
+    return (
+      <span className="text-[11.5px] text-muted">بدون تغییر محسوس{suffix}</span>
+    );
+  }
+
+  const up = value > 0;
+  const good = invert ? !up : up;
+
+  return (
+    <span
+      className={cn(
+        'text-[11.5px] font-semibold',
+        good ? 'text-success' : 'text-error',
+      )}
+    >
+      <span aria-hidden>{up ? '▲' : '▼'}</span>{' '}
+      <span className="sr-only">{up ? 'افزایش' : 'کاهش'} </span>
+      {faRate(Math.abs(value))}
+      {suffix}
+    </span>
+  );
+}
+
+/**
+ * The dashboard's ۲۴ ساعت / ۷ روز / ۳۰ روز control. Links, not buttons: the
+ * range lives in the URL, so a view an operator is looking at can be sent to
+ * someone else and survives a reload.
+ */
+export function RangeTabs({
+  value,
+  hrefFor,
+}: {
+  value: string;
+  hrefFor: (range: string) => string;
+}) {
+  const RANGES = [
+    { id: '24h', label: '۲۴ ساعت' },
+    { id: '7d', label: '۷ روز' },
+    { id: '30d', label: '۳۰ روز' },
+  ];
+
+  return (
+    <div className="ms-auto inline-flex rounded-lg border border-border bg-elev p-0.75">
+      {RANGES.map((range) => (
+        <Link
+          key={range.id}
+          href={hrefFor(range.id)}
+          aria-current={range.id === value ? 'true' : undefined}
+          className={cn(
+            'rounded-md px-3.25 py-1.75 text-[12px] font-semibold text-ink hover:no-underline',
+            range.id === value && 'bg-surface shadow-card',
+          )}
+        >
+          {range.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * «قصه‌های ساخته‌شده در هفته». Seven bars against the tallest, labelled with
+ * the Jalali weekday — a sparkline with a real axis rather than a chart
+ * library pulled in for one panel.
+ */
+export function WeekBars({
+  data,
+}: {
+  data: { date: string; count: number }[];
+}) {
+  const peak = Math.max(1, ...data.map((d) => d.count));
+  const peakDay = data.reduce((a, b) => (b.count > a.count ? b : a), data[0]);
+
+  return (
+    <>
+      <div className="mb-2 flex items-center gap-2.5">
+        <strong className="text-[13.5px]">قصه‌های ساخته‌شده در هفته</strong>
+        {peakDay && peakDay.count > 0 ? (
+          <span className="ms-auto text-[11.5px] text-muted">
+            اوج: {faWeekdayShort(peakDay.date)} · {faNum(peakDay.count)}
+          </span>
+        ) : null}
+      </div>
+
+      <ul className="flex h-37.5 items-end gap-2.5">
+        {data.map((day) => (
+          <li key={day.date} className="flex h-full flex-1 items-end">
+            <span
+              className={cn(
+                'block w-full rounded-t-md bg-brand',
+                day.count < peak && 'opacity-75',
+              )}
+              // A zero-count day still needs a hairline, or the week reads as
+              // six days long.
+              style={{ height: `${Math.max(2, (day.count / peak) * 100)}%` }}
+            >
+              <span className="sr-only">
+                {faDateNumeric(day.date)}: {faNum(day.count)} قصه
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div aria-hidden className="mt-2.25 flex gap-2.5">
+        {data.map((day) => (
+          <span
+            key={day.date}
+            className="flex-1 text-center text-[11px] text-muted"
+          >
+            {faWeekdayShort(day.date)}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/**
+ * The filter row every admin table carries. A plain GET form, so the filters
+ * end up in the URL and a row an operator found can be sent as a link.
+ */
+export function FilterBar({
+  action,
+  filtered,
+  children,
+}: {
+  action: string;
+  /** Shows «پاک کردن» only when something is actually filtered. */
+  filtered: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <form action={action} className="flex flex-wrap gap-2">
+      {children}
+      <button
+        type="submit"
+        className="rounded-lg border border-border bg-surface px-3.25 py-2 text-[12.5px] font-semibold"
+      >
+        اعمال
+      </button>
+      {filtered ? (
+        <Link
+          href={action}
+          className="rounded-lg border border-border bg-surface px-3.25 py-2 text-[12.5px] font-semibold text-ink hover:no-underline"
+        >
+          پاک کردن
+        </Link>
+      ) : null}
+    </form>
+  );
+}
+
+export function SearchInput(
+  props: React.InputHTMLAttributes<HTMLInputElement>,
+) {
+  return (
+    <input
+      type="search"
+      name="q"
+      {...props}
+      className="w-56 rounded-lg border border-border bg-surface px-2.75 py-2 text-[12.5px] text-ink"
+    />
   );
 }

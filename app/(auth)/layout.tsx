@@ -8,7 +8,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
  */
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
-    <div className="grid min-h-full grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
+    <div className="grid min-h-svh grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
       <aside className="relative flex min-h-[280px] flex-col justify-between overflow-hidden bg-[linear-gradient(180deg,#221C46,#59418C_58%,#D9926B)] p-[clamp(28px,5vw,52px)] text-[#FFF6E6]">
         <span
           aria-hidden

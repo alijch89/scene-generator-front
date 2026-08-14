@@ -19,6 +19,7 @@ const STORY_STATUS_LABEL: Record<string, string> = {
   FAILED: 'ناموفق',
 };
 
+/** Displays one labelled value in the transaction detail grid. */
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex gap-4 border-b border-border py-2.5 text-[12.5px] last:border-b-0">
@@ -34,6 +35,7 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
  * everything about this payment", and the honest version of each is the same
  * record plus the audit trail the callback left.
  */
+/** Server page that retrieves one transaction by its dynamic order identifier. */
 export default async function AdminPaymentDetailPage({
   params,
 }: PageProps<'/admin/payments/[orderId]'>) {
@@ -73,7 +75,9 @@ export default async function AdminPaymentDetailPage({
             label="شمارهٔ پیگیری بانک"
             value={
               payment.paymentRef ? (
-                <span className="font-mono">{faDigits(payment.paymentRef)}</span>
+                <span className="font-mono">
+                  {faDigits(payment.paymentRef)}
+                </span>
               ) : (
                 <span className="text-muted">— ثبت نشده</span>
               )
@@ -92,7 +96,9 @@ export default async function AdminPaymentDetailPage({
           />
           <Field
             label="شناسهٔ سفارش"
-            value={<span className="font-mono text-[11.5px]">{payment.id}</span>}
+            value={
+              <span className="font-mono text-[11.5px]">{payment.id}</span>
+            }
           />
         </Panel>
 
@@ -107,14 +113,21 @@ export default async function AdminPaymentDetailPage({
                   </Link>
                 }
               />
-              <Field label="ایمیل" value={payment.user.email} />
+              <Field label="شمارهٔ موبایل" value={payment.user.phone ?? '—'} />
             </>
           ) : (
-            <Field label="کاربر" value={<span className="text-muted">— حساب حذف شده</span>} />
+            <Field
+              label="کاربر"
+              value={<span className="text-muted">— حساب حذف شده</span>}
+            />
           )}
           <Field
             label="قصه"
-            value={payment.storyTitle ?? <span className="text-muted">— هنوز بی‌نام</span>}
+            value={
+              payment.storyTitle ?? (
+                <span className="text-muted">— هنوز بی‌نام</span>
+              )
+            }
           />
           <Field
             label="کودک"
@@ -137,10 +150,7 @@ export default async function AdminPaymentDetailPage({
             title="ساخت قصه پس از پرداخت شکست خورد"
             className="border-error"
           >
-            <p
-              role="alert"
-              className="text-[12.5px] leading-[1.9] text-muted"
-            >
+            <p role="alert" className="text-[12.5px] leading-[1.9] text-muted">
               {payment.failureReason ??
                 'دلیلی ثبت نشده است. صف تولید را بررسی کنید.'}
             </p>
@@ -184,3 +194,7 @@ export default async function AdminPaymentDetailPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders one transaction with payer, story, payment, failure, and callback-audit details.
+ */

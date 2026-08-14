@@ -6,6 +6,7 @@ export const metadata: Metadata = { title: 'حریم خصوصی' };
 /** A literal, not faDate(new Date()) — a policy's date is when it last changed. */
 const UPDATED_AT = '۲۲ مرداد ۱۴۰۵';
 
+/** Static privacy policy with a literal last-updated date. */
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-[760px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
@@ -30,7 +31,7 @@ export default function PrivacyPage() {
         <Card className="rounded-[20px]">
           <h2 className="mb-2.5 text-[17px]">چه چیزی جمع‌آوری می‌کنیم</h2>
           <p className="text-[14.5px] leading-[2] text-muted">
-            اطلاعات حساب (نام، ایمیل)، پروندهٔ کودک (نام کوچک، سن، علاقه‌ها)،
+            اطلاعات حساب (نام، شمارهٔ موبایل)، پروندهٔ کودک (نام کوچک، سن، علاقه‌ها)،
             عکس‌هایی که خودتان می‌فرستید، و قصه‌هایی که ساخته می‌شوند. اطلاعات
             پرداخت را نگه نمی‌داریم؛ پردازش آن نزد درگاه بانکی انجام می‌شود و
             فقط شمارهٔ پیگیری تراکنش نزد ما می‌ماند.
@@ -59,3 +60,7 @@ export default function PrivacyPage() {
     </main>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders the public child-data, photo, storage, retention, and account privacy policy.
+ */

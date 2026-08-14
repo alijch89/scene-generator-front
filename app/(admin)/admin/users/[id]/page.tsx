@@ -4,7 +4,12 @@ import { notFound } from 'next/navigation';
 import { Panel } from '@/components/admin/ui';
 import { UserStatusButton } from '@/components/admin/user-status';
 import { StatusBadge } from '@/components/status-badge';
-import { PHOTO_STATUS, ROLE_LABEL, STORY_STATUS, USER_STATUS } from '@/lib/admin';
+import {
+  PHOTO_STATUS,
+  ROLE_LABEL,
+  STORY_STATUS,
+  USER_STATUS,
+} from '@/lib/admin';
 import { ApiError } from '@/lib/api';
 import { requireAdmin, sapi } from '@/lib/dal';
 import { faAgo, faDate, faDigits, faNum, faPrice } from '@/lib/fa';
@@ -13,6 +18,7 @@ import type { AdminUserDetailDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'پروندهٔ کاربر' };
 
+/** Displays one account detail as a labelled row. */
 function Line({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex text-[12.5px]">
@@ -22,6 +28,7 @@ function Line({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+/** Server page that retrieves one account using its dynamic identifier. */
 export default async function AdminUserDetailPage({
   params,
 }: PageProps<'/admin/users/[id]'>) {
@@ -59,7 +66,7 @@ export default async function AdminUserDetailPage({
             </StatusBadge>
           </h1>
           <p className="text-[12.5px] text-muted">
-            {user.email} · {ROLE_LABEL[user.role]} · عضو از{' '}
+            {user.phone} · {ROLE_LABEL[user.role]} · عضو از{' '}
             {faDate(user.createdAt)}
           </p>
         </div>
@@ -75,17 +82,15 @@ export default async function AdminUserDetailPage({
             <Line label="نقش" value={ROLE_LABEL[user.role]} />
             <Line label="وضعیت" value={badge.label} />
             <Line
-              label="تأیید ایمیل"
+              label="تأیید شمارهٔ موبایل"
               value={
-                user.emailVerified ? `✓ ${faDate(user.emailVerifiedAt!)}` : '— انجام نشده'
+                user.phoneVerified
+                  ? `✓ ${faDate(user.phoneVerifiedAt!)}`
+                  : '— انجام نشده'
               }
             />
-            <Line label="شمارهٔ تماس" value={user.phone ?? '—'} />
             <Line label="آخرین فعالیت" value={faAgo(user.lastActiveAt)} />
-            <Line
-              label="نشست‌های باز"
-              value={faNum(user.activeSessions)}
-            />
+            <Line label="نشست‌های باز" value={faNum(user.activeSessions)} />
             <Line
               label="مجموع پرداخت"
               value={`${faPrice(user.paidTotal)} · ${faNum(user.paidCount)} تراکنش`}
@@ -93,7 +98,7 @@ export default async function AdminUserDetailPage({
           </div>
           <p className="mt-4 text-[11.5px] leading-[1.9] text-muted">
             «بازنشانی گذرواژه» از این‌جا ساخته نشده است: بازنشانی با پیوند
-            امضاشده به ایمیل خود کاربر انجام می‌شود و مسیر «گذرواژه را فراموش
+            امضاشده به پیامک خود کاربر انجام می‌شود و مسیر «گذرواژه را فراموش
             کرده‌ام» برای همان است.
           </p>
         </Panel>
@@ -137,7 +142,13 @@ export default async function AdminUserDetailPage({
         <Panel title="قصه‌ها">
           <div className="mb-3.5 flex flex-col gap-2.75">
             {(
-              ['READY', 'GENERATING', 'AWAITING_PAYMENT', 'FAILED', 'DRAFT'] as const
+              [
+                'READY',
+                'GENERATING',
+                'AWAITING_PAYMENT',
+                'FAILED',
+                'DRAFT',
+              ] as const
             ).map((status) => (
               <Line
                 key={status}
@@ -147,7 +158,7 @@ export default async function AdminUserDetailPage({
             ))}
           </div>
           <Link
-            href={`/admin/stories?q=${encodeURIComponent(user.email)}`}
+            href={`/admin/stories?q=${encodeURIComponent(user.phone ?? '')}`}
             className="text-[12.5px] font-bold"
           >
             همهٔ قصه‌های این خانواده ←
@@ -168,7 +179,8 @@ export default async function AdminUserDetailPage({
                   </span>
                   «{story.title ?? 'قصهٔ بی‌عنوان'}» برای{' '}
                   {story.childName ?? 'کودک حذف‌شده'} —{' '}
-                  {THEME_LABEL[story.theme]} ({STORY_STATUS[story.status].label})
+                  {THEME_LABEL[story.theme]} ({STORY_STATUS[story.status].label}
+                  )
                 </li>
               ))}
             </ul>
@@ -189,3 +201,7 @@ export default async function AdminUserDetailPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders an audited administrator view of one account and its operational history.
+ */

@@ -1,7 +1,11 @@
-/** Shared between proxy.ts, the DAL and client components. No secrets here. */
+/**
+ * @file session.ts
+ * @description Shares non-secret cookie names, role types, and safe account shapes across Next.js runtimes.
+ */
 
 import type { NotificationPrefs } from './types';
 
+/** HTTP-only session cookie name written by the backend. */
 export const SESSION_COOKIE = 'sid';
 
 /**
@@ -11,19 +15,20 @@ export const SESSION_COOKIE = 'sid';
  */
 export const ROLE_HINT_COOKIE = 'role';
 
+/** Account roles understood by frontend navigation and the data-access layer. */
 export type Role = 'ADMIN' | 'PARENT';
 
+/** Safe account response returned by GET /auth/me. */
 export interface UserDto {
   id: string;
-  email: string;
   fullName: string;
   phone: string | null;
   role: Role;
-  emailVerified: boolean;
+  phoneVerified: boolean;
   prefs: NotificationPrefs;
   createdAt: string;
 }
 
-/** Where each role lands after login. */
+/** Returns the default post-login route for a role. */
 export const homeFor = (role: Role) =>
   role === 'ADMIN' ? '/admin' : '/dashboard';

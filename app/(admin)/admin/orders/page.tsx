@@ -35,6 +35,7 @@ const STORY_FLOW: { status: StoryStatus; label: string; color: string }[] = [
   { status: 'FAILED', label: 'ناموفق', color: 'var(--sh-error)' },
 ];
 
+/** Displays one labelled count and amount inside an order-status section. */
 function Line({
   label,
   value,
@@ -71,6 +72,7 @@ function Line({
  * either settles it or does not, and generation either delivers or does not.
  * That is what this page measures.
  */
+/** Server page that retrieves and renders the current order lifecycle overview. */
 export default async function AdminOrdersPage() {
   await requireAdmin();
 
@@ -238,3 +240,7 @@ export default async function AdminOrdersPage() {
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders aggregate order-to-generation lifecycle, conversion, and action-needed metrics.
+ */

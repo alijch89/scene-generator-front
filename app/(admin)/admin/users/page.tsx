@@ -40,6 +40,7 @@ const STATUS_FILTER = [
   { value: 'unverified', label: 'تأیید نشده' },
 ];
 
+/** Server page that combines account counters with URL-filtered user rows. */
 export default async function AdminUsersPage({
   searchParams,
 }: PageProps<'/admin/users'>) {
@@ -53,7 +54,10 @@ export default async function AdminUsersPage({
     ? (sp.status as string)
     : '';
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
-  const page = Math.max(1, Number(typeof sp.page === 'string' ? sp.page : 1) || 1);
+  const page = Math.max(
+    1,
+    Number(typeof sp.page === 'string' ? sp.page : 1) || 1,
+  );
 
   const query = new URLSearchParams({
     page: String(page),
@@ -93,7 +97,7 @@ export default async function AdminUsersPage({
         <FilterBar action="/admin/users" filtered={filtered}>
           <SearchInput
             defaultValue={q}
-            placeholder="نام، ایمیل یا شناسه"
+            placeholder="نام، شمارهٔ موبایل یا شناسه"
             aria-label="جست‌وجو در کاربران"
           />
           <FilterSelect label="نقش کاربر" name="role" defaultValue={role}>
@@ -155,7 +159,7 @@ export default async function AdminUsersPage({
               // An unverified account is a more useful thing to see than
               // "active", so it wins the badge when both are true.
               const badge =
-                user.status === 'ACTIVE' && !user.emailVerified
+                user.status === 'ACTIVE' && !user.phoneVerified
                   ? UNVERIFIED
                   : USER_STATUS[user.status];
 
@@ -169,7 +173,7 @@ export default async function AdminUsersPage({
                       {user.fullName}
                     </Link>
                     <span className="block text-[11.5px] text-muted">
-                      {user.email}
+                      {user.phone}
                     </span>
                   </td>
                   <td className={tdClass}>
@@ -225,10 +229,14 @@ export default async function AdminUsersPage({
       />
 
       <p className="mt-3 text-[11.5px] leading-[1.9] text-muted">
-        اقدام‌های گروهی طرح اولیه (ارسال ایمیل، تغییر طرح، غیرفعال کردن دسته‌ای)
-        ساخته نشده‌اند: سامانهٔ ایمیل انبوه نداریم و طرحی هم برای تغییر نیست.
-        فعال و غیرفعال کردن در پروندهٔ هر کاربر انجام می‌شود.
+        اقدام‌های گروهی طرح اولیه (ارسال پیامک، تغییر طرح، غیرفعال کردن دسته‌ای)
+        ساخته نشده‌اند: سامانهٔ پیامک انبوه نداریم و طرحی هم برای تغییر نیست. فعال
+        و غیرفعال کردن در پروندهٔ هر کاربر انجام می‌شود.
       </p>
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders user counters and the searchable, filterable administrator account table.
+ */

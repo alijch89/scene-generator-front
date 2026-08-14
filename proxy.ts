@@ -29,12 +29,19 @@ const AUTH_PREFIXES = [
   '/register',
   '/forgot-password',
   '/reset-password',
-  '/verify-email',
+  '/verify-phone',
 ];
 
+/** Returns whether a pathname equals or descends from one of the route prefixes. */
 const startsWith = (path: string, prefixes: string[]) =>
   prefixes.some((p) => path === p || path.startsWith(`${p}/`));
 
+/**
+ * Applies optimistic login and role redirects without performing network I/O.
+ *
+ * @param req - Incoming Next.js request with URL and cookie access.
+ * @returns A redirect, a cookie-clearing continuation, or the unchanged request.
+ */
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
@@ -92,6 +99,11 @@ export function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
+/** Limits proxy execution to document routes, excluding framework and SVG assets. */
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg$).*)'],
 };
+/**
+ * @file proxy.ts
+ * @description Performs fast cookie-only route redirects before App Router rendering; authoritative checks remain in the DAL and API.
+ */

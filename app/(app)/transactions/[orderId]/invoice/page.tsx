@@ -12,6 +12,7 @@ import { PrintButton } from './print-button';
 
 export const metadata: Metadata = { title: 'فاکتور' };
 
+/** Displays one labelled invoice value. */
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex gap-4 border-b border-border py-2.5 text-[13.5px] last:border-b-0">
@@ -26,6 +27,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
  * session's userId, so another parent's invoice is a 404 here, not a page with
  * someone else's name on it.
  */
+/** Server page that loads a dynamic owned order for invoice rendering. */
 export default async function InvoicePage({
   params,
 }: PageProps<'/transactions/[orderId]/invoice'>) {
@@ -107,7 +109,7 @@ export default async function InvoicePage({
           <div>
             <p className="mb-2 text-[12px] font-bold text-muted">خریدار</p>
             <strong className="block text-[14px]">{user.fullName}</strong>
-            <span className="text-[12.5px] text-muted">{user.email}</span>
+            <span className="text-[12.5px] text-muted">{user.phone}</span>
           </div>
           <div>
             <p className="mb-2 text-[12px] font-bold text-muted">
@@ -128,10 +130,16 @@ export default async function InvoicePage({
         <table className="mb-6 w-full border-collapse text-[13.5px]">
           <thead className="bg-elev print:bg-transparent">
             <tr>
-              <th scope="col" className="rounded-s-xl px-4 py-3 text-right font-bold">
+              <th
+                scope="col"
+                className="rounded-s-xl px-4 py-3 text-right font-bold"
+              >
                 شرح
               </th>
-              <th scope="col" className="rounded-e-xl px-4 py-3 text-left font-bold">
+              <th
+                scope="col"
+                className="rounded-e-xl px-4 py-3 text-left font-bold"
+              >
                 مبلغ
               </th>
             </tr>
@@ -179,3 +187,7 @@ export default async function InvoicePage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders a print-friendly invoice for one payment order owned by the parent.
+ */

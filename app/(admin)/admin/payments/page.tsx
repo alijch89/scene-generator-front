@@ -38,22 +38,31 @@ const STATUS_FILTER: { value: string; label: string }[] = [
   { value: 'CANCELLED', label: 'لغو شده' },
 ];
 
+/** Narrows arbitrary URL text to a supported payment status. */
 const isStatus = (v: string): v is OrderStatus =>
   STATUS_FILTER.some((s) => s.value === v && v !== '');
 
 const PER_PAGE = 25;
 
+/** Server page that combines month statistics with URL-filtered transactions. */
 export default async function AdminPaymentsPage({
   searchParams,
 }: PageProps<'/admin/payments'>) {
   await requireAdmin();
 
   const sp = await searchParams;
-  const status = typeof sp.status === 'string' && isStatus(sp.status) ? sp.status : '';
+  const status =
+    typeof sp.status === 'string' && isStatus(sp.status) ? sp.status : '';
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
-  const page = Math.max(1, Number(typeof sp.page === 'string' ? sp.page : 1) || 1);
+  const page = Math.max(
+    1,
+    Number(typeof sp.page === 'string' ? sp.page : 1) || 1,
+  );
 
-  const query = new URLSearchParams({ page: String(page), take: String(PER_PAGE) });
+  const query = new URLSearchParams({
+    page: String(page),
+    take: String(PER_PAGE),
+  });
   if (status) query.set('status', status);
   if (q) query.set('q', q);
 
@@ -95,11 +104,15 @@ export default async function AdminPaymentsPage({
             type="search"
             name="q"
             defaultValue={q}
-            placeholder="نام، ایمیل، شمارهٔ پیگیری یا شناسه"
+            placeholder="نام، شمارهٔ موبایل، شمارهٔ پیگیری یا شناسه"
             aria-label="جست‌وجو در تراکنش‌ها"
             className="w-56 rounded-lg border border-border bg-surface px-2.75 py-2 text-[12.5px] text-ink"
           />
-          <FilterSelect label="وضعیت تراکنش" name="status" defaultValue={status}>
+          <FilterSelect
+            label="وضعیت تراکنش"
+            name="status"
+            defaultValue={status}
+          >
             {STATUS_FILTER.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -185,7 +198,7 @@ export default async function AdminPaymentsPage({
                           {payment.user.fullName}
                         </strong>
                         <span className="text-[11.5px] text-muted">
-                          {payment.user.email}
+                          {payment.user.phone}
                         </span>
                       </>
                     ) : (
@@ -253,3 +266,7 @@ export default async function AdminPaymentsPage({
     </section>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders payment statistics and the searchable, filterable administrator transaction table.
+ */

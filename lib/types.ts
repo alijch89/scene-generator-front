@@ -1,15 +1,20 @@
-/** Mirrors the DTOs the API returns. Kept flat and hand-written on purpose. */
+/**
+ * @file types.ts
+ * @description Defines hand-written frontend domain and API response types that mirror backend payloads.
+ */
 
+/** Supported story lengths. */
 export type StoryLength = 'SHORT' | 'MEDIUM' | 'LONG';
+/** Supported narration voices. */
 export type NarratorVoice = 'MARYAM' | 'BABAK' | 'NAZANIN';
+/** Supported generated illustration styles. */
 export type IllustrationStyle = 'WATERCOLOR' | 'CLASSIC' | 'PAPERCUT';
+/** Supported story tones. */
 export type StoryTone = 'CALM' | 'FUNNY' | 'BRAVE';
+/** Story lifecycle states returned by parent and administrator endpoints. */
 export type StoryStatus =
-  | 'DRAFT'
-  | 'AWAITING_PAYMENT'
-  | 'GENERATING'
-  | 'READY'
-  | 'FAILED';
+  'DRAFT' | 'AWAITING_PAYMENT' | 'GENERATING' | 'READY' | 'FAILED';
+/** Adventure themes accepted by the story wizard. */
 export type StoryTheme =
   | 'FANTASY'
   | 'SPACE'
@@ -21,6 +26,7 @@ export type StoryTheme =
   | 'BEDTIME'
   | 'OWN';
 
+/** Parent-facing child-profile response. */
 export interface ChildDto {
   id: string;
   firstName: string;
@@ -36,6 +42,7 @@ export interface ChildDto {
   createdAt: string;
 }
 
+/** Parent-facing story summary without internal prompts or storage keys. */
 export interface StoryDto {
   id: string;
   title: string | null;
@@ -58,17 +65,17 @@ export interface StoryDto {
   readyAt: string | null;
 }
 
+/** Payment order lifecycle states. */
 export type OrderStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
 
+/** Persisted stages in the generation pipeline. */
 export type JobStage =
-  | 'CHARACTER'
-  | 'WRITING'
-  | 'ILLUSTRATION'
-  | 'NARRATION'
-  | 'BINDING';
+  'CHARACTER' | 'WRITING' | 'ILLUSTRATION' | 'NARRATION' | 'BINDING';
 
+/** Execution states for one generation stage. */
 export type JobStatus = 'QUEUED' | 'RUNNING' | 'DONE' | 'FAILED';
 
+/** Parent-facing payment order, optionally enriched with story summary fields. */
 export interface OrderDto {
   id: string;
   storyId: string;
@@ -101,15 +108,17 @@ export interface AdminPaymentDto {
   paymentRef: string | null;
   paidAt: string | null;
   createdAt: string;
-  user: { id: string; fullName: string; email: string } | null;
+  user: { id: string; fullName: string; phone: string | null } | null;
 }
 
+/** Administrator transaction detail including callback audit events. */
 export interface AdminPaymentDetailDto extends AdminPaymentDto {
   childName: string | null;
   failureReason: string | null;
   events: { id: string; event: string; ip: string | null; createdAt: string }[];
 }
 
+/** Paginated administrator payment response. */
 export interface AdminPaymentsPageDto {
   total: number;
   page: number;
@@ -150,11 +159,13 @@ export interface CreatedStory {
   payUrl: string;
 }
 
+/** Reader-visible generated story page. */
 export interface StoryPageDto {
   index: number;
   text: string;
 }
 
+/** Polling response used by the five-stage generating screen. */
 export interface StoryProgressDto {
   status: StoryStatus;
   failureReason: string | null;
@@ -163,6 +174,7 @@ export interface StoryProgressDto {
   stages: { stage: JobStage; status: JobStatus; error: string | null }[];
 }
 
+/** Parent-facing notification row. */
 export interface NotificationDto {
   id: string;
   type: string;
@@ -172,6 +184,7 @@ export interface NotificationDto {
   createdAt: string;
 }
 
+/** Safe active-session metadata shown in account security settings. */
 export interface SessionDto {
   id: string;
   device: string | null;
@@ -180,6 +193,7 @@ export interface SessionDto {
   current: boolean;
 }
 
+/** Complete notification-preference shape returned by the account endpoint. */
 export interface NotificationPrefs {
   notifyStoryReady: boolean;
   notifyPayment: boolean;
@@ -188,10 +202,15 @@ export interface NotificationPrefs {
 
 /* ——— the admin panel ——————————————————————————————————————————— */
 
+/** Account access states shown in administrator views. */
 export type UserStatus = 'ACTIVE' | 'SUSPENDED';
+/** Child-photo storage and moderation states. */
 export type PhotoStatus = 'NONE' | 'PENDING' | 'READY' | 'FLAGGED' | 'DELETED';
+/** Domain object under moderation review. */
 export type ModerationTarget = 'STORY' | 'CHILD_PHOTO';
+/** Human-review lifecycle state. */
 export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+/** Time windows supported by administrator metrics. */
 export type AdminRange = '24h' | '7d' | '30d';
 
 /** Every admin table returns this envelope. */
@@ -206,7 +225,7 @@ export interface AdminPage<T> {
 export interface AdminUserRef {
   id: string;
   fullName: string;
-  email?: string;
+  phone?: string | null;
 }
 
 /** GET /admin/dashboard */
@@ -290,28 +309,29 @@ export interface AdminUsageDto {
   };
 }
 
+/** One account summary in the administrator user table. */
 export interface AdminUserRow {
   id: string;
   fullName: string;
-  email: string;
+  phone: string | null;
   role: 'ADMIN' | 'PARENT';
   status: UserStatus;
-  emailVerified: boolean;
+  phoneVerified: boolean;
   createdAt: string;
   lastActiveAt: string | null;
   childCount: number;
   storyCount: number;
 }
 
+/** Audited administrator account-detail response. */
 export interface AdminUserDetailDto {
   id: string;
   fullName: string;
-  email: string;
   phone: string | null;
   role: 'ADMIN' | 'PARENT';
   status: UserStatus;
-  emailVerified: boolean;
-  emailVerifiedAt: string | null;
+  phoneVerified: boolean;
+  phoneVerifiedAt: string | null;
   createdAt: string;
   lastActiveAt: string | null;
   activeSessions: number;
@@ -337,6 +357,7 @@ export interface AdminUserDetailDto {
   }[];
 }
 
+/** Privacy-limited child-profile row shown to administrators. */
 export interface AdminChildRow {
   id: string;
   firstName: string;
@@ -348,6 +369,7 @@ export interface AdminChildRow {
   user: AdminUserRef | null;
 }
 
+/** Cross-family story row shown to administrators. */
 export interface AdminStoryRow {
   id: string;
   title: string | null;
@@ -364,6 +386,7 @@ export interface AdminStoryRow {
   user: AdminUserRef | null;
 }
 
+/** One generation-stage execution row in the administrator pipeline table. */
 export interface AdminJobRow {
   id: string;
   storyId: string;
@@ -411,6 +434,7 @@ export interface AdminStoryJobsDto {
   }[];
 }
 
+/** Safe list summary for one moderation queue item. */
 export interface AdminModerationItem {
   id: string;
   targetType: ModerationTarget;
@@ -430,6 +454,7 @@ export interface AdminModerationItem {
   missing: boolean;
 }
 
+/** Moderation summary enriched with target-specific review context. */
 export interface AdminModerationDetail extends AdminModerationItem {
   /** Story targets only. */
   ownIdea?: string | null;
@@ -443,11 +468,13 @@ export interface AdminModerationDetail extends AdminModerationItem {
   interests?: string[];
 }
 
+/** Moderation list response and live pending count. */
 export interface AdminModerationQueueDto {
   pending: number;
   items: AdminModerationItem[];
 }
 
+/** One append-only event shown in the administrator audit trail. */
 export interface AdminAuditRow {
   id: string;
   event: string;
@@ -459,6 +486,7 @@ export interface AdminAuditRow {
   actor: { id: string; fullName: string; role: 'ADMIN' | 'PARENT' } | null;
 }
 
+/** Paginated audit response with the effective retention period. */
 export interface AdminAuditPageDto extends AdminPage<AdminAuditRow> {
   retentionDays: number;
 }

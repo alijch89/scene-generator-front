@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 export const metadata: Metadata = { title: 'نتیجهٔ پرداخت' };
 
 /** The design's centred result panel — one shape, five outcomes. */
+/** Renders the shared icon, heading, copy, and actions for a payment outcome. */
 function Panel({
   icon,
   tone,
@@ -59,6 +60,7 @@ function Panel({
 }
 
 /** «شمارهٔ پیگیری / مبلغ / تاریخ» — the design's receipt strip. */
+/** Displays payment reference, amount, and date after a confirmed transaction. */
 function Receipt({ order }: { order: OrderDto }) {
   const rows = [
     order.paymentRef ? ['شمارهٔ پیگیری', faDigits(order.paymentRef)] : null,
@@ -78,6 +80,7 @@ function Receipt({ order }: { order: OrderDto }) {
   );
 }
 
+/** Server page that resolves a dynamic order and renders its current payment outcome. */
 export default async function CheckoutPage({
   params,
 }: PageProps<'/checkout/[orderId]'>) {
@@ -185,7 +188,7 @@ export default async function CheckoutPage({
       icon="⏳"
       tone="warning"
       title="این پرداخت هنوز تکمیل نشده است"
-      lead="اگر پرداخت کرده‌اید، تأیید بانک تا چند دقیقه طول می‌کشد و نتیجه را ایمیل می‌کنیم. در غیر این صورت می‌توانید همین حالا ادامه دهید."
+      lead="اگر پرداخت کرده‌اید، تأیید بانک تا چند دقیقه طول می‌کشد و نتیجه را اطلاع می‌دهیم. در غیر این صورت می‌توانید همین حالا ادامه دهید."
       actions={
         <>
           <PrimaryLink href={`/stories/${order.storyId}/pay`}>
@@ -203,3 +206,7 @@ export default async function CheckoutPage({
     </Panel>
   );
 }
+/**
+ * @file page.tsx
+ * @description Renders paid, pending, failed, cancelled, and invalid payment result states.
+ */

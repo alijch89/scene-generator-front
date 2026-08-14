@@ -1,3 +1,8 @@
+/**
+ * @file page.tsx
+ * @description Implements the client password-reset request form with enumeration-safe feedback.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -5,19 +10,21 @@ import { useState } from 'react';
 import { Alert, Field, Input, SubmitButton } from '@/components/form';
 import { ApiError, api } from '@/lib/api';
 
+/** Requests a password-reset token without revealing whether the phone exists. */
 export default function ForgotPasswordPage() {
   const [state, setState] = useState<'idle' | 'bad' | 'sent'>('idle');
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [devToken, setDevToken] = useState<string | null>(null);
 
+  /** Requests password recovery and displays the enumeration-safe response. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     try {
       const res = await api.post<{ devToken?: string }>(
         '/auth/forgot-password',
-        { email },
+        { phone },
       );
       setDevToken(res.devToken ?? null);
       setState('sent');
@@ -34,12 +41,12 @@ export default function ForgotPasswordPage() {
         بازیابی گذرواژه
       </h1>
       <p className="mb-6 text-[14.5px] leading-[1.9] text-muted">
-        ایمیل حسابتان را بنویسید؛ یک لینک بازیابی می‌فرستیم.
+        شمارهٔ موبایل حسابتان را بنویسید؛ یک لینک بازیابی می‌فرستیم.
       </p>
 
       {state === 'bad' && (
         <Alert tone="error" icon="✕">
-          این ایمیل درست به نظر نمی‌رسد. نمونه: name@example.com
+          شمارهٔ موبایل درست به نظر نمی‌رسد. نمونه: ۰۹۱۲۳۴۵۶۷۸۹
         </Alert>
       )}
 
@@ -49,16 +56,16 @@ export default function ForgotPasswordPage() {
             aria-hidden
             className="mb-3 grid size-11 place-items-center rounded-[14px] bg-surface text-lg text-brand"
           >
-            ✉
+            ▣
           </span>
-          <strong className="mb-[7px] block text-base">ایمیل فرستاده شد</strong>
+          <strong className="mb-[7px] block text-base">پیامک فرستاده شد</strong>
           <p className="m-0 text-[13.5px] leading-[1.9] text-muted">
-            لینک بازیابی به {email} رفت و تا ۳۰ دقیقه معتبر است. اگر نرسید،
-            پوشهٔ اسپم را ببینید.
+            لینک بازیابی به {phone} فرستاده شد و تا ۳۰ دقیقه معتبر است. اگر
+            نرسید، چند دقیقه بعد دوباره تلاش کنید.
           </p>
           {devToken && (
             <p className="mt-3 text-[12.5px]">
-              {/* SMTP isn't wired yet — this shortcut only exists outside production. */}
+              {/* SMS isn't wired yet — this shortcut only exists outside production. */}
               <Link
                 href={`/reset-password?token=${encodeURIComponent(devToken)}`}
                 className="font-bold"
@@ -71,13 +78,17 @@ export default function ForgotPasswordPage() {
       )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
-        <Field label="ایمیل">
+        <Field label="شمارهٔ موبایل">
           <Input
-            type="email"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            pattern="09[0-9]{9}"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="sahar@example.com"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="09123456789"
+            dir="ltr"
             invalid={state === 'bad'}
           />
         </Field>

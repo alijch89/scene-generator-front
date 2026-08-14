@@ -1,18 +1,31 @@
+/**
+ * @file account-forms.tsx
+ * @description Implements parent profile, password, session, notification, display, and account-deletion controls.
+ */
+
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ConfirmDelete } from '@/components/app/confirm-delete';
-import { Alert, Field, Input, Select, SubmitButton, Toggle } from '@/components/form';
+import {
+  Alert,
+  Field,
+  Input,
+  Select,
+  SubmitButton,
+  Toggle,
+} from '@/components/form';
 import { api } from '@/lib/api';
 import { faDate } from '@/lib/fa';
 import type { NotificationPrefs, SessionDto } from '@/lib/types';
 import type { UserDto } from '@/lib/session';
 import { useTheme } from '@/app/providers';
 
+/** Inline success or failure message emitted by an account form. */
 type Feedback = { tone: 'success' | 'error'; text: string } | null;
 
-/** اطلاعات شخصی. Email is shown but not editable — see UpdateProfileDto. */
+/** اطلاعات شخصی. The login phone is shown but changes require verification. */
 export function ProfileForm({ user }: { user: UserDto }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -28,7 +41,6 @@ export function ProfileForm({ user }: { user: UserDto }) {
         try {
           await api.patch('/auth/me', {
             fullName: String(form.get('fullName') ?? ''),
-            phone: String(form.get('phone') ?? '') || undefined,
           });
           setFeedback({ tone: 'success', text: 'تغییرات ذخیره شد.' });
           router.refresh();
@@ -53,23 +65,32 @@ export function ProfileForm({ user }: { user: UserDto }) {
 
       <div className="grid gap-3.5 sm:grid-cols-2">
         <Field label="نام">
-          <Input name="fullName" defaultValue={user.fullName} required minLength={2} />
-        </Field>
-        <Field label="ایمیل" hint="برای تغییر ایمیل با پشتیبانی تماس بگیرید.">
-          <Input defaultValue={user.email} type="email" disabled readOnly />
-        </Field>
-        <Field label="شماره تماس" hint="۱۱ رقم، مثل ۰۹۱۲۳۴۵۶۷۸۹">
           <Input
-            name="phone"
+            name="fullName"
+            defaultValue={user.fullName}
+            required
+            minLength={2}
+          />
+        </Field>
+        <Field
+          label="شمارهٔ موبایل"
+          hint="برای تغییر شماره با پشتیبانی تماس بگیرید."
+        >
+          <Input
             type="tel"
-            inputMode="numeric"
-            pattern="0[0-9]{10}"
             defaultValue={user.phone ?? ''}
+            dir="ltr"
+            disabled
+            readOnly
           />
         </Field>
       </div>
 
-      <SubmitButton loading={busy} loadingLabel="در حال ذخیره…" className="mt-4.5 px-5.5 py-3.5">
+      <SubmitButton
+        loading={busy}
+        loadingLabel="در حال ذخیره…"
+        className="mt-4.5 px-5.5 py-3.5"
+      >
         ذخیرهٔ تغییرات
       </SubmitButton>
     </form>
@@ -152,23 +173,32 @@ export function ChangePasswordForm() {
 /** iPhone سحر · تهران · همین حالا — from a raw user-agent string. */
 function deviceLabel(device: string | null) {
   if (!device) return 'دستگاه ناشناس';
-  const os =
-    /iPhone/i.test(device) ? 'iPhone'
-    : /iPad/i.test(device) ? 'iPad'
-    : /Android/i.test(device) ? 'Android'
-    : /Macintosh|Mac OS/i.test(device) ? 'Mac'
-    : /Windows/i.test(device) ? 'Windows'
-    : /Linux/i.test(device) ? 'Linux'
-    : 'دستگاه';
-  const browser =
-    /Edg\//i.test(device) ? 'Edge'
-    : /Chrome\//i.test(device) ? 'Chrome'
-    : /Firefox\//i.test(device) ? 'Firefox'
-    : /Safari\//i.test(device) ? 'Safari'
-    : '';
+  const os = /iPhone/i.test(device)
+    ? 'iPhone'
+    : /iPad/i.test(device)
+      ? 'iPad'
+      : /Android/i.test(device)
+        ? 'Android'
+        : /Macintosh|Mac OS/i.test(device)
+          ? 'Mac'
+          : /Windows/i.test(device)
+            ? 'Windows'
+            : /Linux/i.test(device)
+              ? 'Linux'
+              : 'دستگاه';
+  const browser = /Edg\//i.test(device)
+    ? 'Edge'
+    : /Chrome\//i.test(device)
+      ? 'Chrome'
+      : /Firefox\//i.test(device)
+        ? 'Firefox'
+        : /Safari\//i.test(device)
+          ? 'Safari'
+          : '';
   return browser ? `${os} · ${browser}` : os;
 }
 
+/** Lists active device sessions and allows non-current sessions to be revoked. */
 export function SessionList({ sessions }: { sessions: SessionDto[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -224,6 +254,7 @@ export function SessionList({ sessions }: { sessions: SessionDto[] }) {
   );
 }
 
+/** Edits the three persisted account notification preferences. */
 export function NotificationPrefsForm({ prefs }: { prefs: NotificationPrefs }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -304,7 +335,8 @@ export function DisplaySettings() {
           // hydration, so reading it through a ref keeps the box in sync
           // without a state copy that would mismatch on the server.
           ref={(el: HTMLInputElement | null) => {
-            if (el) el.checked = document.documentElement.dataset.motion === 'reduce';
+            if (el)
+              el.checked = document.documentElement.dataset.motion === 'reduce';
           }}
           onChange={(event) => {
             const on = event.target.checked;
@@ -323,6 +355,7 @@ export function DisplaySettings() {
   );
 }
 
+/** Opens an irreversible type-and-password confirmation for account deletion. */
 export function DeleteAccountButton() {
   const router = useRouter();
 
@@ -355,4 +388,3 @@ export function DeleteAccountButton() {
     />
   );
 }
-

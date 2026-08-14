@@ -1,3 +1,8 @@
+/**
+ * @file register-form.tsx
+ * @description Implements parent registration, password-strength feedback, terms acknowledgement, and verification handoff.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -8,6 +13,7 @@ import { ApiError, api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 /** 0–3, matching the design's three-segment meter. */
+/** Scores password length and character variety for the three-segment UI meter. */
 function strengthOf(password: string) {
   if (password.length < 8) return password.length === 0 ? 0 : 1;
   const hasDigit = /\d/.test(password);
@@ -24,6 +30,7 @@ const STRENGTH_HINT = [
   'گذرواژهٔ قوی.',
 ];
 
+/** Submits parent registration and routes the issued development token to verification. */
 export function RegisterForm() {
   const router = useRouter();
   const [password, setPassword] = useState('');
@@ -34,6 +41,7 @@ export function RegisterForm() {
   const strength = strengthOf(password);
   const mismatch = confirm.length > 0 && confirm !== password;
 
+  /** Registers the account and forwards development verification context. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (mismatch) return;
@@ -44,15 +52,15 @@ export function RegisterForm() {
     try {
       const res = await api.post<{ devToken?: string }>('/auth/register', {
         fullName: String(form.get('fullName') ?? ''),
-        email: String(form.get('email') ?? ''),
+        phone: String(form.get('phone') ?? ''),
         password: String(form.get('password') ?? ''),
         acceptedTerms: form.get('acceptedTerms') === 'on',
       });
       const query = new URLSearchParams({
-        email: String(form.get('email') ?? ''),
+        phone: String(form.get('phone') ?? ''),
         ...(res.devToken ? { token: res.devToken } : {}),
       });
-      router.push(`/verify-email?${query.toString()}`);
+      router.push(`/verify-phone?${query.toString()}`);
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -83,13 +91,16 @@ export function RegisterForm() {
           <Input name="fullName" required placeholder="سحر رضایی" />
         </Field>
 
-        <Field label="ایمیل">
+        <Field label="شمارهٔ موبایل">
           <Input
-            name="email"
-            type="email"
-            autoComplete="email"
+            name="phone"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            pattern="09[0-9]{9}"
             required
-            placeholder="sahar@example.com"
+            placeholder="09123456789"
+            dir="ltr"
           />
         </Field>
 
@@ -123,7 +134,10 @@ export function RegisterForm() {
           </span>
         </Field>
 
-        <Field label="تکرار گذرواژه" hint={mismatch ? 'گذرواژه‌ها یکی نیستند.' : undefined}>
+        <Field
+          label="تکرار گذرواژه"
+          hint={mismatch ? 'گذرواژه‌ها یکی نیستند.' : undefined}
+        >
           <Input
             type="password"
             autoComplete="new-password"

@@ -1,3 +1,8 @@
+/**
+ * @file login-form.tsx
+ * @description Implements phone/password login and maps backend outcomes to the specified UI states.
+ */
+
 'use client';
 
 import Link from 'next/link';
@@ -8,6 +13,7 @@ import { ApiError, api } from '@/lib/api';
 import { homeFor, type UserDto } from '@/lib/session';
 
 /** The five login states the design specifies, plus the happy path. */
+/** Login feedback states represented by the authentication design. */
 type Status =
   | 'idle'
   | 'invalid' // اطلاعات نادرست
@@ -16,6 +22,7 @@ type Status =
   | 'network' // خطای شبکه
   | 'expired'; // پایان نشست
 
+/** Authenticates credentials and routes to a safe role-appropriate destination. */
 export function LoginForm({
   initialStatus,
   next,
@@ -26,7 +33,9 @@ export function LoginForm({
   const router = useRouter();
   const [status, setStatus] = useState<Status>(initialStatus);
   const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState('');
 
+  /** Submits credentials and maps API failures to explicit login states. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -35,7 +44,7 @@ export function LoginForm({
 
     try {
       const { user } = await api.post<{ user: UserDto }>('/auth/login', {
-        email: String(form.get('email') ?? ''),
+        phone,
         password: String(form.get('password') ?? ''),
         remember: form.get('remember') === 'on',
       });
@@ -47,7 +56,7 @@ export function LoginForm({
       if (err instanceof ApiError) {
         const code = (err.body as { code?: string })?.code;
         if (err.status === 429) setStatus('rate');
-        else if (code === 'EMAIL_NOT_VERIFIED') setStatus('verify');
+        else if (code === 'PHONE_NOT_VERIFIED') setStatus('verify');
         else setStatus('invalid');
       } else {
         // fetch itself failed — no response to read a code from
@@ -71,7 +80,7 @@ export function LoginForm({
 
       {status === 'invalid' && (
         <Alert tone="error" icon="✕">
-          ایمیل یا گذرواژه درست نیست. دوباره امتحان کنید یا{' '}
+          شمارهٔ موبایل یا گذرواژه درست نیست. دوباره امتحان کنید یا{' '}
           <Link href="/forgot-password" className="font-bold">
             گذرواژه را بازیابی کنید
           </Link>
@@ -80,14 +89,21 @@ export function LoginForm({
       )}
       {status === 'rate' && (
         <Alert tone="warning" icon="!">
-          تلاش‌های زیادی انجام شده. برای امنیت حساب، ۵ دقیقهٔ دیگر دوباره
-          امتحان کنید.
+          تلاش‌های زیادی انجام شده. برای امنیت حساب، ۵ دقیقهٔ دیگر دوباره امتحان
+          کنید.
         </Alert>
       )}
       {status === 'verify' && (
-        <Alert icon="✉">
-          ایمیلتان هنوز تأیید نشده.{' '}
-          <Link href="/verify-email" className="font-bold">
+        <Alert icon="▣">
+          شمارهٔ موبایلتان هنوز تأیید نشده.{' '}
+          <Link
+            href={
+              phone
+                ? `/verify-phone?phone=${encodeURIComponent(phone)}`
+                : '/verify-phone'
+            }
+            className="font-bold"
+          >
             ارسال دوبارهٔ لینک تأیید
           </Link>
         </Alert>
@@ -104,13 +120,18 @@ export function LoginForm({
       )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
-        <Field label="ایمیل">
+        <Field label="شمارهٔ موبایل">
           <Input
-            name="email"
-            type="email"
-            autoComplete="email"
+            name="phone"
+            type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
+            pattern="09[0-9]{9}"
             required
-            placeholder="sahar@example.com"
+            placeholder="09123456789"
+            dir="ltr"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
             invalid={invalid}
           />
         </Field>

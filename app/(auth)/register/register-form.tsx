@@ -1,8 +1,3 @@
-/**
- * @file register-form.tsx
- * @description Implements parent registration, password-strength feedback, terms acknowledgement, and verification handoff.
- */
-
 'use client';
 
 import Link from 'next/link';
@@ -10,63 +5,53 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Alert, Field, Input, SubmitButton } from '@/components/form';
 import { ApiError, api } from '@/lib/api';
-import { cn } from '@/lib/utils';
 
-/** 0–3, matching the design's three-segment meter. */
-/** Scores password length and character variety for the three-segment UI meter. */
-function strengthOf(password: string) {
-  if (password.length < 8) return password.length === 0 ? 0 : 1;
-  const hasDigit = /\d/.test(password);
-  const hasSpecial = /[^A-Za-z0-9]/.test(password);
-  if (hasDigit && hasSpecial) return 3;
-  if (hasDigit || hasSpecial) return 2;
-  return 2;
-}
-
-const STRENGTH_HINT = [
-  '',
-  'گذرواژه باید حداقل ۸ نویسه باشد.',
-  'گذرواژه خوب است. یک عدد یا نویسهٔ ویژه آن را قوی‌تر می‌کند.',
-  'گذرواژهٔ قوی.',
-];
-
-/** Submits parent registration and routes the issued development token to verification. */
+/** Collects a phone number, and optionally a name, then sends a sign-in code. */
 export function RegisterForm() {
   const router = useRouter();
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<React.ReactNode | null>(null);
 
-  const strength = strengthOf(password);
-  const mismatch = confirm.length > 0 && confirm !== password;
-
-  /** Registers the account and forwards development verification context. */
+  /** Creates the account and forwards the code-verification context. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (mismatch) return;
     const form = new FormData(event.currentTarget);
+    const phone = String(form.get('phone') ?? '');
+    const fullName = String(form.get('fullName') ?? '').trim();
+
     setLoading(true);
     setError(null);
 
     try {
       const res = await api.post<{ devToken?: string }>('/auth/register', {
-        fullName: String(form.get('fullName') ?? ''),
-        phone: String(form.get('phone') ?? ''),
-        password: String(form.get('password') ?? ''),
-        acceptedTerms: form.get('acceptedTerms') === 'on',
+        phone,
+        // Omitted entirely when blank, so the API applies its own placeholder.
+        ...(fullName ? { fullName } : {}),
       });
       const query = new URLSearchParams({
-        phone: String(form.get('phone') ?? ''),
+        phone,
+        mode: 'signup',
         ...(res.devToken ? { token: res.devToken } : {}),
       });
       router.push(`/verify-phone?${query.toString()}`);
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : 'اتصال برقرار نشد. دوباره تلاش کنید.',
-      );
+      if (err instanceof ApiError && err.status === 409) {
+        setError(
+          <>
+            این شماره قبلاً ثبت شده.{' '}
+            <Link href="/login" className="font-bold">
+              وارد شوید
+            </Link>
+            .
+          </>,
+        );
+      } else {
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : 'اتصال برقرار نشد. دوباره تلاش کنید.',
+        );
+      }
       setLoading(false);
     }
   }
@@ -77,7 +62,7 @@ export function RegisterForm() {
         حساب خانوادگی بسازید
       </h1>
       <p className="mb-6 text-[14.5px] text-muted">
-        اولین قصه را همین امشب بسازید.
+        شمارهٔ موبایلتان کافی است. اولین قصه را همین امشب بسازید.
       </p>
 
       {error && (
@@ -87,10 +72,6 @@ export function RegisterForm() {
       )}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
-        <Field label="نام و نام خانوادگی">
-          <Input name="fullName" required placeholder="سحر رضایی" />
-        </Field>
-
         <Field label="شمارهٔ موبایل">
           <Input
             name="phone"
@@ -99,73 +80,41 @@ export function RegisterForm() {
             autoComplete="tel"
             pattern="09[0-9]{9}"
             required
+            autoFocus
             placeholder="09123456789"
             dir="ltr"
           />
         </Field>
 
-        <Field label="گذرواژه" hint={STRENGTH_HINT[strength]}>
-          <Input
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            placeholder="حداقل ۸ نویسه"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <span className="mt-0.5 flex gap-[5px]" aria-hidden>
-            {[1, 2, 3].map((step) => (
-              <span
-                key={step}
-                className={cn(
-                  'h-1 flex-1 rounded-[3px]',
-                  strength >= step
-                    ? strength === 1
-                      ? 'bg-error'
-                      : strength === 2
-                        ? 'bg-warning'
-                        : 'bg-success'
-                    : 'bg-border',
-                )}
-              />
-            ))}
-          </span>
-        </Field>
-
         <Field
-          label="تکرار گذرواژه"
-          hint={mismatch ? 'گذرواژه‌ها یکی نیستند.' : undefined}
+          label={
+            <>
+              نام و نام خانوادگی
+              <span className="ms-2 font-normal text-muted">(اختیاری)</span>
+            </>
+          }
+          hint="بعداً هم می‌توانید در تنظیمات اضافه کنید."
         >
           <Input
-            type="password"
-            autoComplete="new-password"
-            required
-            placeholder="••••••••"
-            value={confirm}
-            invalid={mismatch}
-            onChange={(e) => setConfirm(e.target.value)}
+            name="fullName"
+            autoComplete="name"
+            minLength={2}
+            maxLength={60}
+            placeholder="سحر رضایی"
           />
         </Field>
 
-        <label className="flex items-start gap-2.5 text-[13px] leading-[1.8] text-muted">
-          <input
-            type="checkbox"
-            name="acceptedTerms"
-            required
-            className="mt-[3px] size-[17px] accent-[var(--sh-primary)]"
-          />
-          <span>
-            <Link href="/terms">شرایط استفاده</Link> و{' '}
-            <Link href="/privacy">حریم خصوصی</Link> را می‌پذیرم. تأیید می‌کنم
-            بالای ۱۸ سال دارم.
-          </span>
-        </label>
-
-        <SubmitButton loading={loading} loadingLabel="در حال ساخت حساب…">
-          ساخت حساب و شروع
+        <SubmitButton loading={loading} loadingLabel="در حال ارسال کد…">
+          دریافت کد
         </SubmitButton>
+
+        {/* The design's explicit checkbox is gone with the rest of the form —
+            consent rides on the submit, as it does in every code sign-up. */}
+        <p className="text-center text-[12.5px] leading-[1.9] text-muted">
+          با ادامه، <Link href="/terms">شرایط استفاده</Link> و{' '}
+          <Link href="/privacy">حریم خصوصی</Link> را می‌پذیرید و تأیید می‌کنید
+          بالای ۱۸ سال دارید.
+        </p>
       </form>
 
       <p className="mt-6 text-center text-[13px] text-muted">
@@ -177,3 +126,7 @@ export function RegisterForm() {
     </section>
   );
 }
+/**
+ * @file register-form.tsx
+ * @description Implements phone-only parent registration and the handoff to code verification.
+ */

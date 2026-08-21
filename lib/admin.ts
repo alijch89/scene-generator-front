@@ -18,9 +18,10 @@ import type {
  */
 
 /** Persian display labels for account roles. */
-export const ROLE_LABEL: Record<'ADMIN' | 'PARENT', string> = {
-  ADMIN: 'مدیر',
-  PARENT: 'والد',
+export const ROLE_LABEL: Record<'SuperAdmin' | 'Admin' | 'User', string> = {
+  SuperAdmin: 'مدیر ارشد',
+  Admin: 'مدیر',
+  User: 'کاربر',
 };
 
 /** Label, icon, and tone for each user access state. */

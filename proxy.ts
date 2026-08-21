@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { ROLE_HINT_COOKIE, SESSION_COOKIE, type Role } from '@/lib/session';
+import {
+  ADMIN_ROLES,
+  ROLE_HINT_COOKIE,
+  SESSION_COOKIE,
+  type Role,
+} from '@/lib/session';
 
 /**
  * Optimistic gate only — it reads cookies and never touches the API, because
@@ -22,6 +27,10 @@ const PARENT_PREFIXES = [
   '/wizard',
   '/stories',
   '/checkout',
+  // Reached with a session already in hand — verification signs the parent in
+  // before they pick a password — so it gates like the rest of the app, not
+  // like the auth pages it sits beside.
+  '/set-password',
 ];
 
 const AUTH_PREFIXES = [
@@ -47,6 +56,7 @@ export function proxy(req: NextRequest) {
 
   const hasSession = Boolean(req.cookies.get(SESSION_COOKIE)?.value);
   const role = req.cookies.get(ROLE_HINT_COOKIE)?.value as Role | undefined;
+  const isAdminRole = role !== undefined && ADMIN_ROLES.includes(role);
 
   const isAdminArea = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
   const isParentArea = startsWith(pathname, PARENT_PREFIXES);
@@ -76,20 +86,20 @@ export function proxy(req: NextRequest) {
 
   if (hasSession && isAuthArea) {
     const url = req.nextUrl.clone();
-    url.pathname = role === 'ADMIN' ? '/admin' : '/dashboard';
+    url.pathname = isAdminRole ? '/admin' : '/dashboard';
     url.search = '';
     return NextResponse.redirect(url);
   }
 
   // Keep each role in its own half of the product.
-  if (hasSession && isAdminArea && role === 'PARENT') {
+  if (hasSession && isAdminArea && !isAdminRole) {
     const url = req.nextUrl.clone();
     url.pathname = '/dashboard';
     url.search = '';
     return NextResponse.redirect(url);
   }
 
-  if (hasSession && isParentArea && role === 'ADMIN') {
+  if (hasSession && isParentArea && isAdminRole) {
     const url = req.nextUrl.clone();
     url.pathname = '/admin';
     url.search = '';

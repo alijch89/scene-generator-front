@@ -29,8 +29,9 @@ const PER_PAGE = 25;
  */
 const ROLE_FILTER = [
   { value: '', label: 'همهٔ نقش‌ها' },
-  { value: 'PARENT', label: 'والد' },
-  { value: 'ADMIN', label: 'مدیر' },
+  { value: 'User', label: 'کاربر' },
+  { value: 'Admin', label: 'مدیر' },
+  { value: 'SuperAdmin', label: 'مدیر ارشد' },
 ];
 
 const STATUS_FILTER = [

@@ -41,14 +41,15 @@ export async function verifySession(): Promise<UserDto> {
 /** Requires a valid session whose role belongs to the accepted role set. */
 export async function requireRole(...roles: Role[]): Promise<UserDto> {
   const user = await verifySession();
-  if (!roles.includes(user.role)) forbidden();
+  // An account may hold several roles; any accepted one is enough.
+  if (!user.roles.some((held) => roles.includes(held))) forbidden();
   return user;
 }
 
 /** Requires an authenticated administrator or renders the forbidden boundary. */
-export const requireAdmin = () => requireRole('ADMIN');
+export const requireAdmin = () => requireRole('SuperAdmin', 'Admin');
 /** Requires an authenticated parent or renders the forbidden boundary. */
-export const requireParent = () => requireRole('PARENT');
+export const requireParent = () => requireRole('User');
 
 /** Forwards the caller's session cookie to the API from a server component. */
 export async function serverCookieHeader(): Promise<string | undefined> {

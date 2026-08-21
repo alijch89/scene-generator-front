@@ -16,13 +16,19 @@ export const SESSION_COOKIE = 'sid';
 export const ROLE_HINT_COOKIE = 'role';
 
 /** Account roles understood by frontend navigation and the data-access layer. */
-export type Role = 'ADMIN' | 'PARENT';
+export type Role = 'SuperAdmin' | 'Admin' | 'User';
+
+/** Roles that land in the admin panel rather than the family dashboard. */
+export const ADMIN_ROLES: Role[] = ['SuperAdmin', 'Admin'];
 
 /** Safe account response returned by GET /auth/me. */
 export interface UserDto {
   id: string;
   fullName: string;
   phone: string | null;
+  /** Every role held by the account. */
+  roles: Role[];
+  /** Highest-privilege role, which is what navigation routes on. */
   role: Role;
   phoneVerified: boolean;
   prefs: NotificationPrefs;
@@ -31,4 +37,4 @@ export interface UserDto {
 
 /** Returns the default post-login route for a role. */
 export const homeFor = (role: Role) =>
-  role === 'ADMIN' ? '/admin' : '/dashboard';
+  ADMIN_ROLES.includes(role) ? '/admin' : '/dashboard';

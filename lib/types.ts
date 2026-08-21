@@ -314,7 +314,8 @@ export interface AdminUserRow {
   id: string;
   fullName: string;
   phone: string | null;
-  role: 'ADMIN' | 'PARENT';
+  roles: ('SuperAdmin' | 'Admin' | 'User')[];
+  role: 'SuperAdmin' | 'Admin' | 'User';
   status: UserStatus;
   phoneVerified: boolean;
   createdAt: string;
@@ -328,7 +329,8 @@ export interface AdminUserDetailDto {
   id: string;
   fullName: string;
   phone: string | null;
-  role: 'ADMIN' | 'PARENT';
+  roles: ('SuperAdmin' | 'Admin' | 'User')[];
+  role: 'SuperAdmin' | 'Admin' | 'User';
   status: UserStatus;
   phoneVerified: boolean;
   phoneVerifiedAt: string | null;
@@ -483,7 +485,11 @@ export interface AdminAuditRow {
   ip: string | null;
   createdAt: string;
   /** Null means the system itself acted — «سامانه» in the table. */
-  actor: { id: string; fullName: string; role: 'ADMIN' | 'PARENT' } | null;
+  actor: {
+    id: string;
+    fullName: string;
+    role: 'SuperAdmin' | 'Admin' | 'User';
+  } | null;
 }
 
 /** Paginated audit response with the effective retention period. */

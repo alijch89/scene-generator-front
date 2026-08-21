@@ -70,10 +70,11 @@ export default async function AdminUserDetailPage({
             {faDate(user.createdAt)}
           </p>
         </div>
-        {/* Only a parent account is suspendable; the API refuses an admin and
-            refuses the current session's own account, so the button is hidden
-            rather than offered and then rejected. */}
-        {user.role === 'PARENT' ? <UserStatusButton user={user} /> : null}
+        {/* Only a plain user account is suspendable; the API refuses anyone
+            holding an admin role and refuses the current session's own
+            account, so the button is hidden rather than offered and then
+            rejected. */}
+        {user.role === 'User' ? <UserStatusButton user={user} /> : null}
       </div>
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] items-start gap-3.5">

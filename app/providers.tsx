@@ -33,6 +33,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stamped = document.documentElement.dataset.theme;
+    // The inline pre-hydration script is the external source of truth here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stamped === 'dark' || stamped === 'light') setTheme(stamped);
   }, []);
 

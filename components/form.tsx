@@ -56,7 +56,6 @@ export function Alert({
 export function Field({
   label,
   hint,
-  error,
   children,
 }: {
   label: React.ReactNode;

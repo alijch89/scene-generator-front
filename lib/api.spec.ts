@@ -1,6 +1,6 @@
-import { ApiError, request } from './api';
+import { ApiError, request } from "./api";
 
-const response = (payload: unknown, status: number, statusText = '') =>
+const response = (payload: unknown, status: number, statusText = "") =>
   ({
     status,
     statusText,
@@ -8,58 +8,86 @@ const response = (payload: unknown, status: number, statusText = '') =>
     json: async () => payload,
   }) as Response;
 
-describe('request', () => {
+describe("request", () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('serializes JSON, includes credentials, and returns a parsed response', async () => {
-    const fetchMock = jest.spyOn(global, 'fetch').mockResolvedValue(
-      response({ id: 'story-1' }, 200),
-    );
+  it("serializes JSON, includes credentials, and returns a parsed response", async () => {
+    const fetchMock = jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(response({ id: "story-1" }, 200));
 
     await expect(
-      request('/stories', {
-        method: 'POST',
-        body: { theme: 'SPACE' },
-        cookie: 'sid=session-token',
+      request("/stories", {
+        method: "POST",
+        body: { theme: "SPACE" },
+        cookie: "sid=session-token",
       }),
-    ).resolves.toEqual({ id: 'story-1' });
+    ).resolves.toEqual({ id: "story-1" });
 
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringMatching(/\/api\/stories$/),
       expect.objectContaining({
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify({ theme: 'SPACE' }),
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ theme: "SPACE" }),
         headers: expect.objectContaining({
-          'content-type': 'application/json',
-          cookie: 'sid=session-token',
+          "content-type": "application/json",
+          cookie: "sid=session-token",
         }),
       }),
     );
   });
 
-  it('returns undefined for a successful 204 response', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(response(undefined, 204));
-    await expect(request('/auth/logout', { method: 'POST' })).resolves.toBeUndefined();
+  it("returns undefined for a successful 204 response", async () => {
+    jest.spyOn(global, "fetch").mockResolvedValue(response(undefined, 204));
+    await expect(
+      request("/auth/logout", { method: "POST" }),
+    ).resolves.toBeUndefined();
   });
 
-  it('maps API error arrays and preserves status and payload', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(
-      response(
-        { message: ['phone is invalid', 'name is short'], code: 'VALIDATION' },
-        400,
-        'Bad Request',
-      ),
-    );
+  it("passes FormData through without forcing a JSON content type", async () => {
+    const fetchMock = jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(response({ id: "story-1" }, 201));
+    const form = new FormData();
+    form.append("topic", "دوست داشتن حیوانات");
 
-    await expect(request('/auth/register', { method: 'POST', body: {} })).rejects.toEqual(
+    await request("/stories", { method: "POST", body: form });
+
+    const init = fetchMock.mock.lastCall?.[1] as RequestInit;
+    expect(init.body).toBe(form);
+    expect(init.headers).not.toEqual(
+      expect.objectContaining({ "content-type": "application/json" }),
+    );
+  });
+
+  it("maps API error arrays and preserves status and payload", async () => {
+    jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(
+        response(
+          {
+            message: ["phone is invalid", "name is short"],
+            code: "VALIDATION",
+          },
+          400,
+          "Bad Request",
+        ),
+      );
+
+    await expect(
+      request("/auth/register", { method: "POST", body: {} }),
+    ).rejects.toEqual(
       expect.objectContaining<ApiError>({
-        name: 'ApiError',
+        name: "ApiError",
         status: 400,
-        message: 'phone is invalid، name is short',
-        body: { message: ['phone is invalid', 'name is short'], code: 'VALIDATION' },
+        message: "phone is invalid، name is short",
+        body: {
+          message: ["phone is invalid", "name is short"],
+          code: "VALIDATION",
+        },
       }),
     );
   });

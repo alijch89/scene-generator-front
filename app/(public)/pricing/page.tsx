@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Card, PageHeader } from '@/components/public/ui';
-import { STORY_PRICE } from '@/lib/config';
+import { STORY_PRICE_BY_LENGTH } from '@/lib/config';
 import { faNum } from '@/lib/fa';
 
 export const metadata: Metadata = { title: 'قیمت' };
 
 /**
- * The design's three-tier subscription table is deliberately gone: there is one
- * static price per story, no plans, no credit packs and no usage meters. So
- * everything the product does is included — the list below is the whole thing.
+ * There are no subscription plans, credit packs, or usage meters. The only
+ * price difference is the requested video length.
  */
 const INCLUDED = [
   'متن اختصاصی با نام، سن و علاقه‌های کودک',
@@ -35,26 +34,56 @@ const REASSURANCES = [
   },
 ];
 
-/** Static public pricing page driven by the frontend display-price configuration. */
+const PRICE_OPTIONS = [
+  {
+    label: 'ویدیوی کوتاه',
+    detail: '۵ صفحه · حدود ۳ دقیقه',
+    price: STORY_PRICE_BY_LENGTH.SHORT,
+  },
+  {
+    label: 'ویدیوی متوسط',
+    detail: '۱۰ صفحه · حدود ۶ دقیقه',
+    price: STORY_PRICE_BY_LENGTH.MEDIUM,
+  },
+  {
+    label: 'ویدیوی بلند',
+    detail: '۱۶ صفحه · حدود ۱۰ دقیقه',
+    price: STORY_PRICE_BY_LENGTH.LONG,
+  },
+];
+
+/** Public per-length pricing driven by the frontend display configuration. */
 export default function PricingPage() {
   return (
     <main className="mx-auto max-w-[1080px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
       <PageHeader
-        title="یک قیمت، همین."
-        lead="نه اشتراک ماهانه، نه بستهٔ اعتبار. برای هر قصه‌ای که می‌سازید یک بار پرداخت می‌کنید و آن قصه برای همیشه مال شماست."
+        title="قیمت متناسب با طول ویدیو"
+        lead="نه اشتراک ماهانه، نه بستهٔ اعتبار. فقط طول ویدیوی قصه را انتخاب می‌کنید و یک بار پرداخت می‌کنید."
       />
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] items-start gap-5">
         <div className="rounded-3xl border-2 border-brand bg-surface p-7 shadow-card-lg">
-          <strong className="mb-1.5 block text-[17px]">یک قصهٔ کامل</strong>
-          <p className="mb-5 text-[13px] text-muted">
+          <strong className="mb-1.5 block text-[17px]">قیمت هر ویدیو</strong>
+          <p className="mb-4 text-[13px] text-muted">
             متن، تصویر، روایت و ویدئو
           </p>
-          <p className="mb-1 font-display text-[44px] leading-none">
-            {faNum(STORY_PRICE)}{' '}
-            <span className="text-sm text-muted">تومان</span>
-          </p>
-          <p className="mb-6 text-[13px] text-muted">برای هر قصه</p>
+
+          <dl className="mb-6 divide-y divide-border rounded-[18px] border border-border bg-elev px-4">
+            {PRICE_OPTIONS.map((option) => (
+              <div key={option.label} className="flex items-center gap-3 py-3.5">
+                <div>
+                  <dt className="text-[14px] font-bold">{option.label}</dt>
+                  <dd className="mt-0.5 text-[11.5px] text-muted">
+                    {option.detail}
+                  </dd>
+                </div>
+                <dd className="ms-auto whitespace-nowrap font-display text-[20px]">
+                  {faNum(option.price)}{' '}
+                  <span className="font-sans text-[11px] text-muted">تومان</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
 
           <Link
             href="/wizard"
@@ -109,5 +138,5 @@ export default function PricingPage() {
 }
 /**
  * @file page.tsx
- * @description Renders the single per-story price and explicitly explains the no-subscription model.
+ * @description Renders per-video-length prices and explains the no-subscription model.
  */

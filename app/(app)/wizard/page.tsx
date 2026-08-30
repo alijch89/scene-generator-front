@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { AddChildButton } from '@/components/app/child-form';
 import { EmptyState } from '@/components/app/ui';
-import { STORY_PRICE_RIAL } from '@/lib/config';
+import { STORY_PRICE_RIAL_BY_LENGTH } from '@/lib/config';
 import { sapi } from '@/lib/dal';
 import type { ChildDto } from '@/lib/types';
 import { WizardForm } from './wizard-form';
@@ -37,7 +37,7 @@ export default async function WizardPage({
       childProfiles={childProfiles}
       initialChildId={typeof child === 'string' ? child : undefined}
       initialIdea={typeof idea === 'string' ? idea : undefined}
-      price={STORY_PRICE_RIAL}
+      prices={STORY_PRICE_RIAL_BY_LENGTH}
     />
   );
 }

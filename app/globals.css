@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 /* The theme toggle stamps data-theme on <html>, not a .dark class. */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
@@ -35,7 +35,7 @@
   --sh-shadow-lg: 0 22px 54px rgba(74, 38, 110, 0.2);
 }
 
-[data-theme='dark'] {
+[data-theme="dark"] {
   /* parent-facing — dark */
   --sh-bg: #140e24;
   --sh-bg2: #1e1436;
@@ -63,7 +63,7 @@
 /* The admin panel is a separate visual language. Set data-surface="admin" on
    the (admin) layout root and everything inside — shadcn components included —
    picks up the cool palette with no component changes. */
-[data-surface='admin'] {
+[data-surface="admin"] {
   --sh-bg: #f4f5f8;
   --sh-bg2: #eceef4;
   --sh-surface: #ffffff;
@@ -85,8 +85,8 @@
   --radius: 0.625rem;
 }
 
-[data-theme='dark'] [data-surface='admin'],
-[data-surface='admin'][data-theme='dark'] {
+[data-theme="dark"] [data-surface="admin"],
+[data-surface="admin"][data-theme="dark"] {
   --sh-bg: #0f1218;
   --sh-bg2: #141922;
   --sh-surface: #171b24;
@@ -152,7 +152,7 @@
   --sidebar-ring: var(--sh-accent);
 }
 
-[data-surface='admin'] {
+[data-surface="admin"] {
   /* admin focuses with primary at 2px, not the accent */
   --ring: var(--sh-primary);
   --chart-2: var(--sh-info);
@@ -238,8 +238,62 @@
     color: var(--sh-ink);
   }
 
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  * {
+    scrollbar-color: var(--sh-primary) var(--sh-bg2);
+    scrollbar-width: thin;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--sh-bg2);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border: 2px solid var(--sh-bg2);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--sh-primary) 82%, var(--sh-accent));
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--sh-accent);
+  }
+
   body {
     font-family: var(--font-vazirmatn), system-ui, sans-serif;
+  }
+
+  :where(
+    a[href],
+    button:not(:disabled),
+    select:not(:disabled),
+    summary,
+    [role="button"]:not([aria-disabled="true"]),
+    input[type="button"]:not(:disabled),
+    input[type="submit"]:not(:disabled),
+    input[type="checkbox"]:not(:disabled),
+    input[type="radio"]:not(:disabled),
+    input[type="file"]:not(:disabled),
+    input[type="range"]:not(:disabled),
+    label:has(input[type="file"]:not(:disabled))
+  ) {
+    cursor: pointer;
+  }
+
+  :where(
+    button:disabled,
+    select:disabled,
+    input:disabled,
+    [aria-disabled="true"]
+  ) {
+    cursor: not-allowed;
   }
 
   :focus-visible {
@@ -248,7 +302,7 @@
     border-radius: 6px;
   }
 
-  [data-surface='admin'] :focus-visible {
+  [data-surface="admin"] :focus-visible {
     outline-width: 2px;
   }
 
@@ -341,7 +395,7 @@
 
 /* The soft moving glow behind the parent-facing pages. Admin has none. */
 .aurora::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: -20vh -10vw;
   z-index: 0;
@@ -375,9 +429,9 @@
 }
 
 /* The same thing, asked for by hand on تنظیمات → کاهش حرکت. */
-[data-motion='reduce'] *,
-[data-motion='reduce'] *::before,
-[data-motion='reduce'] *::after {
+[data-motion="reduce"] *,
+[data-motion="reduce"] *::before,
+[data-motion="reduce"] *::after {
   animation: none !important;
   transition: none !important;
 }

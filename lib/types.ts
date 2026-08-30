@@ -4,27 +4,27 @@
  */
 
 /** Supported story lengths. */
-export type StoryLength = 'SHORT' | 'MEDIUM' | 'LONG';
+export type StoryLength = "SHORT" | "MEDIUM" | "LONG";
 /** Supported narration voices. */
-export type NarratorVoice = 'MARYAM' | 'BABAK' | 'NAZANIN';
+export type NarratorVoice = "MARYAM" | "BABAK" | "NAZANIN";
 /** Supported generated illustration styles. */
-export type IllustrationStyle = 'WATERCOLOR' | 'CLASSIC' | 'PAPERCUT';
+export type IllustrationStyle = "WATERCOLOR" | "CLASSIC" | "PAPERCUT";
 /** Supported story tones. */
-export type StoryTone = 'CALM' | 'FUNNY' | 'BRAVE';
+export type StoryTone = "CALM" | "FUNNY" | "BRAVE";
 /** Story lifecycle states returned by parent and administrator endpoints. */
 export type StoryStatus =
-  'DRAFT' | 'AWAITING_PAYMENT' | 'GENERATING' | 'READY' | 'FAILED';
+  "DRAFT" | "AWAITING_PAYMENT" | "GENERATING" | "READY" | "FAILED";
 /** Adventure themes accepted by the story wizard. */
 export type StoryTheme =
-  | 'FANTASY'
-  | 'SPACE'
-  | 'DINO'
-  | 'OCEAN'
-  | 'ANIMALS'
-  | 'HERO'
-  | 'MYSTERY'
-  | 'BEDTIME'
-  | 'OWN';
+  | "FANTASY"
+  | "SPACE"
+  | "DINO"
+  | "OCEAN"
+  | "ANIMALS"
+  | "HERO"
+  | "MYSTERY"
+  | "BEDTIME"
+  | "OWN";
 
 /** Parent-facing child-profile response. */
 export interface ChildDto {
@@ -33,7 +33,7 @@ export interface ChildDto {
   age: number;
   interests: string[];
   hasPhoto: boolean;
-  photoStatus: 'NONE' | 'PENDING' | 'READY' | 'FLAGGED' | 'DELETED';
+  photoStatus: "NONE" | "PENDING" | "READY" | "FLAGGED" | "DELETED";
   prefLength: StoryLength;
   prefVoice: NarratorVoice;
   prefStyle: IllustrationStyle;
@@ -54,6 +54,19 @@ export interface StoryDto {
   tone: StoryTone;
   style: IllustrationStyle;
   voice: NarratorVoice;
+  topic: string;
+  storyConsiderations: string;
+  mode: string;
+  artStyle: string;
+  desiredMoral: string | null;
+  nScenes: number;
+  ageRange: string;
+  additionalCharacters: {
+    slot: number;
+    name: string;
+    relation: string;
+    hasPhoto: boolean;
+  }[];
   status: StoryStatus;
   durationSec: number | null;
   isFavorite: boolean;
@@ -66,14 +79,14 @@ export interface StoryDto {
 }
 
 /** Payment order lifecycle states. */
-export type OrderStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED';
+export type OrderStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
 
 /** Persisted stages in the generation pipeline. */
 export type JobStage =
-  'CHARACTER' | 'WRITING' | 'ILLUSTRATION' | 'NARRATION' | 'BINDING';
+  "CHARACTER" | "WRITING" | "ILLUSTRATION" | "NARRATION" | "BINDING";
 
 /** Execution states for one generation stage. */
-export type JobStatus = 'QUEUED' | 'RUNNING' | 'DONE' | 'FAILED';
+export type JobStatus = "QUEUED" | "RUNNING" | "DONE" | "FAILED";
 
 /** Parent-facing payment order, optionally enriched with story summary fields. */
 export interface OrderDto {
@@ -203,15 +216,15 @@ export interface NotificationPrefs {
 /* ——— the admin panel ——————————————————————————————————————————— */
 
 /** Account access states shown in administrator views. */
-export type UserStatus = 'ACTIVE' | 'SUSPENDED';
+export type UserStatus = "ACTIVE" | "SUSPENDED";
 /** Child-photo storage and moderation states. */
-export type PhotoStatus = 'NONE' | 'PENDING' | 'READY' | 'FLAGGED' | 'DELETED';
+export type PhotoStatus = "NONE" | "PENDING" | "READY" | "FLAGGED" | "DELETED";
 /** Domain object under moderation review. */
-export type ModerationTarget = 'STORY' | 'CHILD_PHOTO';
+export type ModerationTarget = "STORY" | "CHILD_PHOTO";
 /** Human-review lifecycle state. */
-export type ModerationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+export type ModerationStatus = "PENDING" | "APPROVED" | "REJECTED";
 /** Time windows supported by administrator metrics. */
-export type AdminRange = '24h' | '7d' | '30d';
+export type AdminRange = "24h" | "7d" | "30d";
 
 /** Every admin table returns this envelope. */
 export interface AdminPage<T> {
@@ -314,8 +327,8 @@ export interface AdminUserRow {
   id: string;
   fullName: string;
   phone: string | null;
-  roles: ('SuperAdmin' | 'Admin' | 'User')[];
-  role: 'SuperAdmin' | 'Admin' | 'User';
+  roles: ("SuperAdmin" | "Admin" | "User")[];
+  role: "SuperAdmin" | "Admin" | "User";
   status: UserStatus;
   phoneVerified: boolean;
   createdAt: string;
@@ -329,8 +342,8 @@ export interface AdminUserDetailDto {
   id: string;
   fullName: string;
   phone: string | null;
-  roles: ('SuperAdmin' | 'Admin' | 'User')[];
-  role: 'SuperAdmin' | 'Admin' | 'User';
+  roles: ("SuperAdmin" | "Admin" | "User")[];
+  role: "SuperAdmin" | "Admin" | "User";
   status: UserStatus;
   phoneVerified: boolean;
   phoneVerifiedAt: string | null;
@@ -488,7 +501,7 @@ export interface AdminAuditRow {
   actor: {
     id: string;
     fullName: string;
-    role: 'SuperAdmin' | 'Admin' | 'User';
+    role: "SuperAdmin" | "Admin" | "User";
   } | null;
 }
 

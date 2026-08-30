@@ -184,22 +184,11 @@ export const SETTINGS_FORM: {
     key: string;
     label: string;
     hint?: string;
-    kind: 'number' | 'price' | 'switch';
+    kind: 'number' | 'switch';
     min?: number;
     max?: number;
   }[];
 }[] = [
-  {
-    title: 'قیمت و پرداخت',
-    fields: [
-      {
-        key: 'story.price',
-        label: 'قیمت هر قصه (تومان)',
-        hint: 'روی سفارش‌های تازه اعمال می‌شود؛ سفارش‌های ثبت‌شده با قیمت خودشان می‌مانند.',
-        kind: 'price',
-      },
-    ],
-  },
   {
     title: 'ظرفیت تولید',
     note: 'این چهار مقدار را موتور ساخت در شروع هر مرحله می‌خواند، پس تغییرشان از همان کار بعدی اثر می‌گذارد.',

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { STORY_PRICE_RIAL } from '@/lib/config';
+import { DEFAULT_STORY_PRICE_RIAL } from '@/lib/config';
 import { faPrice } from '@/lib/fa';
 import { MockPayButtons } from './pay-buttons';
 
@@ -28,7 +28,7 @@ export default async function MockPaymentPage({
   if (process.env.NEXT_PUBLIC_PAYMENT_MODE === 'link') notFound();
   if (typeof callback !== 'string') notFound();
 
-  const rial = Number(amount) || STORY_PRICE_RIAL;
+  const rial = Number(amount) || DEFAULT_STORY_PRICE_RIAL;
 
   return (
     <main className="mx-auto max-w-135 px-5 py-[clamp(24px,4vw,44px)]">

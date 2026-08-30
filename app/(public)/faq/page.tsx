@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PageHeader } from '@/components/public/ui';
-import { STORY_PRICE } from '@/lib/config';
+import { STORY_PRICE_BY_LENGTH } from '@/lib/config';
 import { faNum } from '@/lib/fa';
 
 export const metadata: Metadata = { title: 'پرسش‌های پرتکرار' };
 
-/** Answers that referred to plans and credits now describe the per-story price. */
+/** Answers that referred to plans and credits now describe per-length pricing. */
 const QUESTIONS = [
   {
     q: 'عکس کودکم چه می‌شود؟',
@@ -18,7 +18,7 @@ const QUESTIONS = [
   },
   {
     q: 'چطور پرداخت می‌کنم؟',
-    a: `یک قیمت ثابت برای هر قصه: ${faNum(STORY_PRICE)} تومان. اشتراک ماهانه و بستهٔ اعتبار نداریم. متن قصه که نوشته شد، لینک پرداخت را می‌گیرید و بعد از پرداخت، تصویرها و روایت ساخته می‌شوند.`,
+    a: `قیمت بر اساس طول ویدیو است: کوتاه ${faNum(STORY_PRICE_BY_LENGTH.SHORT)} تومان، متوسط ${faNum(STORY_PRICE_BY_LENGTH.MEDIUM)} تومان و بلند ${faNum(STORY_PRICE_BY_LENGTH.LONG)} تومان. اشتراک ماهانه و بستهٔ اعتبار نداریم. بعد از ثبت قصه لینک پرداخت را می‌گیرید و با پرداخت، ساخت شروع می‌شود.`,
   },
   {
     q: 'اگر قصه را دوست نداشتیم؟',

@@ -67,7 +67,7 @@ function Line({
 
 /**
  * The design's اشتراک‌ها screen, rebuilt. It measured plan mix, MRR and churn —
- * none of which exist once monetization is one static price per story. What
+ * none of which exist with one-time per-length story pricing. What
  * does exist is a lifecycle: a story is drafted, an order is raised, a bank
  * either settles it or does not, and generation either delivers or does not.
  * That is what this page measures.

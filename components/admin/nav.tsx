@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * The sidebar, in the design's four groups. اشتراک‌ها is repurposed as
- * سفارش‌ها — with one static price per story there are no plans to manage,
+ * سفارش‌ها — with one-time per-length pricing there are no plans to manage,
  * only the lifecycle of an order.
  *
  * A client component solely so the current section can be marked; the count it

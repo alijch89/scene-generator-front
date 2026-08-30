@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SETTINGS_FORM } from '@/lib/admin';
 import { api } from '@/lib/api';
-import { faPrice } from '@/lib/fa';
 import type { AdminSettingsDto } from '@/lib/types';
 
 /**
@@ -17,16 +16,12 @@ import type { AdminSettingsDto } from '@/lib/types';
  * reads those rows at the start of each stage — so «حداکثر کار هم‌زمان» bites
  * on the next job, not the next deploy.
  *
- * The price is the one field that is not stored as typed: the country prices
- * in تومان and the database keeps ریال, so it is converted on the way in and
- * out rather than asking an operator to type a trailing zero correctly.
+ * Prices are deliberately absent: they are fixed server-side by video length,
+ * so neither this form nor another frontend can create an unsupported amount.
  */
 export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
   const router = useRouter();
-  const [values, setValues] = useState<AdminSettingsDto>(() => ({
-    ...initial,
-    'story.price': String(Math.round(Number(initial['story.price'] ?? 0) / 10)),
-  }));
+  const [values, setValues] = useState<AdminSettingsDto>(initial);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,12 +31,7 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
     setSaved(null);
   };
 
-  const toPayload = () => ({
-    ...values,
-    'story.price': String(Math.round(Number(values['story.price'] || 0) * 10)),
-  });
-
-  /** Converts display units, submits changed settings, and refreshes server data. */
+  /** Submits changed settings and refreshes server data. */
   async function save() {
     setBusy(true);
     setError(null);
@@ -50,14 +40,9 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
       const res = await api.patch<{
         settings: AdminSettingsDto;
         changed: { key: string }[];
-      }>('/admin/settings', toPayload());
+      }>('/admin/settings', values);
 
-      setValues({
-        ...res.settings,
-        'story.price': String(
-          Math.round(Number(res.settings['story.price'] ?? 0) / 10),
-        ),
-      });
+      setValues(res.settings);
       setSaved(
         res.changed.length === 0
           ? 'چیزی تغییر نکرده بود.'
@@ -80,12 +65,7 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
       const res = await api.post<{ settings: AdminSettingsDto }>(
         '/admin/settings/reset',
       );
-      setValues({
-        ...res.settings,
-        'story.price': String(
-          Math.round(Number(res.settings['story.price'] ?? 0) / 10),
-        ),
-      });
+      setValues(res.settings);
       setSaved('مقادیر پیش‌فرض بازگردانده شد.');
       router.refresh();
     } catch (err) {
@@ -167,12 +147,6 @@ export function SettingsForm({ initial }: { initial: AdminSettingsDto }) {
                     onChange={(event) => set(field.key, event.target.value)}
                     className={input}
                   />
-                  {field.kind === 'price' ? (
-                    <span className="text-[11.5px] text-muted">
-                      یعنی {faPrice(Number(values[field.key] || 0) * 10)} برای هر
-                      قصه
-                    </span>
-                  ) : null}
                   {field.hint ? (
                     <span className="text-[11.5px] leading-[1.8] text-muted">
                       {field.hint}

@@ -3,9 +3,26 @@
  * @description Provides the shared credentialed JSON client used by browser and server code.
  */
 
-/** Public backend base URL, configurable through NEXT_PUBLIC_API_URL. */
+/**
+ * Public backend base URL, configurable through NEXT_PUBLIC_API_URL. Baked
+ * into the client bundle at build time, so it is the URL a *browser* must be
+ * able to reach — it also ends up in image `src` and download `href`
+ * attributes across the app.
+ */
 export const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+
+/**
+ * Base the Node server dials instead. Under Docker the browser's
+ * `http://localhost:3001/api` resolves to the frontend container's own
+ * loopback, so server components have to address the API by its compose
+ * service name. Left unset outside Docker, where one origin serves both.
+ */
+const SERVER_API_URL = process.env.INTERNAL_API_URL || API_URL;
+
+/** Picks the base for the current execution context. */
+const baseUrl = () =>
+  typeof window === "undefined" ? SERVER_API_URL : API_URL;
 
 /** HTTP error that preserves response status and the parsed backend payload. */
 export class ApiError extends Error {
@@ -41,7 +58,7 @@ export async function request<T>(
 ): Promise<T> {
   const isFormData =
     typeof FormData !== "undefined" && body instanceof FormData;
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(`${baseUrl()}${path}`, {
     ...init,
     // The session cookie has to survive the :3000 → :3001 hop.
     credentials: "include",

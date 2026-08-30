@@ -178,6 +178,15 @@ export const WIZARD_THEMES: {
   },
 ];
 
+/**
+ * The topics the public site advertises: every wizard topic that carries cover
+ * art. "ایدهٔ خودم" has no artwork and belongs to the wizard, not the marketing
+ * pages, so the flatMap both drops it and narrows `image` to a plain string.
+ */
+export const PUBLIC_TOPICS = WIZARD_THEMES.flatMap((topic) =>
+  topic.image ? [{ ...topic, image: topic.image }] : [],
+);
+
 /** Deterministic gradient for a child's avatar when there is no photo. */
 export const AVATAR_GRADIENT =
   'linear-gradient(140deg,var(--sh-primary),var(--sh-accent))';

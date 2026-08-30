@@ -1,7 +1,19 @@
+import {
+  BookOpenText,
+  Compass,
+  MoveDown,
+  MoveLeft,
+  UserRoundPlus,
+  WandSparkles,
+} from 'lucide-react';
 import Link from 'next/link';
-import { Card, SectionHeading } from '@/components/public/ui';
+import { Fragment } from 'react';
+import { Card, SectionHeading, TopicCard } from '@/components/public/ui';
 import { faDigits, faNum } from '@/lib/fa';
-import { THEMES } from '@/lib/themes';
+import { PUBLIC_TOPICS } from '@/lib/story-art';
+
+/** The landing teases six adventures; /features lists all of them. */
+const FEATURED_TOPICS = PUBLIC_TOPICS.slice(0, 6);
 
 /**
  * Marketing numbers, kept together so they are one edit rather than six.
@@ -11,39 +23,45 @@ import { THEMES } from '@/lib/themes';
 const STATS = [
   { value: faNum(14200), label: 'قصهٔ ساخته‌شده' },
   { value: `${faNum(92)} ثانیه`, label: 'میانگین زمان ساخت' },
-  { value: `${faNum(12)} ماجرا`, label: 'دسته‌بندی آماده' },
+  { value: `${faNum(8)} ماجرا`, label: 'دسته‌بندی آماده' },
   { value: `${faNum(4.8)} از ${faNum(5)}`, label: 'رضایت خانواده‌ها' },
 ];
 
+/**
+ * The four cards of the process strip. `Icon` replaces the decorative gradient
+ * tiles the section used to carry, and `tint` walks the palette so the row
+ * reads as a progression rather than four identical cards.
+ */
 const STEPS = [
   {
     title: 'پروندهٔ کودکتان را بسازید',
     body: 'نام، سن، یک عکس و چند علاقه. همین.',
-    art: 'bg-[linear-gradient(150deg,#EBD6F0,#F6D9BC)]',
-    blob: 'absolute -bottom-3.5 end-1/2 translate-x-1/2 size-14 rounded-full bg-[rgba(122,79,168,.35)]',
+    Icon: UserRoundPlus,
+    tint: 'text-brand',
+    glow: 'bg-[color-mix(in_srgb,var(--sh-primary)_26%,transparent)]',
   },
   {
     title: 'یک ماجرا انتخاب کنید',
-    body: 'دوازده دنیای آماده، یا ایدهٔ خودتان.',
-    art: 'bg-[linear-gradient(150deg,#6B4BA8,#F3B26A)]',
-    blob: 'absolute top-3.5 left-5 size-6 rounded-full bg-[#FFF3D6]',
+    body: 'هشت دنیای آماده، یا ایدهٔ خودتان.',
+    Icon: Compass,
+    tint: 'text-teal',
+    glow: 'bg-[color-mix(in_srgb,var(--sh-teal)_26%,transparent)]',
   },
   {
     title: 'هوش مصنوعی قصه را می‌سازد',
     body: 'متن، تصویرها و روایت، حدود یک دقیقه.',
-    art: 'bg-[conic-gradient(from_210deg,#7A4FA8,#DE7639,#D79C17,#7A4FA8)]',
-    blob: '',
+    Icon: WandSparkles,
+    tint: 'text-warm',
+    glow: 'bg-[color-mix(in_srgb,var(--sh-accent)_26%,transparent)]',
   },
   {
     title: 'بخوانید، گوش کنید، ذخیره کنید',
     body: 'کتابخانهٔ خانه، همیشه در دسترس.',
-    art: 'bg-[linear-gradient(180deg,#221C46,#D9926B)]',
-    blob: 'absolute bottom-0 -inset-x-[10%] h-2/5 rounded-t-[50%] bg-[#1D1840]',
+    Icon: BookOpenText,
+    tint: 'text-gold',
+    glow: 'bg-[color-mix(in_srgb,var(--sh-gold)_26%,transparent)]',
   },
 ];
-
-/** The landing shows the first six; /features lists all twelve. */
-const FEATURED_THEMES = THEMES.slice(0, 6);
 
 /** Static public landing page assembled from reusable marketing primitives. */
 export default function LandingPage() {
@@ -176,53 +194,76 @@ export default function LandingPage() {
           title="در چهار قدم"
           lead="از عکس تا کتاب قصهٔ روایت‌شده."
         />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(230px,1fr))] gap-4">
+        {/* One rail: cards stack with a down-arrow on narrow screens and sit
+            in a right-to-left row joined by arrows from `lg` up. */}
+        <ol className="flex list-none flex-col items-stretch gap-2 lg:flex-row lg:gap-0">
           {STEPS.map((step, i) => (
-            <Card key={step.title} className="p-5">
-              <span className="mb-2.5 block font-display text-[30px] text-warm">
-                {faDigits(String(i + 1).padStart(2, '0'))}
-              </span>
-              <span
-                aria-hidden
-                className={`relative mb-3.5 block h-[74px] overflow-hidden rounded-[14px] ${step.art}`}
-              >
-                {step.blob ? <span className={step.blob} /> : null}
-              </span>
-              <strong className="mb-1.5 block text-base">{step.title}</strong>
-              <span className="block text-[13.5px] leading-[1.8] text-muted">
-                {step.body}
-              </span>
-            </Card>
+            <Fragment key={step.title}>
+              <li className="lg:flex-1">
+                <Card className="relative h-full overflow-hidden p-5">
+                  <span
+                    aria-hidden
+                    className={`pointer-events-none absolute -top-14 -end-12 size-24 rounded-full blur-2xl ${step.glow}`}
+                  />
+                  {/* The step number rides the icon badge so the pair stays
+                      together at every card width. */}
+                  <span
+                    aria-hidden
+                    className={`relative grid size-12 place-items-center rounded-[17px] border border-border bg-elev ${step.tint}`}
+                  >
+                    <step.Icon className="size-[22px]" strokeWidth={1.75} />
+                    <span className="absolute -bottom-2 -start-2 grid size-6 place-items-center rounded-full border border-border bg-surface font-display text-[11.5px] text-ink shadow-card">
+                      {faDigits(String(i + 1))}
+                    </span>
+                  </span>
+                  <strong className="relative mt-4.5 mb-1.5 block text-base">
+                    {step.title}
+                  </strong>
+                  <span className="relative block text-[13.5px] leading-[1.8] text-muted">
+                    {step.body}
+                  </span>
+                </Card>
+              </li>
+
+              {i < STEPS.length - 1 ? (
+                <li
+                  aria-hidden
+                  className="flex items-center justify-center self-center px-1 py-1 text-warm/70 lg:w-10 lg:py-0"
+                >
+                  <MoveDown className="size-5 lg:hidden" strokeWidth={1.75} />
+                  <span className="hidden items-center lg:flex">
+                    <span className="h-px w-3.5 bg-border" />
+                    <MoveLeft className="size-5" strokeWidth={1.75} />
+                  </span>
+                </li>
+              ) : null}
+            </Fragment>
           ))}
-        </div>
+        </ol>
       </section>
 
       {/* ————— adventures ————— */}
       <section className="border-y border-border bg-bg2">
         <div className="mx-auto max-w-[1180px] px-5 py-[clamp(40px,6vw,64px)]">
-          <SectionHeading title="ماجراها" />
+          <SectionHeading
+            title="ماجراها"
+            lead="هر قصه دور یکی از این موضوع‌ها ساخته می‌شود."
+          />
           <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3">
-            {FEATURED_THEMES.map((theme) => (
-              <div
-                key={theme.id}
-                className="overflow-hidden rounded-[18px] border border-border bg-surface"
-              >
-                <span
-                  aria-hidden
-                  className={`block h-[84px] ${theme.art}`}
-                />
-                <span className="block px-3.5 py-3">
-                  <strong className="block text-[14.5px]">{theme.title}</strong>
-                  <span className="text-xs text-muted">{theme.body}</span>
-                </span>
-              </div>
+            {FEATURED_TOPICS.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                image={topic.image}
+                title={topic.title}
+                body={topic.body}
+              />
             ))}
           </div>
           <Link
             href="/features"
             className="mt-5 inline-block text-sm font-bold text-brand"
           >
-            همهٔ دوازده ماجرا ←
+            همهٔ ماجراها ←
           </Link>
         </div>
       </section>

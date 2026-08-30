@@ -7,6 +7,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useDismissDetails } from '@/lib/use-dismiss';
 import { cn } from '@/lib/utils';
 
 /** Sidebar order from Parent App.dc.html, minus the dropped subscription page. */
@@ -80,13 +81,16 @@ export function SidebarNav() {
 }
 
 /**
- * Mobile disclosure. <details> gives the open/close state, keyboard support
- * and Escape-free simplicity with no JS of our own.
+ * Mobile disclosure. <details> still owns the open/close state and keyboard
+ * support; useDismissDetails only ever closes it, so nothing here is
+ * controlled state that could drift out of sync with the element.
  */
 /** Renders the compact mobile parent navigation. */
 export function MobileNav() {
+  const { ref, close } = useDismissDetails();
+
   return (
-    <details className="group relative md:hidden">
+    <details ref={ref} className="group relative md:hidden">
       <summary
         aria-label="منو"
         className="grid size-9.5 cursor-pointer list-none place-items-center rounded-xl border border-border bg-surface"
@@ -96,7 +100,12 @@ export function MobileNav() {
           className="block h-0.5 w-4 bg-current shadow-[0_5px_0_currentColor,0_-5px_0_currentColor]"
         />
       </summary>
-      <div className="absolute start-0 top-12 z-30 flex w-56 flex-col gap-3 rounded-2xl border border-border bg-bg2 p-3 shadow-card-lg">
+      {/* Taps inside the panel close it on click, not pointerdown: the link
+          has to survive long enough to actually navigate. */}
+      <div
+        onClick={close}
+        className="absolute start-0 top-12 z-30 flex w-56 flex-col gap-3 rounded-2xl border border-border bg-bg2 p-3 shadow-card-lg"
+      >
         <NavList compact />
       </div>
     </details>

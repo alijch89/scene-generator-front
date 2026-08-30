@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { SiteMobileNav } from '@/components/public/site-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 /**
@@ -45,8 +46,11 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
       </aside>
 
       <main className="flex flex-col p-[clamp(22px,4vw,44px)]">
+        {/* Stacked below ~680px the marketing header is gone, so the way back
+            out to the public site rides in the hamburger. */}
         <div className="mb-auto flex items-center gap-2.5">
           <ThemeToggle className="size-[38px] rounded-xl" />
+          <SiteMobileNav className="ms-auto" />
         </div>
 
         <div className="mx-auto my-auto w-full max-w-[420px] py-[26px]">

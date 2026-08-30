@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
-import { Card, PageHeader, SectionHeading } from '@/components/public/ui';
-import { THEMES } from '@/lib/themes';
+import {
+  Card,
+  PageHeader,
+  SectionHeading,
+  TopicCard,
+} from '@/components/public/ui';
+import { PUBLIC_TOPICS } from '@/lib/story-art';
 
 export const metadata: Metadata = { title: 'ویژگی‌ها' };
 
@@ -21,7 +26,7 @@ const FEATURES = [
     icon: '▶',
     tone: 'text-brand',
     title: 'روایت فارسی',
-    body: 'سه صدای راوی، سرعت پخش قابل تنظیم و هم‌خوانی متن با صدا.',
+    body: 'صدای راوی، سرعت پخش قابل تنظیم و هم‌خوانی متن با صدا.',
   },
   {
     icon: '🛡',
@@ -69,21 +74,17 @@ export default function FeaturesPage() {
 
       <section className="mt-14">
         <SectionHeading
-          title="دوازده ماجرا"
+          title="هشت ماجرا"
           lead="یکی را بردارید، یا ایدهٔ خودتان را در یک جمله بنویسید."
         />
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3">
-          {THEMES.map((theme) => (
-            <div
-              key={theme.id}
-              className="overflow-hidden rounded-[18px] border border-border bg-surface"
-            >
-              <span aria-hidden className={`block h-[84px] ${theme.art}`} />
-              <span className="block px-3.5 py-3">
-                <strong className="block text-[14.5px]">{theme.title}</strong>
-                <span className="text-xs text-muted">{theme.body}</span>
-              </span>
-            </div>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3">
+          {PUBLIC_TOPICS.map((topic) => (
+            <TopicCard
+              key={topic.id}
+              image={topic.image}
+              title={topic.title}
+              body={topic.body}
+            />
           ))}
         </div>
       </section>

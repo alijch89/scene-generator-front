@@ -3,6 +3,7 @@
  * @description Provides reusable cards and headings for public marketing and policy pages.
  */
 
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
 /** The surface card the marketing pages repeat ~25 times. */
@@ -63,5 +64,39 @@ export function SectionHeading({
       </h2>
       {lead ? <p className="mb-7 text-[15.5px] text-muted">{lead}</p> : null}
     </>
+  );
+}
+
+/** One adventure tile: cover photo over its title and one-line pitch. */
+export function TopicCard({
+  image,
+  title,
+  body,
+}: {
+  image: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="group overflow-hidden rounded-[18px] border border-border bg-surface transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card">
+      {/* The topic artwork is 1408×768, so the box keeps 11/6 and nothing
+          is cropped at any column width. */}
+      <span
+        aria-hidden
+        className="relative block aspect-[11/6] overflow-hidden bg-elev"
+      >
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(min-width:1180px) 240px, (min-width:640px) 33vw, 50vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+      </span>
+      <span className="block px-3.5 py-3">
+        <strong className="block text-[14.5px]">{title}</strong>
+        <span className="text-xs leading-[1.7] text-muted">{body}</span>
+      </span>
+    </div>
   );
 }

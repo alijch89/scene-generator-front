@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { HeaderTitle, MobileNav, SidebarNav } from '@/components/app/nav';
+import { Logo } from '@/components/logo';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { requireParent, sapi } from '@/lib/dal';
@@ -30,9 +31,7 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
           href="/"
           className="mb-2 flex items-center gap-2.5 text-ink hover:no-underline"
         >
-          <span className="grid size-8.5 place-items-center rounded-xl bg-linear-to-br from-brand to-warm text-brand-fg">
-            ★
-          </span>
+          <Logo />
           <strong className="font-display">شهرزاد قصه‌گو</strong>
         </Link>
 

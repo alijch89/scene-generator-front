@@ -357,6 +357,8 @@ export interface AdminUserDetailDto {
   status: UserStatus;
   phoneVerified: boolean;
   phoneVerifiedAt: string | null;
+  /** True while an administrator's password reset is still unclaimed. */
+  mustChangePassword: boolean;
   createdAt: string;
   lastActiveAt: string | null;
   activeSessions: number;

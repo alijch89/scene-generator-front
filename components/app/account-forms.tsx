@@ -12,9 +12,13 @@ import {
   Alert,
   Field,
   Input,
+  PASSWORD_HINT,
+  PasswordInput,
+  PasswordStrength,
   Select,
   SubmitButton,
   Toggle,
+  passwordStrength,
 } from '@/components/form';
 import { api } from '@/lib/api';
 import { faDate } from '@/lib/fa';
@@ -97,10 +101,21 @@ export function ProfileForm({ user }: { user: UserDto }) {
   );
 }
 
-/** «تغییر گذرواژه» — a <details> disclosure, as the design's button implies. */
+/**
+ * «تغییر گذرواژه» — a <details> disclosure, as the design's button implies.
+ *
+ * This is the only way to change a password from inside the product, and the
+ * same endpoint the forced post-reset screen posts to, so the confirmation
+ * box and the reveal toggle live here rather than only on the sign-up form.
+ */
 export function ChangePasswordForm() {
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+
+  const strength = passwordStrength(password);
+  const mismatch = confirm.length > 0 && confirm !== password;
 
   return (
     <details className="rounded-2xl border border-border bg-elev px-4 py-3.5">
@@ -112,6 +127,7 @@ export function ChangePasswordForm() {
         className="mt-4 flex flex-col gap-3"
         onSubmit={async (event) => {
           event.preventDefault();
+          if (mismatch) return;
           const form = event.currentTarget;
           const data = new FormData(form);
           setBusy(true);
@@ -119,9 +135,12 @@ export function ChangePasswordForm() {
           try {
             await api.post('/auth/change-password', {
               currentPassword: String(data.get('currentPassword') ?? ''),
-              newPassword: String(data.get('newPassword') ?? ''),
+              newPassword: password,
+              confirmPassword: confirm,
             });
             form.reset();
+            setPassword('');
+            setConfirm('');
             setFeedback({
               tone: 'success',
               text: 'گذرواژه عوض شد. نشست‌های دیگر بسته شدند.',
@@ -146,20 +165,32 @@ export function ChangePasswordForm() {
         ) : null}
 
         <Field label="گذرواژهٔ فعلی">
-          <Input
+          <PasswordInput
             name="currentPassword"
-            type="password"
             autoComplete="current-password"
             required
           />
         </Field>
-        <Field label="گذرواژهٔ تازه" hint="حداقل ۸ نویسه">
-          <Input
-            name="newPassword"
-            type="password"
+        <Field label="گذرواژهٔ تازه" hint={PASSWORD_HINT[strength]}>
+          <PasswordInput
             autoComplete="new-password"
             minLength={8}
             required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+          <PasswordStrength score={strength} />
+        </Field>
+        <Field
+          label="تکرار گذرواژهٔ تازه"
+          hint={mismatch ? 'گذرواژه‌ها یکی نیستند.' : undefined}
+        >
+          <PasswordInput
+            autoComplete="new-password"
+            required
+            value={confirm}
+            invalid={mismatch}
+            onChange={(event) => setConfirm(event.target.value)}
           />
         </Field>
         <SubmitButton loading={busy} loadingLabel="در حال تغییر…">
@@ -370,8 +401,7 @@ export function DeleteAccountButton() {
       confirmLabel="حساب را پاک کن"
       extraField={({ value, onChange, disabled }) => (
         <Field label="گذرواژه">
-          <Input
-            type="password"
+          <PasswordInput
             autoComplete="current-password"
             value={value}
             disabled={disabled}

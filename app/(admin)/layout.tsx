@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/logo';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AdminNav } from '@/components/admin/nav';
@@ -23,12 +24,7 @@ export default async function AdminLayout({ children }: LayoutProps<'/'>) {
     >
       <aside className="sticky top-0 hidden h-screen flex-col gap-1 overflow-y-auto border-e border-border bg-surface px-3 py-5 md:flex">
         <div className="mb-2 flex items-center gap-2.25 px-2">
-          <span
-            aria-hidden
-            className="grid size-7 place-items-center rounded-lg bg-brand text-[12px] font-bold text-brand-fg"
-          >
-            قص
-          </span>
+          <Logo className="size-7 rounded-lg" />
           <span className="flex flex-col">
             <strong className="text-[14px]">پنل مدیریت</strong>
             <span className="text-[11px] text-muted">شهرزاد قصه‌گو</span>

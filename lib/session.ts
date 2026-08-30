@@ -31,6 +31,11 @@ export interface UserDto {
   /** Highest-privilege role, which is what navigation routes on. */
   role: Role;
   phoneVerified: boolean;
+  /**
+   * True while an administrator-issued password still has to be replaced.
+   * Every gated page bounces to /change-password until it clears.
+   */
+  mustChangePassword: boolean;
   prefs: NotificationPrefs;
   createdAt: string;
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 /**
@@ -25,9 +26,7 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
         />
 
         <Link href="/" className="relative flex items-center gap-2.5 text-[#FFF6E6] no-underline hover:no-underline">
-          <span className="grid size-[34px] place-items-center rounded-xl bg-white/20 text-base">
-            ★
-          </span>
+          <Logo className="size-[34px]" />
           <strong className="font-display text-lg">شهرزاد قصه‌گو</strong>
         </Link>
 

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { EmptyState, PrimaryLink, SecondaryLink } from '@/components/app/ui';
+import { Logo } from '@/components/logo';
 import { StatusBadge } from '@/components/status-badge';
 import { ApiError } from '@/lib/api';
 import { sapi, verifySession } from '@/lib/dal';
@@ -82,12 +83,7 @@ export default async function InvoicePage({
       <article className="rounded-[22px] border border-border bg-surface p-6.5 shadow-card print:rounded-none print:border-0 print:p-0 print:shadow-none">
         <header className="mb-6 flex flex-wrap items-start gap-4 border-b border-border pb-5">
           <div className="flex items-center gap-2.5">
-            <span
-              aria-hidden
-              className="grid size-9 place-items-center rounded-xl bg-linear-to-br from-brand to-warm text-brand-fg"
-            >
-              ★
-            </span>
+            <Logo className="size-9" />
             <div>
               <strong className="block font-display text-[17px]">
                 شهرزاد قصه‌گو

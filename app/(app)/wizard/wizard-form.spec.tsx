@@ -34,6 +34,51 @@ const savedRelation: ChildRelationDto = {
 };
 
 describe("WizardForm supporting characters", () => {
+  it("shows the public topic images on the theme-selection step", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <WizardForm childProfiles={[child]} prices={prices} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+
+    const topicSources = Array.from(
+      container.querySelectorAll<HTMLImageElement>('img[alt=""]'),
+      (image) => decodeURIComponent(image.getAttribute("src") ?? ""),
+    );
+
+    expect(topicSources).toHaveLength(8);
+    expect(topicSources).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("/topics/راستگویی.jpeg"),
+        expect.stringContaining("/topics/مهربانی.jpeg"),
+        expect.stringContaining("/topics/شجاعت.jpeg"),
+        expect.stringContaining("/topics/سهیم.jpeg"),
+        expect.stringContaining("/topics/همکاری.jpeg"),
+        expect.stringContaining("/topics/مسئولیت.jpeg"),
+        expect.stringContaining("/topics/پشتکار.jpeg"),
+        expect.stringContaining("/topics/احترام.jpeg"),
+      ]),
+    );
+  });
+
+  it("uses the selected topic image in the final preview", async () => {
+    const user = userEvent.setup();
+    render(<WizardForm childProfiles={[child]} prices={prices} />);
+
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    await user.click(screen.getByRole("button", { name: /^شجاعت/ }));
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+
+    const preview = screen.getByRole("img", {
+      name: "تصویر پیش‌نمایش موضوع شجاعت",
+    });
+    expect(decodeURIComponent(preview.getAttribute("src") ?? "")).toContain(
+      "/topics/شجاعت.jpeg",
+    );
+  });
+
   it("shows the character editor after age settings and supports relation choices, custom text, and photo preview", async () => {
     const user = userEvent.setup();
     const { container } = render(

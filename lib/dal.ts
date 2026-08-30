@@ -31,10 +31,19 @@ export const getCurrentUser = cache(async (): Promise<UserDto | null> => {
   }
 });
 
-/** Redirects to login when there is no valid session. */
+/**
+ * Redirects to login when there is no valid session, and to «تغییر گذرواژه»
+ * while an administrator-issued password is still in place.
+ *
+ * The API refuses those accounts everywhere but a short allowlist, so this is
+ * what turns a 403 they cannot act on into the one page that clears it. The
+ * change-password route reads {@link getCurrentUser} directly instead, or it
+ * would redirect to itself.
+ */
 export async function verifySession(): Promise<UserDto> {
   const user = await getCurrentUser();
   if (!user) redirect('/login?reason=expired');
+  if (user.mustChangePassword) redirect('/change-password');
   return user;
 }
 

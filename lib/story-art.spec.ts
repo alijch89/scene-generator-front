@@ -16,4 +16,18 @@ describe('story presentation data', () => {
     expect(WIZARD_THEMES.map((theme) => theme.id)).toContain('OWN');
     expect(WIZARD_THEMES).toHaveLength(9);
   });
+
+  it('maps every predefined wizard topic to its public card image', () => {
+    expect(WIZARD_THEMES.map(({ image }) => image)).toEqual([
+      '/topics/راستگویی.jpeg',
+      '/topics/مهربانی.jpeg',
+      '/topics/شجاعت.jpeg',
+      '/topics/سهیم.jpeg',
+      '/topics/همکاری.jpeg',
+      '/topics/مسئولیت.jpeg',
+      '/topics/پشتکار.jpeg',
+      '/topics/احترام.jpeg',
+      null,
+    ]);
+  });
 });

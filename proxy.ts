@@ -27,19 +27,18 @@ const PARENT_PREFIXES = [
   '/wizard',
   '/stories',
   '/checkout',
-  // Reached with a session already in hand — verification signs the parent in
-  // before they pick a password — so it gates like the rest of the app, not
-  // like the auth pages it sits beside.
-  '/set-password',
 ];
 
-const AUTH_PREFIXES = [
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-phone',
-];
+const AUTH_PREFIXES = ['/login', '/register'];
+
+/**
+ * Needs a session but belongs to neither half of the product: an
+ * administrator can reset an admin's password as well as a parent's, so both
+ * roles have to be able to reach «تغییر گذرواژه» without being bounced to
+ * their own home. Whether the change is actually owed is decided by the page
+ * itself, which can read the account; this file only sees cookies.
+ */
+const SESSION_PREFIXES = ['/change-password'];
 
 /** Returns whether a pathname equals or descends from one of the route prefixes. */
 const startsWith = (path: string, prefixes: string[]) =>
@@ -61,10 +60,11 @@ export function proxy(req: NextRequest) {
   const isAdminArea = pathname === ADMIN_PREFIX || pathname.startsWith(`${ADMIN_PREFIX}/`);
   const isParentArea = startsWith(pathname, PARENT_PREFIXES);
   const isAuthArea = startsWith(pathname, AUTH_PREFIXES);
+  const isSessionArea = startsWith(pathname, SESSION_PREFIXES);
   const isExpiredLogin =
     pathname === '/login' && req.nextUrl.searchParams.get('reason') === 'expired';
 
-  if (!hasSession && (isAdminArea || isParentArea)) {
+  if (!hasSession && (isAdminArea || isParentArea || isSessionArea)) {
     const url = req.nextUrl.clone();
     url.pathname = '/login';
     url.search = '';

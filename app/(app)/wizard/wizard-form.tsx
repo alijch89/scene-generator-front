@@ -6,6 +6,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { AddChildButton } from "@/components/app/child-form";
 import { ChildAvatar } from "@/components/app/ui";
 import { Alert } from "@/components/form";
@@ -714,14 +715,19 @@ export function WizardForm({
               >
                 <span
                   aria-hidden
-                  className="grid h-26 place-items-center text-[26px] text-brand"
-                  style={
-                    t.id === "OWN"
-                      ? undefined
-                      : { backgroundImage: THEME_COVER[t.id] }
-                  }
+                  className="relative grid h-26 place-items-center overflow-hidden text-[26px] text-brand"
                 >
-                  {t.id === "OWN" ? "✎" : ""}
+                  {t.image ? (
+                    <Image
+                      src={t.image}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1280px) 240px, (min-width: 640px) 33vw, 100vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    "✎"
+                  )}
                 </span>
                 <span className="block p-[13px_15px_16px]">
                   <strong className="mb-1.25 block text-[15.5px]">
@@ -1016,17 +1022,46 @@ export function WizardForm({
           <div className="grid items-start gap-5 sm:grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
             <div className="rounded-3xl border border-border bg-surface p-2 shadow-card-lg">
               <div
-                className="relative aspect-4/5 overflow-hidden rounded-[18px]"
-                style={{ backgroundImage: THEME_COVER[theme] }}
+                className={cn(
+                  "relative overflow-hidden rounded-[18px]",
+                  // Topic covers are 1408×768, so the frame takes their own
+                  // ratio and the last look at the story never loses a third
+                  // of the artwork to a crop. The drawn «ایدهٔ خودم» sky below
+                  // is composed as a portrait and keeps its taller frame.
+                  chosen.image ? "aspect-11/6" : "aspect-4/5",
+                )}
+                style={
+                  chosen.image
+                    ? undefined
+                    : { backgroundImage: THEME_COVER[theme] }
+                }
               >
-                <span
-                  aria-hidden
-                  className="absolute inset-e-[14%] top-[12%] size-13 rounded-full bg-[#FFF3D6] shadow-[0_0_40px_rgba(255,240,200,.8)]"
-                />
-                <span
-                  aria-hidden
-                  className="absolute bottom-0 inset-s-[-10%] inset-e-[-10%] h-[34%] rounded-t-[50%] bg-[#1F1A3C]"
-                />
+                {chosen.image ? (
+                  <>
+                    <Image
+                      src={chosen.image}
+                      alt={`تصویر پیش‌نمایش موضوع ${chosen.title}`}
+                      fill
+                      sizes="(min-width: 640px) 50vw, 100vw"
+                      className="object-cover"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 bg-linear-to-t from-black/70 via-black/5 to-transparent"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span
+                      aria-hidden
+                      className="absolute inset-e-[14%] top-[12%] size-13 rounded-full bg-[#FFF3D6] shadow-[0_0_40px_rgba(255,240,200,.8)]"
+                    />
+                    <span
+                      aria-hidden
+                      className="absolute bottom-0 inset-s-[-10%] inset-e-[-10%] h-[34%] rounded-t-[50%] bg-[#1F1A3C]"
+                    />
+                  </>
+                )}
                 <div className="absolute inset-x-4 bottom-4 flex items-end gap-3">
                   {child ? <ChildAvatar child={child} size={62} /> : null}
                   <div className="pb-1">
@@ -1137,8 +1172,7 @@ export function WizardForm({
                   {faPrice(prices[length])}
                 </p>
                 <p className="mt-2 text-[12.5px] leading-[1.9] text-muted">
-                  یک پرداخت برای همین یک قصه. اشتراک و تمدید خودکاری در کار
-                  نیست، و تا وقتی پرداخت انجام نشود چیزی ساخته نمی‌شود.
+                 پرداخت از طریق درگاه امن بانکی
                 </p>
               </div>
             </div>

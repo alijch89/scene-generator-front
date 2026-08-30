@@ -97,12 +97,13 @@ export const STAGE_LABEL: Record<string, string> = {
   BINDING: 'صحافی کتاب',
 };
 
-/** The nine topics the wizard offers, each with a sample opening line. */
+/** The nine topics the wizard offers, with card artwork and a sample opening line. */
 export const WIZARD_THEMES: {
   id: StoryTheme;
   title: string;
   body: string;
   example: string;
+  image: string | null;
 }[] = [
   {
     id: 'HONESTY',
@@ -110,6 +111,7 @@ export const WIZARD_THEMES: {
     body: 'وقتی یک دروغ کوچک بزرگ و بزرگ‌تر می‌شود',
     example:
       'گلدان مادربزرگ می‌شکند و یک «کار من نبود» کوچک، تا شب آن‌قدر قد می‌کشد که اندازهٔ اتاق می‌شود.',
+    image: '/topics/راستگویی.jpeg',
   },
   {
     id: 'KINDNESS',
@@ -117,6 +119,7 @@ export const WIZARD_THEMES: {
     body: 'یک کار خوب کوچک که دست‌به‌دست می‌چرخد',
     example:
       'صبح یک کار خوب کوچک در کوچه انجام می‌شود و تا غروب دست‌به‌دست می‌گردد و به در خانهٔ خودمان برمی‌گردد.',
+    image: '/topics/مهربانی.jpeg',
   },
   {
     id: 'COURAGE',
@@ -124,6 +127,7 @@ export const WIZARD_THEMES: {
     body: 'رو‌به‌رو شدن با چیزی که کمی می‌ترساند',
     example:
       'چراغ که خاموش می‌شود، سایهٔ گوشهٔ اتاق باید یک بار از نزدیک دیده شود تا معلوم شود کیست.',
+    image: '/topics/شجاعت.jpeg',
   },
   {
     id: 'SHARING',
@@ -131,6 +135,7 @@ export const WIZARD_THEMES: {
     body: 'یک اسباب‌بازی و دو دستِ منتظر',
     example:
       'در حیاط فقط یک ماشین قرمز هست و دو نفر هم‌زمان آن را می‌خواهند؛ باید راهی پیدا شود.',
+    image: '/topics/سهیم.jpeg',
   },
   {
     id: 'TEAMWORK',
@@ -138,6 +143,7 @@ export const WIZARD_THEMES: {
     body: 'کاری که از پس یک نفر تنها برنمی‌آید',
     example:
       'بادبادک روی بلندترین شاخهٔ کوچه گیر کرده و هیچ‌کس به‌تنهایی دستش به آن نمی‌رسد.',
+    image: '/topics/همکاری.jpeg',
   },
   {
     id: 'RESPONSIBILITY',
@@ -145,6 +151,7 @@ export const WIZARD_THEMES: {
     body: 'قولی که داده شده و باید نگه داشته شود',
     example:
       'قرار بوده هر روز به گلدان کوچک آب برسد؛ امروز صبح برگ‌هایش خم شده‌اند.',
+    image: '/topics/مسئولیت.jpeg',
   },
   {
     id: 'PATIENCE',
@@ -152,6 +159,7 @@ export const WIZARD_THEMES: {
     body: 'کاری که بار اول درست از آب درنمی‌آید',
     example:
       'دانه‌ای کاشته می‌شود و هر روز صبح هنوز فقط خاک است، خاکِ ساکت؛ تا یک صبح.',
+    image: '/topics/پشتکار.jpeg',
   },
   {
     id: 'RESPECT',
@@ -159,12 +167,14 @@ export const WIZARD_THEMES: {
     body: 'حرف‌هایی که حال کسی را خوب یا بد می‌کنند',
     example:
       'در صف نانوایی حرفی از دهان بیرون می‌پرد که برای برگرداندنش باید فکری کرد.',
+    image: '/topics/احترام.jpeg',
   },
   {
     id: 'OWN',
     title: 'ایدهٔ خودم را می‌نویسم',
     body: 'درسی که فقط در خانهٔ شما معنا دارد',
     example: '',
+    image: null,
   },
 ];
 

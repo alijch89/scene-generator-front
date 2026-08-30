@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/components/logo';
 import { SiteNav } from '@/components/public/site-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -39,12 +40,7 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
             href="/"
             className="flex items-center gap-2.5 text-ink hover:no-underline"
           >
-            <span
-              aria-hidden
-              className="grid size-[34px] place-items-center rounded-xl gradient-brand text-[17px] text-white"
-            >
-              ★
-            </span>
+            <Logo className="size-[34px]" />
             <strong className="font-display text-lg">شهرزاد قصه‌گو</strong>
           </Link>
 

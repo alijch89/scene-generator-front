@@ -5,6 +5,8 @@
 
 'use client';
 
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 /** Semantic feedback tones supported by the shared form alert. */
@@ -93,6 +95,97 @@ export function Input({
   );
 }
 
+/**
+ * A password box with the «نمایش گذرواژه» eye beside it.
+ *
+ * Typing a password you cannot see is the main way people mistype one, and
+ * every password field in the product is a place a typo costs something — so
+ * the toggle lives in the shared input rather than being re-implemented per
+ * form. Flipping to `text` is what browsers' own reveal buttons do; the value
+ * is only ever visible to whoever is already looking at the screen.
+ */
+export function PasswordInput({
+  invalid,
+  className,
+  ...props
+}: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> & {
+  invalid?: boolean;
+}) {
+  const [shown, setShown] = useState(false);
+
+  return (
+    <span className="relative flex">
+      <Input
+        {...props}
+        type={shown ? 'text' : 'password'}
+        invalid={invalid}
+        // Room for the button, on whichever side the end of the line is.
+        className={cn('w-full pe-12', className)}
+      />
+      <button
+        type="button"
+        onClick={() => setShown((on) => !on)}
+        // The label carries the state rather than aria-pressed, so a screen
+        // reader announces one thing instead of a name and a pressed state
+        // that repeat each other.
+        aria-label={shown ? 'پنهان کردن گذرواژه' : 'نمایش گذرواژه'}
+        className="absolute inset-y-0 end-0 grid w-12 place-items-center text-muted transition-colors hover:text-ink"
+      >
+        {shown ? (
+          <EyeOffIcon aria-hidden className="size-4.5" />
+        ) : (
+          <EyeIcon aria-hidden className="size-4.5" />
+        )}
+      </button>
+    </span>
+  );
+}
+
+/**
+ * Scores a password 0–3 for the design's three-segment meter.
+ *
+ * Length is the only thing the API insists on; the segments past it are
+ * encouragement, not a second gate, so a long letters-only password still
+ * reads as acceptable rather than being blocked.
+ */
+export function passwordStrength(password: string) {
+  if (password.length < 8) return password.length === 0 ? 0 : 1;
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[^A-Za-z0-9]/.test(password);
+  return hasDigit && hasSpecial ? 3 : 2;
+}
+
+/** Hint text paired with each {@link passwordStrength} score. */
+export const PASSWORD_HINT = [
+  'حداقل ۸ نویسه.',
+  'گذرواژه باید حداقل ۸ نویسه باشد.',
+  'گذرواژه خوب است. یک عدد یا نویسهٔ ویژه آن را قوی‌تر می‌کند.',
+  'گذرواژهٔ قوی.',
+];
+
+/** The three-segment strength bar shown under a new-password field. */
+export function PasswordStrength({ score }: { score: number }) {
+  return (
+    <span className="mt-0.5 flex gap-[5px]" aria-hidden>
+      {[1, 2, 3].map((step) => (
+        <span
+          key={step}
+          className={cn(
+            'h-1 flex-1 rounded-[3px]',
+            score >= step
+              ? score === 1
+                ? 'bg-error'
+                : score === 2
+                  ? 'bg-warning'
+                  : 'bg-success'
+              : 'bg-border',
+          )}
+        />
+      ))}
+    </span>
+  );
+}
+
 /** Renders a consistently styled native select control. */
 export function Select({
   className,
@@ -130,11 +223,7 @@ export function Toggle({
           <span className="block text-[12.5px] text-muted">{hint}</span>
         ) : null}
       </span>
-      <input
-        {...props}
-        type="checkbox"
-        className="size-5 accent-brand"
-      />
+      <input {...props} type="checkbox" className="size-5 accent-brand" />
     </label>
   );
 }
@@ -170,41 +259,5 @@ export function SubmitButton({
       ) : null}
       {loading ? (loadingLabel ?? children) : children}
     </button>
-  );
-}
-
-/** Centred success/failure panels — verify, expired, password-changed. */
-export function Notice({
-  icon,
-  tone = 'neutral',
-  title,
-  children,
-}: {
-  icon: string;
-  tone?: Tone;
-  title: string;
-  children?: React.ReactNode;
-}) {
-  const ring =
-    tone === 'success'
-      ? 'border-success text-success bg-[color-mix(in_srgb,var(--sh-success)_16%,var(--sh-surface))]'
-      : tone === 'warning'
-        ? 'border-border text-warning bg-elev'
-        : 'border-border text-brand bg-elev';
-
-  return (
-    <section className="animate-[pageIn_.4s_ease_both] text-center">
-      <span
-        aria-hidden
-        className={cn(
-          'mx-auto mb-4.5 grid size-14 place-items-center rounded-[18px] border text-[22px]',
-          ring,
-        )}
-      >
-        {icon}
-      </span>
-      <h1 className="mb-2.5 font-display text-[26px]">{title}</h1>
-      {children}
-    </section>
   );
 }

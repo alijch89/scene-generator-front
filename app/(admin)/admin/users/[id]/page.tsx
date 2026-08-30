@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Panel } from '@/components/admin/ui';
+import { UserPasswordReset } from '@/components/admin/user-password-reset';
 import { UserStatusButton } from '@/components/admin/user-status';
 import { StatusBadge } from '@/components/status-badge';
 import {
@@ -97,11 +98,10 @@ export default async function AdminUserDetailPage({
               value={`${faPrice(user.paidTotal)} · ${faNum(user.paidCount)} تراکنش`}
             />
           </div>
-          <p className="mt-4 text-[11.5px] leading-[1.9] text-muted">
-            «بازنشانی گذرواژه» از این‌جا ساخته نشده است: بازنشانی با پیوند
-            امضاشده به پیامک خود کاربر انجام می‌شود و مسیر «گذرواژه را فراموش
-            کرده‌ام» برای همان است.
-          </p>
+          <UserPasswordReset
+            userId={user.id}
+            pending={user.mustChangePassword}
+          />
         </Panel>
 
         <Panel title={`پرونده‌های کودکان (${faDigits(user.children.length)})`}>

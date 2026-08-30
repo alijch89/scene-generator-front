@@ -14,16 +14,16 @@ export type StoryTone = "CALM" | "FUNNY" | "BRAVE";
 /** Story lifecycle states returned by parent and administrator endpoints. */
 export type StoryStatus =
   "DRAFT" | "AWAITING_PAYMENT" | "GENERATING" | "READY" | "FAILED";
-/** Adventure themes accepted by the story wizard. */
+/** Moral topics accepted by the story wizard. */
 export type StoryTheme =
-  | "FANTASY"
-  | "SPACE"
-  | "DINO"
-  | "OCEAN"
-  | "ANIMALS"
-  | "HERO"
-  | "MYSTERY"
-  | "BEDTIME"
+  | "HONESTY"
+  | "KINDNESS"
+  | "COURAGE"
+  | "SHARING"
+  | "TEAMWORK"
+  | "RESPONSIBILITY"
+  | "PATIENCE"
+  | "RESPECT"
   | "OWN";
 
 /** Parent-facing child-profile response. */
@@ -39,6 +39,16 @@ export interface ChildDto {
   prefStyle: IllustrationStyle;
   prefAvoidScary: boolean;
   storyCount: number;
+  createdAt: string;
+}
+
+/** A relative or supporting character saved for reuse in one child's stories. */
+export interface ChildRelationDto {
+  id: string;
+  childId: string;
+  name: string;
+  relation: string;
+  hasPhoto: boolean;
   createdAt: string;
 }
 

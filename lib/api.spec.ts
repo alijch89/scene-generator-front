@@ -21,7 +21,7 @@ describe("request", () => {
     await expect(
       request("/stories", {
         method: "POST",
-        body: { theme: "SPACE" },
+        body: { theme: "HONESTY" },
         cookie: "sid=session-token",
       }),
     ).resolves.toEqual({ id: "story-1" });
@@ -31,7 +31,7 @@ describe("request", () => {
       expect.objectContaining({
         method: "POST",
         credentials: "include",
-        body: JSON.stringify({ theme: "SPACE" }),
+        body: JSON.stringify({ theme: "HONESTY" }),
         headers: expect.objectContaining({
           "content-type": "application/json",
           cookie: "sid=session-token",

@@ -165,7 +165,7 @@ export default async function AdminModerationPage({
                 {selected.childName
                   ? ` · ${selected.childName}، ${faDigits(selected.childAge ?? 0)} ساله`
                   : ''}
-                {selected.theme ? ` · ماجرا: ${THEME_LABEL[selected.theme]}` : ''}{' '}
+                {selected.theme ? ` · موضوع: ${THEME_LABEL[selected.theme]}` : ''}{' '}
                 · {faDate(selected.createdAt)}
               </p>
             </div>

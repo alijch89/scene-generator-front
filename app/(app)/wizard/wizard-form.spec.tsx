@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ChildDto } from "@/lib/types";
+import type { ChildDto, ChildRelationDto } from "@/lib/types";
 import { WizardForm } from "./wizard-form";
 
 const prices = {
@@ -21,6 +21,15 @@ const child: ChildDto = {
   prefStyle: "WATERCOLOR",
   prefAvoidScary: true,
   storyCount: 0,
+  createdAt: new Date(0).toISOString(),
+};
+
+const savedRelation: ChildRelationDto = {
+  id: "8a8b0c0f-1e2d-4c3b-9a8f-123456789abc",
+  childId: child.id,
+  name: "سارا",
+  relation: "مادر",
+  hasPhoto: true,
   createdAt: new Date(0).toISOString(),
 };
 
@@ -80,11 +89,15 @@ describe("WizardForm supporting characters", () => {
     await user.click(screen.getByRole("button", { name: "ادامه" }));
     await user.click(screen.getByRole("button", { name: "ادامه" }));
 
-    const shortButton = screen.getByText("کوتاه", { exact: true }).closest("button")!;
+    const shortButton = screen
+      .getByText("کوتاه", { exact: true })
+      .closest("button")!;
     const mediumButton = screen
       .getByText("متوسط", { exact: true })
       .closest("button")!;
-    const longButton = screen.getByText("بلند", { exact: true }).closest("button")!;
+    const longButton = screen
+      .getByText("بلند", { exact: true })
+      .closest("button")!;
 
     expect(shortButton).toHaveTextContent("۴۹۹٬۰۰۰ تومان");
     expect(mediumButton).toHaveTextContent("۶۹۹٬۰۰۰ تومان");
@@ -94,5 +107,30 @@ describe("WizardForm supporting characters", () => {
     await user.click(screen.getByRole("button", { name: "ادامه" }));
 
     expect(screen.getByText("۹۹۹٬۰۰۰ تومان")).toBeInTheDocument();
+  });
+
+  it("lets the parent add a previously saved character for this child", async () => {
+    const user = userEvent.setup();
+    render(
+      <WizardForm
+        childProfiles={[child]}
+        relationsByChild={{ [child.id]: [savedRelation] }}
+        prices={prices}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    await user.click(screen.getByRole("button", { name: /سارا · مادر/ }));
+
+    expect(screen.getByDisplayValue("سارا")).toBeDisabled();
+    expect(screen.getByLabelText("نسبت دلخواه شخصیت 1")).toBeDisabled();
+    expect(screen.getByAltText("عکس سارا")).toHaveAttribute(
+      "src",
+      expect.stringContaining(
+        `/children/${child.id}/relations/${savedRelation.id}/photo`,
+      ),
+    );
+    expect(screen.getByRole("button", { name: /سارا · مادر/ })).toBeDisabled();
   });
 });

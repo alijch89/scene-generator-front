@@ -2,8 +2,8 @@ import { coverFor, FAILED_COVER, LENGTH_LABEL, STATUS_LABEL, WIZARD_THEMES } fro
 
 describe('story presentation data', () => {
   it('uses the failed cover for failed stories and theme covers otherwise', () => {
-    expect(coverFor('SPACE', 'FAILED')).toBe(FAILED_COVER);
-    expect(coverFor('SPACE', 'READY')).toContain('linear-gradient');
+    expect(coverFor('HONESTY', 'FAILED')).toBe(FAILED_COVER);
+    expect(coverFor('HONESTY', 'READY')).toContain('linear-gradient');
   });
 
   it('keeps length labels and page counts consistent with the product contract', () => {

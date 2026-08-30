@@ -3,7 +3,7 @@ import { AddChildButton } from '@/components/app/child-form';
 import { EmptyState } from '@/components/app/ui';
 import { STORY_PRICE_RIAL_BY_LENGTH } from '@/lib/config';
 import { sapi } from '@/lib/dal';
-import type { ChildDto } from '@/lib/types';
+import type { ChildDto, ChildRelationDto } from '@/lib/types';
 import { WizardForm } from './wizard-form';
 
 export const metadata: Metadata = { title: 'ساخت قصهٔ تازه' };
@@ -32,9 +32,23 @@ export default async function WizardPage({
     );
   }
 
+  const relationEntries = await Promise.all(
+    childProfiles.map(
+      async (profile) =>
+        [
+          profile.id,
+          await sapi.get<ChildRelationDto[]>(
+            `/children/${profile.id}/relations`,
+          ),
+        ] as const,
+    ),
+  );
+  const relationsByChild = Object.fromEntries(relationEntries);
+
   return (
     <WizardForm
       childProfiles={childProfiles}
+      relationsByChild={relationsByChild}
       initialChildId={typeof child === 'string' ? child : undefined}
       initialIdea={typeof idea === 'string' ? idea : undefined}
       prices={STORY_PRICE_RIAL_BY_LENGTH}

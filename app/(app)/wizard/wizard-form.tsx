@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { AddChildButton } from "@/components/app/child-form";
 import { ChildAvatar } from "@/components/app/ui";
 import { Alert } from "@/components/form";
-import { ApiError, api } from "@/lib/api";
+import { API_URL, ApiError, api } from "@/lib/api";
 import { faDigits, faPrice } from "@/lib/fa";
 import { photoError } from "@/lib/upload";
 import {
@@ -18,35 +18,33 @@ import {
   STYLE_LABEL,
   THEME_COVER,
   TONE_LABEL,
-  VOICE_LABEL,
   WIZARD_THEMES,
 } from "@/lib/story-art";
 import type {
   ChildDto,
+  ChildRelationDto,
   CreatedStory,
   IllustrationStyle,
-  NarratorVoice,
   StoryLength,
   StoryTheme,
   StoryTone,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const STEPS = ["قهرمان", "ماجرا", "سفارشی‌سازی", "پیش‌نمایش"] as const;
+const STEPS = ["قهرمان", "موضوع", "سفارشی‌سازی", "پیش‌نمایش"] as const;
 const LENGTHS: StoryLength[] = ["SHORT", "MEDIUM", "LONG"];
 const TONES: StoryTone[] = ["CALM", "FUNNY", "BRAVE"];
 const STYLES: IllustrationStyle[] = ["WATERCOLOR", "CLASSIC", "PAPERCUT"];
-const VOICES: NarratorVoice[] = ["MARYAM", "BABAK", "NAZANIN"];
 
 const TOPIC_FOR_THEME: Record<StoryTheme, string> = {
-  FANTASY: "سفر به سرزمین جادویی",
-  SPACE: "ماجراجویی در فضا",
-  DINO: "دیدار با دایناسورها",
-  OCEAN: "ماجراجویی زیر دریا",
-  ANIMALS: "دوست داشتن حیوانات",
-  HERO: "قهرمان شدن و کمک به دیگران",
-  MYSTERY: "حل کردن یک راز",
-  BEDTIME: "یک ماجرای آرام پیش از خواب",
+  HONESTY: "راست‌گویی و پذیرفتن اشتباه",
+  KINDNESS: "مهربانی و انجام کار خوب",
+  COURAGE: "شجاعت و غلبه بر ترس",
+  SHARING: "سهیم شدن و رعایت نوبت",
+  TEAMWORK: "همکاری و کمک به دیگران",
+  RESPONSIBILITY: "مسئولیت‌پذیری و نگه‌داشتن قول",
+  PATIENCE: "صبر و پشتکار",
+  RESPECT: "احترام و رفتار مؤدبانه",
   OWN: "",
 };
 
@@ -92,15 +90,19 @@ const RELATION_EXAMPLES = [
 ];
 
 type CharacterDraft = {
+  savedRelationId: string | null;
   name: string;
   relation: string;
   photo: File | null;
+  hasSavedPhoto: boolean;
 };
 
 const newCharacter = (): CharacterDraft => ({
+  savedRelationId: null,
   name: "",
   relation: "",
   photo: null,
+  hasSavedPhoto: false,
 });
 
 const ageRangeFor = (age: number) =>
@@ -108,7 +110,7 @@ const ageRangeFor = (age: number) =>
 
 const HINTS = [
   "قصه با نام و علاقه‌های او نوشته می‌شود.",
-  "می‌توانید بعداً ماجرا را عوض کنید.",
+  "می‌توانید بعداً موضوع قصه را عوض کنید.",
   "اگر چیزی را عوض نکنید، پیش‌فرض‌ها استفاده می‌شوند.",
   "پس از پرداخت، ساخت قصه حدود یک دقیقه طول می‌کشد.",
 ];
@@ -189,15 +191,21 @@ function CharacterPhotoPreview({ file, name }: { file: File; name: string }) {
 /** Always-visible editor for the four supporting-character multipart slots. */
 function CharacterEditor({
   characters,
+  savedRelations,
+  childId,
   valid,
   onAdd,
+  onReuse,
   onUpdate,
   onRemove,
   onPhoto,
 }: {
   characters: CharacterDraft[];
+  savedRelations: ChildRelationDto[];
+  childId: string;
   valid: boolean;
   onAdd: () => void;
+  onReuse: (relation: ChildRelationDto) => void;
   onUpdate: (index: number, patch: Partial<CharacterDraft>) => void;
   onRemove: (index: number) => void;
   onPhoto: (index: number, file?: File) => void;
@@ -209,8 +217,55 @@ function CharacterEditor({
       </legend>
       <p className="mb-4 text-[12.5px] leading-[1.8] text-muted">
         تا چهار نفر را با نام، نسبت با کودک و عکس معرفی کنید. نسبت‌های پیشنهادی
-        قابل انتخاب‌اند و می‌توانید عبارت خودتان را هم بنویسید.
+        قابل انتخاب‌اند و می‌توانید عبارت خودتان را هم بنویسید. شخصیت تازه برای
+        قصه‌های بعدی ذخیره می‌شود.
       </p>
+      {savedRelations.length ? (
+        <div className="mb-4 rounded-[14px] border border-border bg-elev p-3.5">
+          <p className="mb-2.5 text-[12.5px] font-bold text-warm">
+            استفاده از شخصیت‌های ذخیره‌شده
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {savedRelations.map((relation) => {
+              const selected = characters.some(
+                (character) => character.savedRelationId === relation.id,
+              );
+              return (
+                <button
+                  key={relation.id}
+                  type="button"
+                  disabled={selected || characters.length >= 4}
+                  onClick={() => onReuse(relation)}
+                  className="flex items-center gap-2 rounded-full border border-border bg-surface py-1.5 ps-2 pe-3 text-[12.5px] disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  {relation.hasPhoto ? (
+                    // Private, credentialed API image; next/image cannot proxy it.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`${API_URL}/children/${childId}/relations/${relation.id}/photo`}
+                      alt=""
+                      crossOrigin="use-credentials"
+                      className="size-7 rounded-full border border-border object-cover"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden
+                      className="grid size-7 place-items-center rounded-full bg-elev font-bold text-brand"
+                    >
+                      {relation.name.slice(0, 1)}
+                    </span>
+                  )}
+                  <span>
+                    {relation.name}
+                    {relation.relation ? ` · ${relation.relation}` : ""}
+                  </span>
+                  <span aria-hidden>{selected ? "✓" : "+"}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
       <button
         type="button"
         disabled={characters.length >= 4}
@@ -228,11 +283,17 @@ function CharacterEditor({
             <strong className="mb-3 block text-[13.5px]">
               شخصیت {faDigits(index + 1)}
             </strong>
+            {character.savedRelationId ? (
+              <span className="mb-3 inline-block rounded-full bg-surface px-2.5 py-1 text-[11.5px] font-semibold text-brand">
+                انتخاب‌شده از نزدیکان ذخیره‌شده
+              </span>
+            ) : null}
             <div className="flex flex-col gap-3">
               <label className="flex flex-col gap-1.5 text-[12px] text-muted">
                 نام
                 <input
                   maxLength={40}
+                  disabled={Boolean(character.savedRelationId)}
                   value={character.name}
                   onChange={(event) =>
                     onUpdate(index, { name: event.target.value })
@@ -245,6 +306,7 @@ function CharacterEditor({
                 نسبت با کودک
                 <select
                   aria-label={`نسبت پیشنهادی شخصیت ${index + 1}`}
+                  disabled={Boolean(character.savedRelationId)}
                   value={
                     RELATION_EXAMPLES.includes(character.relation)
                       ? character.relation
@@ -265,6 +327,7 @@ function CharacterEditor({
                 <input
                   aria-label={`نسبت دلخواه شخصیت ${index + 1}`}
                   maxLength={40}
+                  disabled={Boolean(character.savedRelationId)}
                   value={character.relation}
                   onChange={(event) =>
                     onUpdate(index, { relation: event.target.value })
@@ -282,6 +345,14 @@ function CharacterEditor({
                       file={character.photo}
                       name={character.name}
                     />
+                  ) : character.savedRelationId && character.hasSavedPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`${API_URL}/children/${childId}/relations/${character.savedRelationId}/photo`}
+                      alt={`عکس ${character.name}`}
+                      crossOrigin="use-credentials"
+                      className="size-20 flex-none rounded-xl border border-border object-cover"
+                    />
                   ) : (
                     <span className="grid size-20 flex-none place-items-center rounded-xl bg-elev text-[24px] text-muted">
                       +
@@ -290,11 +361,16 @@ function CharacterEditor({
                   <span className="min-w-0 break-all">
                     {character.photo
                       ? `${character.photo.name} · برای تغییر عکس کلیک کنید`
-                      : "انتخاب عکس JPG، PNG یا WebP"}
+                      : character.savedRelationId && character.hasSavedPhoto
+                        ? "عکس ذخیره‌شده"
+                        : character.savedRelationId
+                          ? "بدون عکس"
+                          : "انتخاب عکس JPG، PNG یا WebP"}
                   </span>
                 </span>
                 <input
                   type="file"
+                  disabled={Boolean(character.savedRelationId)}
                   accept="image/jpeg,image/png,image/webp"
                   className="sr-only"
                   onChange={(event) => onPhoto(index, event.target.files?.[0])}
@@ -337,11 +413,13 @@ function CharacterEditor({
 /** Manages all four wizard steps and redirects to the returned payment URL. */
 export function WizardForm({
   childProfiles,
+  relationsByChild = {},
   initialChildId,
   initialIdea,
   prices,
 }: {
   childProfiles: ChildDto[];
+  relationsByChild?: Record<string, ChildRelationDto[]>;
   initialChildId?: string;
   initialIdea?: string;
   prices: Record<StoryLength, number>;
@@ -353,7 +431,7 @@ export function WizardForm({
       : (childProfiles[0]?.id ?? ""),
   );
   const [theme, setTheme] = useState<StoryTheme>(
-    initialIdea ? "OWN" : "FANTASY",
+    initialIdea ? "OWN" : "HONESTY",
   );
   const [ownIdea, setOwnIdea] = useState(
     initialIdea ? `قصه‌ای دربارهٔ ${initialIdea}` : "",
@@ -362,7 +440,6 @@ export function WizardForm({
   const [tone, setTone] = useState<StoryTone>("CALM");
   const [style, setStyle] = useState<IllustrationStyle>("WATERCOLOR");
   const [artStyle, setArtStyle] = useState(ART_STYLE_TEXT.WATERCOLOR);
-  const [voice, setVoice] = useState<NarratorVoice>("MARYAM");
   const [storyConsiderations, setStoryConsiderations] = useState("");
   const [desiredMoral, setDesiredMoral] = useState("");
   const [nScenes, setNScenes] = useState(8);
@@ -373,7 +450,6 @@ export function WizardForm({
     return ageRangeFor(selected?.age ?? childProfiles[0]?.age ?? 7);
   });
   const [characters, setCharacters] = useState<CharacterDraft[]>([]);
-  const [advanced, setAdvanced] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -389,6 +465,7 @@ export function WizardForm({
   const namedCharacters = characters.filter((character) =>
     Boolean(character.name.trim()),
   );
+  const savedRelations = relationsByChild[childId] ?? [];
 
   // The one place a step can be wrong: «ایدهٔ خودم» with nothing written.
   const blocked =
@@ -414,6 +491,26 @@ export function WizardForm({
   function addCharacter() {
     setCharacters((current) =>
       current.length >= 4 ? current : [...current, newCharacter()],
+    );
+  }
+
+  /** Adds a previously saved relation without allowing cross-child reuse. */
+  function reuseRelation(relation: ChildRelationDto) {
+    if (relation.childId !== childId) return;
+    setCharacters((current) =>
+      current.length >= 4 ||
+      current.some((character) => character.savedRelationId === relation.id)
+        ? current
+        : [
+            ...current,
+            {
+              savedRelationId: relation.id,
+              name: relation.name,
+              relation: relation.relation,
+              photo: null,
+              hasSavedPhoto: relation.hasPhoto,
+            },
+          ],
     );
   }
 
@@ -445,7 +542,6 @@ export function WizardForm({
       form.append("length", length);
       form.append("tone", tone);
       form.append("style", style);
-      form.append("voice", voice);
       form.append("topic", topic);
       form.append("story_considerations", storyConsiderations.trim());
       form.append("mode", "video");
@@ -460,6 +556,12 @@ export function WizardForm({
           `additional_character_${slot}_relation`,
           character.relation.trim(),
         );
+        if (character.savedRelationId) {
+          form.append(
+            `additional_character_${slot}_relation_id`,
+            character.savedRelationId,
+          );
+        }
         if (character.photo) {
           form.append(`additional_character_${slot}_photo`, character.photo);
         }
@@ -531,6 +633,7 @@ export function WizardForm({
                 type="button"
                 aria-pressed={childId === c.id}
                 onClick={() => {
+                  if (c.id !== childId) setCharacters([]);
                   setChildId(c.id);
                   setAgeRange(ageRangeFor(c.age));
                 }}
@@ -588,10 +691,10 @@ export function WizardForm({
       {step === 2 ? (
         <section className="animate-[pageIn_.4s_ease_both]">
           <h1 className="mb-2.5 font-display text-[clamp(26px,4.6vw,40px)] leading-[1.35]">
-            یک ماجرا انتخاب کنید
+            موضوع قصه را انتخاب کنید
           </h1>
           <p className="mb-7 max-w-[52ch] text-[clamp(14px,1.8vw,17px)] leading-[1.8] text-muted">
-            {hero} در این قصه به کجا سفر کند؟
+            {hero} در این قصه چه چیزی را یاد بگیرد؟
           </p>
 
           <div className="grid gap-3.5 sm:grid-cols-[repeat(auto-fill,minmax(210px,1fr))]">
@@ -639,7 +742,7 @@ export function WizardForm({
                   htmlFor="own-idea"
                   className="mb-2 block text-[14px] font-bold"
                 >
-                  ایدهٔ قصه‌تان را بنویسید
+                  موضوع قصه‌تان را بنویسید
                 </label>
                 <textarea
                   id="own-idea"
@@ -647,7 +750,7 @@ export function WizardForm({
                   value={ownIdea}
                   onChange={(e) => setOwnIdea(e.target.value)}
                   maxLength={500}
-                  placeholder={`${hero} پشت درخت کهنسال حیاط دری مخفی پیدا می‌کند که به جنگلی جادویی باز می‌شود.`}
+                  placeholder={`${hero} یاد بگیرد اسباب‌بازی‌هایش را با دوستش قسمت کند.`}
                   className="w-full resize-y rounded-2xl border border-border bg-elev px-4 py-3.5 text-[14px] leading-[1.9] text-ink"
                 />
                 <p className="mt-2.25 text-[12.5px] text-muted">
@@ -661,7 +764,7 @@ export function WizardForm({
                 </span>
                 <div>
                   <p className="mb-1.5 text-[12.5px] font-bold text-warm">
-                    نمونه‌ای از این ماجرا
+                    نمونه‌ای از این موضوع
                   </p>
                   <p className="text-[14.5px] leading-[1.9]">
                     {chosen.example}
@@ -887,46 +990,15 @@ export function WizardForm({
 
             <CharacterEditor
               characters={characters}
+              savedRelations={savedRelations}
+              childId={childId}
               valid={charactersAreValid}
               onAdd={addCharacter}
+              onReuse={reuseRelation}
               onUpdate={updateCharacter}
               onRemove={removeCharacter}
               onPhoto={selectCharacterPhoto}
             />
-
-            <button
-              type="button"
-              aria-expanded={advanced}
-              onClick={() => setAdvanced((v) => !v)}
-              className="flex items-center gap-2 self-start px-1 py-2 text-[14px] font-bold text-brand"
-            >
-              <span aria-hidden>{advanced ? "▲" : "▼"}</span>
-              {advanced ? "بستن تنظیمات بیشتر" : "تنظیمات بیشتر (راوی)"}
-            </button>
-
-            {advanced ? (
-              <div className="animate-[pageIn_.35s_ease_both] rounded-[18px] border border-border bg-surface p-[15px_17px] shadow-card">
-                <span className="mb-2 block text-[13.5px] font-bold">
-                  صدای راوی
-                </span>
-                <div className="flex flex-wrap gap-2.5">
-                  {VOICES.map((id) => (
-                    <button
-                      key={id}
-                      type="button"
-                      aria-pressed={voice === id}
-                      onClick={() => setVoice(id)}
-                      className={cn(
-                        "flex-1 basis-30 rounded-2xl border border-border bg-elev p-3 text-[13.5px] font-semibold",
-                        ring(voice === id),
-                      )}
-                    >
-                      {VOICE_LABEL[id]}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : null}
           </div>
         </section>
       ) : null}
@@ -983,7 +1055,6 @@ export function WizardForm({
                     ["سبک تصویر", artStyle],
                     ["بازهٔ سنی", ageRange],
                     ["خروجی", "ویدیو"],
-                    ["راوی", VOICE_LABEL[voice]],
                   ].map(([label, value], i, all) => (
                     <div key={label} className="contents">
                       <dt
@@ -1051,7 +1122,9 @@ export function WizardForm({
                       <li key={`${character.name}-${index}`}>
                         {character.name}
                         {character.relation ? ` · ${character.relation}` : ""}
-                        {character.photo ? " · همراه عکس" : ""}
+                        {character.photo || character.hasSavedPhoto
+                          ? " · همراه عکس"
+                          : ""}
                       </li>
                     ))}
                   </ul>

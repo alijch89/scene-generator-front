@@ -22,12 +22,57 @@ const baloo = Baloo_Bhaijaan_2({
   display: 'swap',
 });
 
+const SITE_TITLE = 'شهرزاد قصه‌گو';
+const SITE_DESCRIPTION = 'کودک شما قهرمان قصهٔ خودش می‌شود.';
+
+/** A deployment-owned origin is the only safe base for absolute social URLs. */
+function getSiteOrigin() {
+  const value = process.env.NEXT_PUBLIC_SITE_URL;
+
+  if (!value) return undefined;
+
+  try {
+    return new URL(value);
+  } catch {
+    return undefined;
+  }
+}
+
+const siteOrigin = getSiteOrigin();
+const socialImage = siteOrigin ? new URL('/og.png', siteOrigin) : undefined;
+
 export const metadata: Metadata = {
+  ...(siteOrigin ? { metadataBase: siteOrigin } : {}),
   title: {
-    default: 'شهرزاد قصه‌گو',
-    template: '%s · شهرزاد قصه‌گو',
+    default: SITE_TITLE,
+    template: `%s · ${SITE_TITLE}`,
   },
-  description: 'کودک شما قهرمان قصهٔ خودش می‌شود.',
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    locale: 'fa_IR',
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    ...(socialImage
+      ? {
+          images: [
+            {
+              url: socialImage,
+              width: 1731,
+              height: 909,
+              alt: 'کتاب قصهٔ جادویی شهرزاد قصه‌گو',
+            },
+          ],
+        }
+      : {}),
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    ...(socialImage ? { images: [socialImage] } : {}),
+  },
 };
 
 /**

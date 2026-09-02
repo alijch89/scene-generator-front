@@ -33,6 +33,7 @@
   --sh-sky2: #fde4cc;
   --sh-shadow: 0 8px 24px rgba(74, 38, 110, 0.1);
   --sh-shadow-lg: 0 22px 54px rgba(74, 38, 110, 0.2);
+  --sh-shadow-float: 0 32px 80px rgba(73, 35, 108, 0.22);
 }
 
 [data-theme="dark"] {
@@ -58,6 +59,7 @@
   --sh-sky2: #3e2749;
   --sh-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   --sh-shadow-lg: 0 22px 54px rgba(0, 0, 0, 0.6);
+  --sh-shadow-float: 0 34px 86px rgba(0, 0, 0, 0.68);
 }
 
 /* The admin panel is a separate visual language. Set data-surface="admin" on
@@ -390,6 +392,234 @@
   }
   50% {
     transform: translate(3%, -4%) scale(1.08);
+  }
+}
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gentleFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(1deg);
+  }
+}
+
+@keyframes floatReverse {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 8px, 0);
+  }
+}
+
+@keyframes softPulse {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes playhead {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes topicMarquee {
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes menuPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Public pages use a slightly richer storybook surface without changing the
+   denser application and admin views. */
+.public-site {
+  isolation: isolate;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sh-bg) 94%, white) 0%,
+      var(--sh-bg) 34%,
+      var(--sh-bg2) 100%
+    );
+}
+
+.public-site::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--sh-primary) 24%, transparent) 0.65px,
+    transparent 0.65px
+  );
+  background-size: 18px 18px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.public-glass {
+  border: 1px solid color-mix(in srgb, var(--sh-border) 86%, white);
+  background: color-mix(in srgb, var(--sh-surface) 82%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
+    var(--sh-shadow);
+  backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.public-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    0 12px 30px color-mix(in srgb, var(--sh-primary) 28%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.32) inset;
+  transition:
+    transform 180ms ease-out,
+    box-shadow 220ms ease-out;
+}
+
+.public-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.24) 44%,
+    transparent 68%
+  );
+  transform: translateX(115%);
+  transition: transform 620ms ease-out;
+}
+
+.public-cta:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 17px 38px color-mix(in srgb, var(--sh-primary) 34%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.38) inset;
+}
+
+.public-cta:hover::after {
+  transform: translateX(-115%);
+}
+
+.public-cta:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.motion-hero-reveal {
+  animation: heroReveal 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.motion-rise {
+  animation: heroReveal 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+.motion-float {
+  animation: gentleFloat 6s ease-in-out infinite;
+}
+
+.motion-float-reverse {
+  animation: floatReverse 5.2s ease-in-out infinite;
+}
+
+.motion-pulse {
+  animation: softPulse 3.4s ease-in-out infinite;
+}
+
+.story-playhead {
+  transform-origin: right center;
+  animation: playhead 5.4s linear infinite;
+}
+
+.topic-marquee-track {
+  width: max-content;
+  animation: topicMarquee 28s linear infinite;
+}
+
+.public-site details[open] > div {
+  animation: menuPop 180ms ease-out both;
+}
+
+.story-card-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 28%,
+    rgba(255, 255, 255, 0.18) 46%,
+    transparent 62%
+  );
+  transform: translateX(110%);
+  transition: transform 700ms ease-out;
+}
+
+.story-card-shine:hover::after {
+  transform: translateX(-110%);
+}
+
+.faq-item::details-content {
+  block-size: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    block-size 360ms ease,
+    content-visibility 360ms ease,
+    opacity 240ms ease;
+  transition-behavior: allow-discrete;
+}
+
+.faq-item[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+.faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 639px) {
+  .topic-marquee-track {
+    animation-duration: 22s;
   }
 }
 

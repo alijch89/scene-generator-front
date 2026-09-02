@@ -29,7 +29,7 @@ export function SiteNav() {
   return (
     // Below sm this would wrap into a ragged second row; SiteMobileNav carries
     // the same links behind a hamburger at those widths instead.
-    <nav className="ms-auto hidden flex-wrap justify-center gap-1 sm:flex">
+    <nav className="ms-auto hidden flex-wrap justify-center gap-1 rounded-[14px] border border-transparent sm:flex lg:bg-[color-mix(in_srgb,var(--sh-elev)_52%,transparent)] lg:p-1">
       {PUBLIC_NAV.map(({ href, label }) => {
         const active = pathname === href;
         return (
@@ -37,8 +37,10 @@ export function SiteNav() {
             key={href}
             href={href}
             aria-current={active ? 'page' : undefined}
-            className={`rounded-[11px] px-3.5 py-2.5 text-[13.5px] font-semibold hover:bg-elev hover:no-underline ${
-              active ? 'text-brand' : 'text-ink'
+            className={`relative rounded-[10px] px-3 py-2 text-[13px] font-semibold transition-[color,background-color,transform] duration-200 hover:-translate-y-px hover:bg-surface hover:no-underline lg:px-3.5 ${
+              active
+                ? 'bg-surface text-brand shadow-[0_4px_14px_color-mix(in_srgb,var(--sh-primary)_10%,transparent)]'
+                : 'text-ink'
             }`}
           >
             {label}
@@ -63,7 +65,7 @@ export function SiteMobileNav({ className }: { className?: string }) {
     <details ref={ref} className={cn('relative sm:hidden', className)}>
       <summary
         aria-label="منو"
-        className="grid size-[38px] cursor-pointer list-none place-items-center rounded-xl border border-border bg-surface text-ink"
+        className="grid size-[38px] cursor-pointer list-none place-items-center rounded-xl border border-border bg-surface text-ink transition-transform active:scale-95"
       >
         <span
           aria-hidden
@@ -75,7 +77,7 @@ export function SiteMobileNav({ className }: { className?: string }) {
           enough to actually navigate. */}
       <div
         onClick={close}
-        className="absolute end-0 top-12 z-40 flex w-56 flex-col gap-1 rounded-2xl border border-border bg-bg2 p-3 shadow-card-lg"
+        className="public-glass absolute end-0 top-12 z-40 flex w-60 origin-top-left flex-col gap-1 rounded-2xl p-3 shadow-card-lg"
       >
         {PUBLIC_NAV.map(({ href, label }) => (
           <Link
@@ -100,7 +102,7 @@ export function SiteMobileNav({ className }: { className?: string }) {
           </Link>
           <Link
             href="/wizard"
-            className="gradient-brand rounded-[13px] px-3 py-[11px] text-center text-sm font-bold text-white shadow-card hover:no-underline"
+            className="public-cta gradient-brand rounded-[13px] px-3 py-[11px] text-center text-sm font-bold text-white hover:no-underline"
           >
             ساخت قصه
           </Link>

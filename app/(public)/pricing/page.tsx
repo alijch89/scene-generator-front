@@ -1,4 +1,11 @@
 import type { Metadata } from 'next';
+import {
+  Check,
+  CreditCard,
+  RefreshCcw,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Card, PageHeader } from '@/components/public/ui';
 import { STORY_PRICE_BY_LENGTH } from '@/lib/config';
@@ -21,14 +28,17 @@ const INCLUDED = [
 
 const REASSURANCES = [
   {
+    Icon: Sparkles,
     title: 'بدون اشتراک',
     body: 'تمدید خودکاری در کار نیست. هر قصه یک پرداخت جداگانه است و اگر قصه‌ای نسازید، چیزی پرداخت نمی‌کنید.',
   },
   {
+    Icon: ShieldCheck,
     title: 'پرداخت امن',
     body: 'پرداخت در درگاه بانکی انجام می‌شود. ما اطلاعات کارت شما را نمی‌بینیم و نگه نمی‌داریم.',
   },
   {
+    Icon: RefreshCcw,
     title: 'اگر ساخت ناموفق بماند',
     body: 'قصه‌ای که با خطا متوقف شود دوباره ساخته می‌شود، بدون پرداخت دوباره.',
   },
@@ -55,24 +65,47 @@ const PRICE_OPTIONS = [
 /** Public per-length pricing driven by the frontend display configuration. */
 export default function PricingPage() {
   return (
-    <main className="mx-auto max-w-[1080px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
+    <main className="mx-auto max-w-[1080px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
         title="قیمت متناسب با طول ویدیو"
         lead="نه اشتراک ماهانه، نه بستهٔ اعتبار. فقط طول ویدیوی قصه را انتخاب می‌کنید و یک بار پرداخت می‌کنید."
       />
 
       <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] items-start gap-5">
-        <div className="rounded-3xl border-2 border-brand bg-surface p-7 shadow-card-lg">
-          <strong className="mb-1.5 block text-[17px]">قیمت هر ویدیو</strong>
-          <p className="mb-4 text-[13px] text-muted">
+        <div className="motion-rise relative overflow-hidden rounded-[30px] border-2 border-[color-mix(in_srgb,var(--sh-primary)_72%,var(--sh-border))] bg-[color-mix(in_srgb,var(--sh-surface)_92%,transparent)] p-6 shadow-[var(--sh-shadow-float)] sm:p-7">
+          <span className="absolute top-0 end-6 rounded-b-xl bg-brand px-3 py-1.5 text-[10.5px] font-bold text-white shadow-card">
+            انتخاب ساده، بدون پلن گیج‌کننده
+          </span>
+          <span
+            aria-hidden
+            className="absolute -top-16 -start-16 size-44 rounded-full bg-[color-mix(in_srgb,var(--sh-primary)_13%,transparent)] blur-3xl"
+          />
+          <strong className="relative mt-5 mb-1.5 block font-display text-[21px]">
+            قیمت هر ویدیو
+          </strong>
+          <p className="relative mb-5 text-[13px] text-muted">
             متن، تصویر، روایت و ویدئو
           </p>
 
-          <dl className="mb-6 divide-y divide-border rounded-[18px] border border-border bg-elev px-4">
-            {PRICE_OPTIONS.map((option) => (
-              <div key={option.label} className="flex items-center gap-3 py-3.5">
+          <dl className="relative mb-6 flex flex-col gap-2.5">
+            {PRICE_OPTIONS.map((option, index) => (
+              <div
+                key={option.label}
+                className={`flex items-center gap-3 rounded-[17px] border px-4 py-3.5 transition-[transform,border-color,background-color] duration-200 hover:-translate-y-0.5 ${
+                  index === 1
+                    ? 'border-[color-mix(in_srgb,var(--sh-primary)_42%,var(--sh-border))] bg-[color-mix(in_srgb,var(--sh-primary)_8%,var(--sh-elev))]'
+                    : 'border-border bg-elev'
+                }`}
+              >
                 <div>
-                  <dt className="text-[14px] font-bold">{option.label}</dt>
+                  <dt className="flex items-center gap-2 text-[14px] font-bold">
+                    {option.label}
+                    {index === 1 ? (
+                      <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[9.5px] text-brand">
+                        محبوب
+                      </span>
+                    ) : null}
+                  </dt>
                   <dd className="mt-0.5 text-[11.5px] text-muted">
                     {option.detail}
                   </dd>
@@ -87,8 +120,9 @@ export default function PricingPage() {
 
           <Link
             href="/wizard"
-            className="gradient-brand block rounded-[14px] py-3.5 text-center text-[15px] font-bold text-white hover:no-underline"
+            className="public-cta gradient-brand flex items-center justify-center gap-2 rounded-[14px] py-3.5 text-center text-[15px] font-bold text-white hover:no-underline"
           >
+            <Sparkles className="size-4.5" />
             ساخت قصه
           </Link>
           <p className="mt-3.5 text-center text-xs text-muted">
@@ -96,13 +130,21 @@ export default function PricingPage() {
           </p>
         </div>
 
-        <Card className="rounded-3xl p-7">
-          <strong className="mb-4 block text-[17px]">چه چیزی شامل می‌شود</strong>
+        <Card className="motion-rise rounded-[30px] p-7 [--motion-delay:110ms]">
+          <span className="mb-4 grid size-11 place-items-center rounded-[15px] bg-[color-mix(in_srgb,var(--sh-teal)_12%,var(--sh-elev))] text-teal">
+            <CreditCard className="size-5" strokeWidth={1.7} />
+          </span>
+          <strong className="mb-4 block font-display text-[20px]">
+            چه چیزی شامل می‌شود
+          </strong>
           <ul className="flex list-none flex-col gap-3 text-[14px] leading-[1.9] text-muted">
             {INCLUDED.map((item) => (
               <li key={item} className="flex gap-2.5">
-                <span aria-hidden className="flex-none text-success">
-                  ✓
+                <span
+                  aria-hidden
+                  className="mt-1 grid size-5 flex-none place-items-center rounded-full bg-success/12 text-success"
+                >
+                  <Check className="size-3.5" strokeWidth={2.2} />
                 </span>
                 {item}
               </li>
@@ -112,8 +154,17 @@ export default function PricingPage() {
       </div>
 
       <div className="mt-5 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
-        {REASSURANCES.map((item) => (
-          <Card key={item.title} className="rounded-[20px] p-5">
+        {REASSURANCES.map((item, index) => (
+          <Card
+            key={item.title}
+            style={
+              { '--motion-delay': `${index * 80 + 160}ms` } as React.CSSProperties
+            }
+            className="motion-rise rounded-[20px] p-5"
+          >
+            <span className="mb-3 grid size-9 place-items-center rounded-[13px] bg-elev text-brand">
+              <item.Icon className="size-4.5" strokeWidth={1.8} />
+            </span>
             <strong className="mb-2 block text-[15px]">{item.title}</strong>
             <p className="text-[13.5px] leading-[1.9] text-muted">
               {item.body}

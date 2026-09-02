@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ChevronDown, HelpCircle, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/public/ui';
 import { STORY_PRICE_BY_LENGTH } from '@/lib/config';
@@ -41,7 +42,7 @@ const QUESTIONS = [
 /** Static FAQ page using native details disclosures. */
 export default function FaqPage() {
   return (
-    <main className="mx-auto max-w-[800px] animate-[pageIn_.4s_ease_both] px-5 pt-[clamp(30px,5vw,60px)] pb-20">
+    <main className="mx-auto max-w-[820px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
         title="پرسش‌های پرتکرار"
         lead={
@@ -56,19 +57,39 @@ export default function FaqPage() {
       />
 
       <div className="flex flex-col gap-3">
-        {QUESTIONS.map((item) => (
+        {QUESTIONS.map((item, index) => (
           <details
             key={item.q}
-            className="rounded-[18px] border border-border bg-surface px-5 py-4.5 shadow-card open:[&_summary]:text-brand"
+            style={
+              { '--motion-delay': `${index * 55}ms` } as React.CSSProperties
+            }
+            className="faq-item motion-rise group rounded-[20px] border border-border bg-[color-mix(in_srgb,var(--sh-surface)_90%,transparent)] px-5 py-4 shadow-card transition-[border-color,box-shadow,transform] duration-300 open:border-[color-mix(in_srgb,var(--sh-primary)_35%,var(--sh-border))] open:shadow-card-lg hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--sh-primary)_25%,var(--sh-border))] open:[&_summary]:text-brand"
           >
-            <summary className="cursor-pointer text-[15.5px] font-bold">
-              {item.q}
+            <summary className="flex cursor-pointer list-none items-center gap-3 text-[15px] font-bold sm:text-[15.5px]">
+              <span className="grid size-8 flex-none place-items-center rounded-[12px] bg-elev text-brand transition-colors group-open:bg-brand group-open:text-white">
+                <HelpCircle className="size-4" strokeWidth={1.9} />
+              </span>
+              <span className="flex-1">{item.q}</span>
+              <ChevronDown className="faq-chevron size-4.5 flex-none text-muted transition-transform duration-300" />
             </summary>
-            <p className="mt-3.5 text-[14.5px] leading-[2] text-muted">
+            <p className="me-11 mt-3.5 border-t border-border pt-3.5 text-[14px] leading-[2.05] text-muted sm:text-[14.5px]">
               {item.a}
             </p>
           </details>
         ))}
+      </div>
+
+      <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-[22px] border border-border bg-elev/70 p-5 sm:flex-row sm:items-center">
+        <p className="text-[13.5px] font-semibold text-muted">
+          هنوز جواب پرسشتان را پیدا نکردید؟
+        </p>
+        <Link
+          href="/contact"
+          className="inline-flex items-center gap-2 rounded-[13px] bg-surface px-4.5 py-3 text-sm font-bold text-brand shadow-card transition-transform hover:-translate-y-0.5 hover:no-underline"
+        >
+          <MessageCircle className="size-4" />
+          با ما در میان بگذارید
+        </Link>
       </div>
     </main>
   );

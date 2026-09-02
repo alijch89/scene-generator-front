@@ -156,6 +156,7 @@ npm run start
 | `NEXT_PUBLIC_API_URL` | build و مرورگر | آدرس عمومی REST API با پیشوند `/api` | `http://localhost:3001/api` |
 | `INTERNAL_API_URL` | runtime سمت سرور | آدرس داخلی API برای Server Componentها؛ Compose آن را روی `http://backend:3001/api` می‌گذارد | همان API یا نام سرویس Docker |
 | `NEXT_PUBLIC_PAYMENT_MODE` | build | با مقدار `link` صفحه پرداخت mock را غیرفعال می‌کند؛ باید با `PAYMENT_MODE` بک‌اند هماهنگ باشد | `mock` |
+| `NEXT_PUBLIC_SITE_URL` | build | مبدأ عمومی سایت برای لینک کامل تصویر اشتراک‌گذاری اجتماعی | آدرس production سایت |
 | `NEXT_PUBLIC_S3_URL` | build | در نمونه env و build args نگه داشته شده، اما کد فعلی رسانه خصوصی را از API stream می‌کند و مستقیماً از این مقدار استفاده نمی‌کند | `http://localhost:9000/shahrzad` |
 
 متغیرهای مخصوص تست مرورگر:

@@ -1,3 +1,4 @@
+import { Heart, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
 import { SiteMobileNav, SiteNav } from '@/components/public/site-nav';
@@ -33,15 +34,22 @@ const FOOTER_COLUMNS = [
 /** Shared marketing layout for public product, policy, contact, and mock-payment routes. */
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
   return (
-    <div className="aurora flex min-h-full flex-col">
-      <header className="sticky top-0 z-30 border-b border-border bg-[color-mix(in_srgb,var(--sh-bg)_88%,transparent)] backdrop-blur-[12px]">
-        <div className="mx-auto flex max-w-[1180px] items-center gap-[18px] px-5 py-3.5">
+    <div className="public-site aurora flex min-h-full flex-col">
+      <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5">
+        <div className="public-glass mx-auto flex max-w-[1180px] items-center gap-[18px] rounded-[20px] px-3.5 py-2.5 sm:px-4.5">
           <Link
             href="/"
-            className="flex items-center gap-2.5 text-ink hover:no-underline"
+            className="group flex items-center gap-2.5 text-ink hover:no-underline"
           >
-            <Logo className="size-[34px]" />
-            <strong className="font-display text-lg">شهرزاد قصه‌گو</strong>
+            <Logo className="size-[38px] shadow-card transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105" />
+            <span>
+              <strong className="block font-display text-[17px] leading-none sm:text-lg">
+                شهرزاد قصه‌گو
+              </strong>
+              <span className="mt-1 hidden text-[9.5px] font-semibold tracking-[.05em] text-muted lg:block">
+                قصه‌ای که فقط برای شماست
+              </span>
+            </span>
           </Link>
 
           <SiteNav />
@@ -58,8 +66,9 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
             </Link>
             <Link
               href="/wizard"
-              className="gradient-brand hidden rounded-[13px] px-[18px] py-[11px] text-sm font-bold text-white shadow-card hover:no-underline sm:block"
+              className="public-cta gradient-brand hidden items-center gap-1.5 rounded-[13px] px-[18px] py-[11px] text-sm font-bold text-white hover:no-underline sm:flex"
             >
+              <Sparkles className="size-4" strokeWidth={1.9} />
               ساخت قصه
             </Link>
             <SiteMobileNav />
@@ -69,15 +78,27 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
 
       <div className="relative z-[1] flex-1">{children}</div>
 
-      <footer className="relative z-[1] border-t border-border bg-bg2">
-        <div className="mx-auto grid max-w-[1180px] grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-6 px-5 py-[34px]">
-          <div>
-            <strong className="mb-2 block font-display text-[17px]">
-              شهرزاد قصه‌گو
-            </strong>
+      <footer className="relative z-[1] mt-auto border-t border-border bg-[color-mix(in_srgb,var(--sh-bg2)_88%,transparent)]">
+        <div className="mx-auto grid max-w-[1180px] grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-7 px-5 py-10">
+          <div className="max-w-[260px]">
+            <div className="mb-3 flex items-center gap-2.5">
+              <Logo className="size-9 shadow-card" />
+              <strong className="font-display text-[17px]">
+                شهرزاد قصه‌گو
+              </strong>
+            </div>
             <p className="text-[13px] leading-[1.9] text-muted">
-              کودک شما، قهرمان قصهٔ خودش.
+              هر کودک دنیایی برای گفتن دارد؛ ما آن را به قصه‌ای دیدنی و شنیدنی
+              تبدیل می‌کنیم.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-[10.5px] font-semibold text-muted">
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1.5">
+                <ShieldCheck className="size-3.5 text-teal" /> خصوصی
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1.5">
+                <Heart className="size-3.5 text-pink" /> ساخته‌شده برای خانواده
+              </span>
+            </div>
           </div>
 
           {FOOTER_COLUMNS.map((column) => (
@@ -89,8 +110,9 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-[13.5px] text-ink hover:text-warm"
+                  className="group flex items-center gap-1 text-[13.5px] text-ink hover:text-warm"
                 >
+                  <span className="h-px w-0 bg-warm transition-[width] duration-200 group-hover:w-3" />
                   {link.label}
                 </Link>
               ))}

@@ -111,7 +111,7 @@ export const WIZARD_THEMES: {
     body: 'وقتی یک دروغ کوچک بزرگ و بزرگ‌تر می‌شود',
     example:
       'گلدان مادربزرگ می‌شکند و یک «کار من نبود» کوچک، تا شب آن‌قدر قد می‌کشد که اندازهٔ اتاق می‌شود.',
-    image: '/topics/راستگویی.jpeg',
+    image: '/topics/honesty-v2.png',
   },
   {
     id: 'KINDNESS',
@@ -119,7 +119,7 @@ export const WIZARD_THEMES: {
     body: 'یک کار خوب کوچک که دست‌به‌دست می‌چرخد',
     example:
       'صبح یک کار خوب کوچک در کوچه انجام می‌شود و تا غروب دست‌به‌دست می‌گردد و به در خانهٔ خودمان برمی‌گردد.',
-    image: '/topics/مهربانی.jpeg',
+    image: '/topics/kindness-v2.png',
   },
   {
     id: 'COURAGE',
@@ -127,7 +127,7 @@ export const WIZARD_THEMES: {
     body: 'رو‌به‌رو شدن با چیزی که کمی می‌ترساند',
     example:
       'چراغ که خاموش می‌شود، سایهٔ گوشهٔ اتاق باید یک بار از نزدیک دیده شود تا معلوم شود کیست.',
-    image: '/topics/شجاعت.jpeg',
+    image: '/topics/courage-v2.png',
   },
   {
     id: 'SHARING',
@@ -135,7 +135,7 @@ export const WIZARD_THEMES: {
     body: 'یک اسباب‌بازی و دو دستِ منتظر',
     example:
       'در حیاط فقط یک ماشین قرمز هست و دو نفر هم‌زمان آن را می‌خواهند؛ باید راهی پیدا شود.',
-    image: '/topics/سهیم.jpeg',
+    image: '/topics/sharing-v2.png',
   },
   {
     id: 'TEAMWORK',
@@ -143,7 +143,7 @@ export const WIZARD_THEMES: {
     body: 'کاری که از پس یک نفر تنها برنمی‌آید',
     example:
       'بادبادک روی بلندترین شاخهٔ کوچه گیر کرده و هیچ‌کس به‌تنهایی دستش به آن نمی‌رسد.',
-    image: '/topics/همکاری.jpeg',
+    image: '/topics/teamwork-v2.png',
   },
   {
     id: 'RESPONSIBILITY',
@@ -151,7 +151,7 @@ export const WIZARD_THEMES: {
     body: 'قولی که داده شده و باید نگه داشته شود',
     example:
       'قرار بوده هر روز به گلدان کوچک آب برسد؛ امروز صبح برگ‌هایش خم شده‌اند.',
-    image: '/topics/مسئولیت.jpeg',
+    image: '/topics/responsibility-v2.png',
   },
   {
     id: 'PATIENCE',
@@ -159,7 +159,7 @@ export const WIZARD_THEMES: {
     body: 'کاری که بار اول درست از آب درنمی‌آید',
     example:
       'دانه‌ای کاشته می‌شود و هر روز صبح هنوز فقط خاک است، خاکِ ساکت؛ تا یک صبح.',
-    image: '/topics/پشتکار.jpeg',
+    image: '/topics/perseverance-v2.png',
   },
   {
     id: 'RESPECT',
@@ -167,7 +167,7 @@ export const WIZARD_THEMES: {
     body: 'حرف‌هایی که حال کسی را خوب یا بد می‌کنند',
     example:
       'در صف نانوایی حرفی از دهان بیرون می‌پرد که برای برگرداندنش باید فکری کرد.',
-    image: '/topics/احترام.jpeg',
+    image: '/topics/respect-v2.png',
   },
   {
     id: 'OWN',

@@ -50,7 +50,7 @@ export default function FaqPage() {
           <>
             اگر جوابتان را پیدا نکردید،{' '}
             <Link href="/contact" className="font-bold text-brand">
-              به ما بنویسید
+               برای ما بنویسید
             </Link>
             .
           </>

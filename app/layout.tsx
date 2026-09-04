@@ -1,26 +1,11 @@
 /**
  * @file layout.tsx
- * @description Defines Persian RTL document metadata, fonts, pre-hydration theme state, and global providers.
+ * @description Defines Persian RTL document metadata, the self-hosted font preload, pre-hydration theme state, and global providers.
  */
 
 import type { Metadata } from 'next';
-import { Baloo_Bhaijaan_2, Vazirmatn } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-
-const vazirmatn = Vazirmatn({
-  variable: '--font-vazirmatn',
-  subsets: ['arabic', 'latin'],
-  weight: ['300', '400', '500', '600', '700', '800'],
-  display: 'swap',
-});
-
-const baloo = Baloo_Bhaijaan_2({
-  variable: '--font-baloo',
-  subsets: ['arabic', 'latin'],
-  weight: ['500', '600', '700', '800'],
-  display: 'swap',
-});
 
 const SITE_TITLE = 'شهرزاد قصه‌گو';
 const SITE_DESCRIPTION = 'کودک شما قهرمان قصهٔ خودش می‌شود.';
@@ -95,10 +80,22 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       lang="fa"
       dir="rtl"
       data-theme="light"
-      className={`${vazirmatn.variable} ${baloo.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <head>
+        {/* Every surface renders Persian body copy, so the arabic cut of
+            Vazirmatn is on the critical path of the first paint everywhere.
+            The latin cuts and the display face are left to @font-face to fetch
+            on demand; the layouts that lead with display type pull theirs in
+            through DisplayFontPreload. */}
+        <link
+          rel="preload"
+          href="/fonts/vazirmatn-v16-arabic.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-bg text-ink">

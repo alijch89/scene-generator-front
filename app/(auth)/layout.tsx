@@ -5,6 +5,7 @@
 
 import { BookOpenText, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { DisplayFontPreload } from '@/components/display-font-preload';
 import { Logo } from '@/components/logo';
 import { SiteMobileNav } from '@/components/public/site-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,6 +14,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 export default function AuthLayout({ children }: LayoutProps<'/'>) {
   return (
     <div className="min-h-svh bg-bg lg:grid lg:grid-cols-[minmax(440px,0.88fr)_minmax(520px,1.12fr)]">
+      <DisplayFontPreload />
       <aside className="relative isolate flex min-h-[278px] flex-col overflow-hidden bg-[linear-gradient(155deg,#1D173E_0%,#382866_50%,#7A4D86_100%)] px-6 py-6 text-[#FFF8E8] sm:px-9 lg:min-h-svh lg:px-[clamp(38px,5vw,76px)] lg:py-[clamp(34px,5vw,60px)]">
         <div
           aria-hidden

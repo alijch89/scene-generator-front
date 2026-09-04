@@ -35,7 +35,7 @@ const TOPIC_ACCENTS = [
  */
 const STATS = [
   {
-    value: faNum(14200),
+    value: faNum(1200),
     label: 'قصهٔ ساخته‌شده',
     tone: 'text-brand',
     accent: 'bg-brand',
@@ -49,7 +49,7 @@ const STATS = [
     glow: 'bg-[color-mix(in_srgb,var(--sh-accent)_16%,transparent)]',
   },
   {
-    value: `${faNum(8)} ماجرا`,
+    value: `${faNum(12)} ماجرا`,
     label: 'دسته‌بندی آماده',
     tone: 'text-teal',
     accent: 'bg-teal',

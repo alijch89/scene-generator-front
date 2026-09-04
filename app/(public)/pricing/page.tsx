@@ -181,7 +181,7 @@ export default function PricingPage() {
         </Link>{' '}
         را ببینید یا{' '}
         <Link href="/contact" className="font-bold text-brand">
-          به ما بنویسید
+          برای ما بنویسید
         </Link>
         .
       </p>

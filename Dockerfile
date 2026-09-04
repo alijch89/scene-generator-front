@@ -38,8 +38,10 @@ ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production
 
-# app/layout.tsx pulls Vazirmatn and Baloo through next/font/google, so this
-# step needs network access to fonts.googleapis.com.
+# Vazirmatn and Baloo ship in public/fonts and are declared by @font-face in
+# app/globals.css, so this step needs no network access at all. It used to pull
+# both through next/font/google, which fails silently behind a filtered network
+# and leaves every page in a system fallback.
 RUN npm run build
 
 # --- runtime ----------------------------------------------------------------

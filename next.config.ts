@@ -57,8 +57,10 @@ const securityHeaders = [
       `connect-src 'self' ${apiOrigin}`,
       `img-src 'self' data: blob: ${apiOrigin}`,
       `media-src 'self' blob: ${apiOrigin}`,
-      "font-src 'self' https://fonts.gstatic.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Both families are served out of public/fonts now; no third-party
+      // origin has to be allowed for type any more.
+      "font-src 'self'",
+      "style-src 'self' 'unsafe-inline'",
       `script-src ${scriptSrc}`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -81,7 +83,22 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
   },
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // Anything under /public is served `max-age=0` by default, so the type
+      // would be re-validated on every navigation. Each font filename carries
+      // its upstream revision (`-v16-`, `-v21-`), so a new cut arrives under a
+      // new URL and pinning the old one costs nothing.
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
   },
 };
 

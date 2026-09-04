@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { ParentFooter } from '@/components/app/footer';
 import { HeaderTitle, MobileNav, SidebarNav } from '@/components/app/nav';
+import { DisplayFontPreload } from '@/components/display-font-preload';
 import { Logo } from '@/components/logo';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -26,6 +27,7 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
 
   return (
     <div className="aurora grid min-h-full grid-cols-1 md:grid-cols-[232px_minmax(0,1fr)]">
+      <DisplayFontPreload />
       {/* print:hidden throughout — the only printable page in here is the
           invoice, and it should come out as a document, not a screenshot. */}
       <aside className="sticky top-0 hidden h-screen flex-col gap-4 overflow-y-auto border-e border-border bg-bg2 px-3.5 py-5 md:flex print:hidden">

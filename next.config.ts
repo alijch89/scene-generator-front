@@ -15,6 +15,18 @@ const apiOrigin = (() => {
 })();
 
 /**
+ * `eval()` is a development-only dependency: React's dev build uses it to
+ * reconstruct callstacks from other environments, and the dev server's bundles
+ * are eval-wrapped for HMR. Both are absent from a production build, so the
+ * relaxation never reaches a deployed response.
+ */
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(process.env.NODE_ENV === 'production' ? [] : ["'unsafe-eval'"]),
+].join(' ');
+
+/**
  * Sent on every response.
  *
  * Neither tier set any of these before, which left the payment and
@@ -23,8 +35,8 @@ const apiOrigin = (() => {
  *
  * `unsafe-inline` for styles is Next's requirement for its own injected
  * critical CSS; scripts get `unsafe-inline` only because the anti-FOUC script
- * in `app/layout.tsx` carries no nonce yet, and `unsafe-eval` is dropped
- * entirely — nothing in the bundle needs it.
+ * in `app/layout.tsx` carries no nonce yet, and `unsafe-eval` is dropped from
+ * production builds — nothing in the shipped bundle needs it.
  */
 const securityHeaders = [
   {
@@ -47,7 +59,7 @@ const securityHeaders = [
       `media-src 'self' blob: ${apiOrigin}`,
       "font-src 'self' https://fonts.gstatic.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src ${scriptSrc}`,
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

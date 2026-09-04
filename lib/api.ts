@@ -10,11 +10,11 @@
  * attributes across the app.
  */
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api";
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 /**
  * Base the Node server dials instead. Under Docker the browser's
- * `http://localhost:3001/api` resolves to the frontend container's own
+ * `http://localhost:3001/api/v1` resolves to the frontend container's own
  * loopback, so server components have to address the API by its compose
  * service name. Left unset outside Docker, where one origin serves both.
  */
@@ -23,6 +23,25 @@ const SERVER_API_URL = process.env.INTERNAL_API_URL || API_URL;
 /** Picks the base for the current execution context. */
 const baseUrl = () =>
   typeof window === "undefined" ? SERVER_API_URL : API_URL;
+
+/**
+ * Header proving a request came from this server rather than a browser.
+ *
+ * The API throttles by client IP, and every server component in the app
+ * reaches it from one address — this container's. That put all server-rendered
+ * traffic into a single 120/min bucket, so the product started returning 429
+ * to everyone at roughly forty page views a minute. The token marks the
+ * frontend as the first-party caller it is.
+ *
+ * Server-only by construction: it is read from a non-`NEXT_PUBLIC_` variable,
+ * which is `undefined` in the browser bundle, and applied only on the server
+ * branch. Inlining it would hand every visitor the exemption.
+ */
+const internalHeaders = (): Record<string, string> => {
+  if (typeof window !== "undefined") return {};
+  const token = process.env.INTERNAL_API_TOKEN;
+  return token ? { "x-internal-token": token } : {};
+};
 
 /** HTTP error that preserves response status and the parsed backend payload. */
 export class ApiError extends Error {
@@ -68,6 +87,7 @@ export async function request<T>(
         ? {}
         : { "content-type": "application/json" }),
       ...(cookie ? { cookie } : {}),
+      ...internalHeaders(),
       ...headers,
     },
     // The browser must supply FormData's boundary; JSON keeps the old client contract.

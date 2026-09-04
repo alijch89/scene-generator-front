@@ -6,7 +6,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { ConfirmDelete } from '@/components/app/confirm-delete';
 import {
   Alert,
@@ -20,52 +20,34 @@ import {
   Toggle,
   passwordStrength,
 } from '@/components/form';
+import {
+  IDLE,
+  changePassword,
+  revokeOtherSessions,
+  revokeSession,
+  updateNotificationPrefs,
+  updateProfile,
+} from '@/lib/actions/account';
 import { api } from '@/lib/api';
 import { faDate } from '@/lib/fa';
 import type { NotificationPrefs, SessionDto } from '@/lib/types';
 import type { UserDto } from '@/lib/session';
 import { useTheme } from '@/app/providers';
 
-/** Inline success or failure message emitted by an account form. */
-type Feedback = { tone: 'success' | 'error'; text: string } | null;
-
 /** اطلاعات شخصی. The login phone is shown but changes require verification. */
 export function ProfileForm({ user }: { user: UserDto }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState<Feedback>(null);
+  const [state, action, pending] = useActionState(updateProfile, IDLE);
 
   return (
-    <form
-      onSubmit={async (event) => {
-        event.preventDefault();
-        const form = new FormData(event.currentTarget);
-        setBusy(true);
-        setFeedback(null);
-        try {
-          await api.patch('/auth/me', {
-            fullName: String(form.get('fullName') ?? ''),
-          });
-          setFeedback({ tone: 'success', text: 'تغییرات ذخیره شد.' });
-          router.refresh();
-        } catch (err) {
-          setFeedback({
-            tone: 'error',
-            text: err instanceof Error ? err.message : 'ذخیره نشد.',
-          });
-        } finally {
-          setBusy(false);
-        }
-      }}
-    >
-      {feedback ? (
+    <form action={action}>
+      {state.tone === 'idle' ? null : (
         <Alert
-          tone={feedback.tone === 'success' ? 'success' : 'error'}
-          icon={feedback.tone === 'success' ? '✓' : '✕'}
+          tone={state.tone}
+          icon={state.tone === 'success' ? '✓' : '✕'}
         >
-          {feedback.text}
+          {state.text}
         </Alert>
-      ) : null}
+      )}
 
       <div className="grid gap-3.5 sm:grid-cols-2">
         <Field label="نام">
@@ -91,7 +73,7 @@ export function ProfileForm({ user }: { user: UserDto }) {
       </div>
 
       <SubmitButton
-        loading={busy}
+        loading={pending}
         loadingLabel="در حال ذخیره…"
         className="mt-4.5 px-5.5 py-3.5"
       >
@@ -109,8 +91,7 @@ export function ProfileForm({ user }: { user: UserDto }) {
  * box and the reveal toggle live here rather than only on the sign-up form.
  */
 export function ChangePasswordForm() {
-  const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState<Feedback>(null);
+  const [state, action, pending] = useActionState(changePassword, IDLE);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
@@ -123,46 +104,15 @@ export function ChangePasswordForm() {
         تغییر گذرواژه
       </summary>
 
-      <form
-        className="mt-4 flex flex-col gap-3"
-        onSubmit={async (event) => {
-          event.preventDefault();
-          if (mismatch) return;
-          const form = event.currentTarget;
-          const data = new FormData(form);
-          setBusy(true);
-          setFeedback(null);
-          try {
-            await api.post('/auth/change-password', {
-              currentPassword: String(data.get('currentPassword') ?? ''),
-              newPassword: password,
-              confirmPassword: confirm,
-            });
-            form.reset();
-            setPassword('');
-            setConfirm('');
-            setFeedback({
-              tone: 'success',
-              text: 'گذرواژه عوض شد. نشست‌های دیگر بسته شدند.',
-            });
-          } catch (err) {
-            setFeedback({
-              tone: 'error',
-              text: err instanceof Error ? err.message : 'انجام نشد.',
-            });
-          } finally {
-            setBusy(false);
-          }
-        }}
-      >
-        {feedback ? (
+      <form className="mt-4 flex flex-col gap-3" action={action}>
+        {state.tone === 'idle' ? null : (
           <Alert
-            tone={feedback.tone === 'success' ? 'success' : 'error'}
-            icon={feedback.tone === 'success' ? '✓' : '✕'}
+            tone={state.tone}
+            icon={state.tone === 'success' ? '✓' : '✕'}
           >
-            {feedback.text}
+            {state.text}
           </Alert>
-        ) : null}
+        )}
 
         <Field label="گذرواژهٔ فعلی">
           <PasswordInput
@@ -173,6 +123,7 @@ export function ChangePasswordForm() {
         </Field>
         <Field label="گذرواژهٔ تازه" hint={PASSWORD_HINT[strength]}>
           <PasswordInput
+            name="newPassword"
             autoComplete="new-password"
             minLength={8}
             required
@@ -186,6 +137,7 @@ export function ChangePasswordForm() {
           hint={mismatch ? 'گذرواژه‌ها یکی نیستند.' : undefined}
         >
           <PasswordInput
+            name="confirmPassword"
             autoComplete="new-password"
             required
             value={confirm}
@@ -193,7 +145,11 @@ export function ChangePasswordForm() {
             onChange={(event) => setConfirm(event.target.value)}
           />
         </Field>
-        <SubmitButton loading={busy} loadingLabel="در حال تغییر…">
+        <SubmitButton
+          loading={pending}
+          disabled={mismatch}
+          loadingLabel="در حال تغییر…"
+        >
           تغییر گذرواژه
         </SubmitButton>
       </form>
@@ -232,7 +188,6 @@ function deviceLabel(device: string | null) {
 /** Lists active device sessions and allows non-current sessions to be revoked. */
 export function SessionList({ sessions }: { sessions: SessionDto[] }) {
   const router = useRouter();
-  const [busy, setBusy] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col gap-3">
@@ -247,89 +202,100 @@ export function SessionList({ sessions }: { sessions: SessionDto[] }) {
                 {faDate(session.createdAt)}
                 {session.current ? ' · این دستگاه' : ''}
               </span>
-              {session.current ? null : (
-                <button
-                  type="button"
-                  disabled={busy === session.id}
-                  onClick={async () => {
-                    setBusy(session.id);
-                    try {
-                      await api.delete(`/auth/sessions/${session.id}`);
-                      router.refresh();
-                    } finally {
-                      setBusy(null);
-                    }
-                  }}
-                  className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-[12px] font-semibold"
-                >
-                  خروج
-                </button>
-              )}
+              {session.current ? null : <RevokeSessionButton id={session.id} />}
             </li>
           ))}
         </ul>
       </div>
 
-      <button
-        type="button"
-        onClick={async () => {
-          await api.post('/auth/logout-all');
+      <form
+        action={async () => {
+          await revokeOtherSessions();
+          // Every other device is signed out; this one stays valid, but the
+          // design's «همه» promises otherwise, so it leaves too.
           router.replace('/login');
           router.refresh();
         }}
-        className="rounded-2xl border border-error bg-surface px-4 py-3.5 text-right text-[14px] font-semibold text-error"
       >
-        خروج از همهٔ دستگاه‌ها
-      </button>
+        <button
+          type="submit"
+          className="w-full rounded-2xl border border-error bg-surface px-4 py-3.5 text-right text-[14px] font-semibold text-error"
+        >
+          خروج از همهٔ دستگاه‌ها
+        </button>
+      </form>
     </div>
+  );
+}
+
+/** One row's «خروج», bound to the session it ends. */
+function RevokeSessionButton({ id }: { id: string }) {
+  // bind() rather than a hidden field: the id is then not part of the
+  // rendered HTML, and the API scopes the delete by the caller's user anyway.
+  const [, action, pending] = useActionState(revokeSession.bind(null, id), IDLE);
+
+  return (
+    <form action={action}>
+      <button
+        type="submit"
+        disabled={pending}
+        className="rounded-lg border border-border bg-surface px-2.5 py-1.5 text-[12px] font-semibold disabled:opacity-60"
+      >
+        {pending ? '…' : 'خروج'}
+      </button>
+    </form>
   );
 }
 
 /** Edits the three persisted account notification preferences. */
 export function NotificationPrefsForm({ prefs }: { prefs: NotificationPrefs }) {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [state, action, pending] = useActionState(
+    updateNotificationPrefs,
+    IDLE,
+  );
+  const form = useRef<HTMLFormElement>(null);
 
-  const save = async (patch: Partial<NotificationPrefs>) => {
-    setError(null);
-    try {
-      await api.patch('/auth/me', { prefs: patch });
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'ذخیره نشد.');
-    }
-  };
+  // Each toggle saves on change, as it did before — but the action sends all
+  // three, so a PATCH can never be read as "the other two were turned off".
+  const submit = () => form.current?.requestSubmit();
 
   return (
-    <>
-      {error ? (
+    <form action={action} ref={form}>
+      {state.tone === 'error' ? (
         <Alert tone="error" icon="✕">
-          {error}
+          {state.text}
         </Alert>
       ) : null}
       <Toggle
         label="قصه آماده شد"
         hint="وقتی ساخت تمام شود خبر می‌دهیم"
+        name="notifyStoryReady"
         defaultChecked={prefs.notifyStoryReady}
-        onChange={(e) => save({ notifyStoryReady: e.target.checked })}
+        disabled={pending}
+        onChange={submit}
         className="border-b border-border"
       />
       <Toggle
         label="پرداخت"
         hint="تأیید پرداخت، خطای پرداخت و صورت‌حساب"
+        name="notifyPayment"
         defaultChecked={prefs.notifyPayment}
-        onChange={(e) => save({ notifyPayment: e.target.checked })}
+        disabled={pending}
+        onChange={submit}
         className="border-b border-border"
       />
       <Toggle
         label="خبرهای محصول"
         hint="ماجراهای تازه و صداهای جدید"
+        name="notifyProductNews"
         defaultChecked={prefs.notifyProductNews}
-        onChange={(e) => save({ notifyProductNews: e.target.checked })}
+        disabled={pending}
+        onChange={submit}
       />
-    </>
+    </form>
   );
 }
+
 
 /** نمایش و زبان. Theme goes through the same provider as the header toggle. */
 export function DisplaySettings() {

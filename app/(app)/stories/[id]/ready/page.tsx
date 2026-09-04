@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect, unstable_rethrow } from 'next/navigation';
 import { FavoriteButton } from '@/components/app/story-actions';
 import { ChildAvatar, PrimaryLink } from '@/components/app/ui';
 import { DownloadButton } from '@/components/app/story-media';
@@ -28,7 +28,12 @@ export default async function ReadyPage({
 
   const child = await sapi
     .get<ChildDto>(`/children/${story.childId}`)
-    .catch(() => null);
+    .catch((err) => {
+      // A missing child card degrades this page; a redirect must not be
+      // caught here and turned into one.
+      unstable_rethrow(err);
+      return null;
+    });
 
   return (
     <section className="mx-auto max-w-225 animate-[riseIn_.6s_cubic-bezier(.2,.8,.2,1)_both] py-11">

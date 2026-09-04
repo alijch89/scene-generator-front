@@ -27,7 +27,7 @@ describe("request", () => {
     ).resolves.toEqual({ id: "story-1" });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringMatching(/\/api\/stories$/),
+      expect.stringMatching(/\/api\/v1\/stories$/),
       expect.objectContaining({
         method: "POST",
         credentials: "include",

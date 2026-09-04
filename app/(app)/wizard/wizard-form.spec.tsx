@@ -50,14 +50,14 @@ describe("WizardForm supporting characters", () => {
     expect(topicSources).toHaveLength(8);
     expect(topicSources).toEqual(
       expect.arrayContaining([
-        expect.stringContaining("/topics/راستگویی.jpeg"),
-        expect.stringContaining("/topics/مهربانی.jpeg"),
-        expect.stringContaining("/topics/شجاعت.jpeg"),
-        expect.stringContaining("/topics/سهیم.jpeg"),
-        expect.stringContaining("/topics/همکاری.jpeg"),
-        expect.stringContaining("/topics/مسئولیت.jpeg"),
-        expect.stringContaining("/topics/پشتکار.jpeg"),
-        expect.stringContaining("/topics/احترام.jpeg"),
+        expect.stringContaining("/topics/honesty-v2.png"),
+        expect.stringContaining("/topics/kindness-v2.png"),
+        expect.stringContaining("/topics/courage-v2.png"),
+        expect.stringContaining("/topics/sharing-v2.png"),
+        expect.stringContaining("/topics/teamwork-v2.png"),
+        expect.stringContaining("/topics/responsibility-v2.png"),
+        expect.stringContaining("/topics/perseverance-v2.png"),
+        expect.stringContaining("/topics/respect-v2.png"),
       ]),
     );
   });
@@ -75,7 +75,7 @@ describe("WizardForm supporting characters", () => {
       name: "تصویر پیش‌نمایش موضوع شجاعت",
     });
     expect(decodeURIComponent(preview.getAttribute("src") ?? "")).toContain(
-      "/topics/شجاعت.jpeg",
+      "/topics/courage-v2.png",
     );
   });
 

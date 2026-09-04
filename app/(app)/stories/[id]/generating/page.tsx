@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect, unstable_rethrow } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { sapi } from '@/lib/dal';
 import type { ChildDto, StoryDto, StoryProgressDto } from '@/lib/types';
@@ -29,7 +29,12 @@ export default async function GeneratingPage({
 
   const child = await sapi
     .get<ChildDto>(`/children/${story.childId}`)
-    .catch(() => null);
+    .catch((err) => {
+      // A missing child card degrades this page; a redirect must not be
+      // caught here and turned into one.
+      unstable_rethrow(err);
+      return null;
+    });
 
   return <ProgressWatch story={story} child={child} initial={progress} />;
 }

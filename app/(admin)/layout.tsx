@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { unstable_rethrow } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { LogoutButton } from '@/components/logout-button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,7 +14,14 @@ export default async function AdminLayout({ children }: LayoutProps<'/'>) {
   // without opening the page. A queue that cannot be read is not a queue.
   const { pending } = await sapi
     .get<{ pending: number }>('/admin/moderation/count')
-    .catch(() => ({ pending: 0 }));
+    .catch((err) => {
+      // A bare catch swallowed Next's own NEXT_REDIRECT control-flow error,
+      // so an expired session turned into a badge of 0 and a rendered admin
+      // shell instead of a trip to the sign-in page. The (app) layout has
+      // always done this; the two siblings now agree.
+      unstable_rethrow(err);
+      return { pending: 0 };
+    });
 
   return (
     // data-surface swaps the whole palette — including every shadcn component

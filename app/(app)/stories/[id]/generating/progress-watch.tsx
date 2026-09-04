@@ -1,6 +1,6 @@
 /**
  * @file progress-watch.tsx
- * @description Polls story progress, renders five stage states, and routes terminal outcomes.
+ * @description Streams story progress, renders five stage states, and routes terminal outcomes.
  */
 
 'use client';
@@ -9,21 +9,23 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ChildAvatar } from '@/components/app/ui';
-import { api } from '@/lib/api';
+import { API_URL, api } from '@/lib/api';
 import { faDigits, faPercent } from '@/lib/fa';
 import { STAGE_LABEL, VOICE_LABEL } from '@/lib/story-art';
 import type { ChildDto, StoryDto, StoryProgressDto } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 /**
- * ponytail: polls every 1.5s rather than opening an SSE channel. A story takes
- * about a minute, so this is ~40 cheap requests and it survives every proxy
- * and reconnect for free. Swap to Nest's `@Sse` if generation ever runs long
- * enough that the request count matters.
+ * Fallback cadence, used only when the event stream will not open.
+ *
+ * Some corporate proxies buffer or drop `text/event-stream`. Losing progress
+ * updates on such a network would leave a parent staring at a frozen bar
+ * through the whole generation, so polling stays as the safety net rather
+ * than being deleted.
  */
 const POLL_MS = 1500;
 
-/** Polls generation state until ready/failed and renders the ordered stages. */
+/** Streams generation state until ready/failed and renders the ordered stages. */
 export function ProgressWatch({
   story,
   child,
@@ -41,25 +43,54 @@ export function ProgressWatch({
     if (progress.status !== 'GENERATING') return;
 
     let alive = true;
+    let poll: ReturnType<typeof setInterval> | null = null;
     const tick = setInterval(() => setElapsed((s) => s + 1), 1000);
 
-    const poll = setInterval(async () => {
-      try {
-        const next = await api.get<StoryProgressDto>(
-          `/stories/${story.id}/progress`,
-        );
-        if (!alive) return;
-        setProgress(next);
-        if (next.status === 'READY') router.replace(`/stories/${story.id}/ready`);
-      } catch {
-        // A blip mid-generation is not worth a scary message — the next tick
-        // recovers, and a hard failure surfaces as status FAILED anyway.
+    /** Applies one snapshot and leaves the screen when the story is done. */
+    const apply = (next: StoryProgressDto) => {
+      if (!alive) return;
+      setProgress(next);
+      if (next.status === 'READY') {
+        router.replace(`/stories/${story.id}/ready`);
       }
-    }, POLL_MS);
+    };
+
+    // The stream carries a stage transition the moment the worker writes it.
+    // This used to be forty authenticated round trips per story, each with a
+    // session lookup behind it, sent whether anything had changed or not.
+    const source = new EventSource(
+      `${API_URL}/stories/${story.id}/progress/stream`,
+      { withCredentials: true },
+    );
+
+    source.onmessage = (event: MessageEvent<string>) => {
+      try {
+        const data = JSON.parse(event.data) as
+          | StoryProgressDto
+          | { heartbeat: true };
+        if ('heartbeat' in data) return;
+        apply(data);
+      } catch {
+        // A malformed frame is not worth a scary message; the next one wins.
+      }
+    };
+
+    source.onerror = () => {
+      // EventSource retries on its own, but a proxy that strips the stream
+      // entirely never recovers — so the first error also starts polling.
+      if (!alive || poll) return;
+      poll = setInterval(() => {
+        void api
+          .get<StoryProgressDto>(`/stories/${story.id}/progress`)
+          .then(apply)
+          .catch(() => undefined);
+      }, POLL_MS);
+    };
 
     return () => {
       alive = false;
-      clearInterval(poll);
+      source.close();
+      if (poll) clearInterval(poll);
       clearInterval(tick);
     };
   }, [progress.status, story.id, router]);

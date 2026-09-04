@@ -19,14 +19,14 @@ describe('story presentation data', () => {
 
   it('maps every predefined wizard topic to its public card image', () => {
     expect(WIZARD_THEMES.map(({ image }) => image)).toEqual([
-      '/topics/راستگویی.jpeg',
-      '/topics/مهربانی.jpeg',
-      '/topics/شجاعت.jpeg',
-      '/topics/سهیم.jpeg',
-      '/topics/همکاری.jpeg',
-      '/topics/مسئولیت.jpeg',
-      '/topics/پشتکار.jpeg',
-      '/topics/احترام.jpeg',
+      '/topics/honesty-v2.png',
+      '/topics/kindness-v2.png',
+      '/topics/courage-v2.png',
+      '/topics/sharing-v2.png',
+      '/topics/teamwork-v2.png',
+      '/topics/responsibility-v2.png',
+      '/topics/perseverance-v2.png',
+      '/topics/respect-v2.png',
       null,
     ]);
   });

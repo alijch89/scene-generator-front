@@ -1,34 +1,51 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { DEFAULT_STORY_PRICE_RIAL } from '@/lib/config';
+import { request } from '@/lib/api';
 import { faPrice } from '@/lib/fa';
 import { MockPayButtons } from './pay-buttons';
 
 export const metadata: Metadata = { title: 'پرداخت (نمونهٔ توسعه)' };
 
+/** What the simulator exposes about an order: the amount, and nothing else. */
+interface MockOrderSummary {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  settled: boolean;
+}
+
 /**
- * The dev stand-in for the bank. It renders the design's checkout summary and
- * its buttons call the same signed callback a real gateway would — so the whole
- * money path runs end to end with no bank involved.
+ * The dev stand-in for the bank.
  *
- * Deliberately unauthenticated: a real gateway page has no session either. It
- * is handed the signed callback URL exactly the way a gateway is, and it can
- * settle nothing on its own — the signature does that.
+ * It behaves the way a gateway does, which is the whole point: it is handed no
+ * signed URL, it reads the order from the API, and its buttons ask the API to
+ * *authorise* the payment. Only then does a signed return URL exist, and it is
+ * minted server-side for that one outcome.
+ *
+ * The previous version took the signed callback straight off its own query
+ * string, which made it both a free-money machine and an open redirect —
+ * `?callback=https://phishing.example` rendered a page branded «درگاه نمونه»
+ * with a «پرداخت» button pointing at the attacker.
+ *
+ * Deliberately unauthenticated: a real gateway page has no session either. The
+ * API answers here only outside production and only while the simulator is the
+ * configured gateway.
  */
-/** Server page that displays a mock bank checkout for the signed callback URL. */
 export default async function MockPaymentPage({
   params,
-  searchParams,
 }: PageProps<'/pay/mock/[orderId]'>) {
   const { orderId } = await params;
-  const { callback, amount } = await searchParams;
 
   // Off when a real gateway is configured: a page that pays for things must
-  // never ship to real users.
+  // never ship to real users. The API enforces the same rule independently,
+  // so a build made without this flag still cannot settle anything.
   if (process.env.NEXT_PUBLIC_PAYMENT_MODE === 'link') notFound();
-  if (typeof callback !== 'string') notFound();
 
-  const rial = Number(amount) || DEFAULT_STORY_PRICE_RIAL;
+  const order = await request<MockOrderSummary>(
+    `/payments/mock/${orderId}`,
+  ).catch(() => null);
+  if (!order) notFound();
 
   return (
     <main className="mx-auto max-w-135 px-5 py-[clamp(24px,4vw,44px)]">
@@ -59,7 +76,8 @@ export default async function MockPaymentPage({
               ⚠
             </span>
             این صفحهٔ نمونهٔ محیط توسعه است و به بانک وصل نیست. دکمه‌ها همان
-            بازگشتِ امضاشده‌ای را صدا می‌زنند که درگاه واقعی صدا می‌زند.
+            مسیری را می‌روند که درگاه واقعی می‌رود: تأیید پرداخت روی سرور ثبت
+            می‌شود و بازگشتِ امضاشده تازه پس از آن ساخته می‌شود.
           </p>
         </div>
 
@@ -71,7 +89,7 @@ export default async function MockPaymentPage({
           <div className="flex">
             <dt className="text-muted">شمارهٔ سفارش</dt>
             <dd className="ms-auto text-[12px]" dir="ltr">
-              {orderId}
+              {order.id}
             </dd>
           </div>
         </dl>
@@ -79,11 +97,17 @@ export default async function MockPaymentPage({
         <div className="mt-4 flex items-baseline gap-2.5 border-t border-border pt-4">
           <strong className="text-[15px]">مبلغ قابل پرداخت</strong>
           <strong className="ms-auto font-display text-[22px]">
-            {faPrice(rial)}
+            {faPrice(order.amount)}
           </strong>
         </div>
 
-        <MockPayButtons callback={callback} />
+        {order.settled ? (
+          <p className="mt-4.5 rounded-[14px] border border-border bg-elev p-4 text-center text-[13.5px]">
+            این سفارش پیش‌تر تعیین‌تکلیف شده است.
+          </p>
+        ) : (
+          <MockPayButtons orderId={order.id} />
+        )}
 
         <p className="mt-3 text-center text-[12px] leading-[1.8] text-muted">
           با پرداخت، <a href="/terms">شرایط استفاده</a> را می‌پذیرید.
@@ -94,5 +118,5 @@ export default async function MockPaymentPage({
 }
 /**
  * @file page.tsx
- * @description Renders the development-only payment stand-in after validating callback and order context.
+ * @description Renders the development-only payment stand-in from the API's own order summary.
  */

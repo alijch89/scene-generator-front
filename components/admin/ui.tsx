@@ -24,19 +24,36 @@ export function AdminHeader({
   title,
   count,
   children,
+  actions,
 }: {
   title: string;
   /** The «۲۴٬۸۱۹ کاربر» line the design puts beside every table heading. */
   count?: React.ReactNode;
   /** Filters and actions; pushed to the far end. */
   children?: React.ReactNode;
+  /**
+   * Pinned to the opposite end from the title — the far left, on an RTL page.
+   *
+   * Passing an export button here rather than as a child is what separates
+   * the two halves of a header: the filters stay with the heading they narrow,
+   * on the side the page is read from, and the action that leaves the page
+   * sits on its own where nobody reaches for it by accident.
+   */
+  actions?: React.ReactNode;
 }) {
   return (
     <div className="mb-3.5 flex flex-wrap items-center gap-2.5">
       <h1 className="text-[19px] font-bold">{title}</h1>
       {count ? <span className="text-[12px] text-muted">{count}</span> : null}
       {children ? (
-        <div className="ms-auto flex flex-wrap gap-2">{children}</div>
+        // Without `actions` the children are the far end themselves, which is
+        // what every other table in the panel already relies on.
+        <div className={cn('flex flex-wrap gap-2', !actions && 'ms-auto')}>
+          {children}
+        </div>
+      ) : null}
+      {actions ? (
+        <div className="ms-auto flex flex-wrap gap-2">{actions}</div>
       ) : null}
     </div>
   );
@@ -181,6 +198,37 @@ export function MeterRow({
 }
 
 /**
+ * How many numbered pages surround the current one before the run is elided.
+ *
+ * Two on each side keeps the control the same width whichever page an
+ * operator is on, so the «بعدی» button does not move under the cursor while
+ * they are paging through a long trail.
+ */
+const PAGE_WINDOW = 2;
+
+/**
+ * The page numbers to draw, with `null` standing in for an elided run.
+ *
+ * The first and last page are always offered: «برو به آخر» is how an operator
+ * finds the oldest retained event, and it should not cost fifty clicks.
+ */
+const pageRun = (page: number, pageCount: number): (number | null)[] => {
+  const shown = new Set([1, pageCount]);
+  for (let p = page - PAGE_WINDOW; p <= page + PAGE_WINDOW; p += 1) {
+    if (p >= 1 && p <= pageCount) shown.add(p);
+  }
+
+  const run: (number | null)[] = [];
+  let previous = 0;
+  for (const p of [...shown].sort((a, b) => a - b)) {
+    if (previous && p - previous > 1) run.push(null);
+    run.push(p);
+    previous = p;
+  }
+  return run;
+};
+
+/**
  * Page links, not buttons: the URL carries the page number, so a paginated
  * table is shareable and survives a reload. The design has no pagination of
  * its own, so this is built on its select and button shapes.
@@ -188,10 +236,13 @@ export function MeterRow({
 export function Pagination({
   page,
   pageCount,
+  total,
   href,
 }: {
   page: number;
   pageCount: number;
+  /** Row count across every page, shown beside the numbers when given. */
+  total?: number;
   /** Builds the URL for a given page, keeping the current filters. */
   href: (page: number) => string;
 }) {
@@ -199,12 +250,14 @@ export function Pagination({
 
   const step =
     'rounded-lg border border-border bg-surface px-3 py-2 text-[12.5px] font-semibold text-ink hover:no-underline';
+  const number =
+    'rounded-lg border border-border bg-surface px-2.75 py-1.75 text-[12.5px] text-ink hover:no-underline';
   const disabled = 'pointer-events-none opacity-45';
 
   return (
     <nav
       aria-label="صفحه‌بندی"
-      className="mt-3 flex items-center justify-center gap-2.5"
+      className="mt-3 flex flex-wrap items-center justify-center gap-2"
     >
       <Link
         href={href(page - 1)}
@@ -213,9 +266,31 @@ export function Pagination({
       >
         قبلی
       </Link>
-      <span aria-current="page" className="text-[12.5px] text-muted">
-        صفحهٔ {faDigits(page)} از {faDigits(pageCount)}
-      </span>
+
+      <ol className="flex items-center gap-1.5">
+        {pageRun(page, pageCount).map((p, i) =>
+          p === null ? (
+            <li key={`gap-${i}`} aria-hidden className="px-0.5 text-muted">
+              …
+            </li>
+          ) : (
+            <li key={p}>
+              <Link
+                href={href(p)}
+                aria-label={`صفحهٔ ${faDigits(p)}`}
+                aria-current={p === page ? 'page' : undefined}
+                className={cn(
+                  number,
+                  p === page && 'border-brand bg-brand font-bold text-brand-fg',
+                )}
+              >
+                {faDigits(p)}
+              </Link>
+            </li>
+          ),
+        )}
+      </ol>
+
       <Link
         href={href(page + 1)}
         aria-disabled={page >= pageCount}
@@ -223,6 +298,11 @@ export function Pagination({
       >
         بعدی
       </Link>
+
+      <span className="w-full text-center text-[11.5px] text-muted sm:w-auto sm:ms-1.5">
+        صفحهٔ {faDigits(page)} از {faDigits(pageCount)}
+        {total === undefined ? '' : ` · ${faNum(total)} ردیف`}
+      </span>
     </nav>
   );
 }

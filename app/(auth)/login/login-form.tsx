@@ -1,5 +1,6 @@
 'use client';
 
+import { LockKeyhole, LogIn, Phone, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -81,11 +82,15 @@ export function LoginForm({
 
   return (
     <section className="animate-[pageIn_.4s_ease_both]">
-      <h1 className="mb-2 font-display text-[clamp(25px,3.6vw,33px)]">
+      <span className="mb-3 flex w-fit items-center gap-2 rounded-full bg-[color-mix(in_srgb,var(--sh-primary)_9%,transparent)] px-3 py-1.5 text-[11.5px] font-bold text-brand">
+        <Sparkles aria-hidden className="size-3.5" />
+        ادامهٔ قصه از همین‌جا
+      </span>
+      <h1 className="mb-1.5 font-display text-[clamp(27px,3.6vw,35px)] leading-[1.4]">
         خوش آمدید
       </h1>
-      <p className="mb-5 text-[14.5px] text-muted">
-        وارد شوید تا کتابخانهٔ قصه‌های خانه را ببینید.
+      <p className="mb-6 text-[14px] leading-7 text-muted">
+        به دنیای قصه‌های خانوادگی‌تان برگردید.
       </p>
 
       {status === 'invalid' && (
@@ -115,8 +120,15 @@ export function LoginForm({
         </Alert>
       )}
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3.5">
-        <Field label="شمارهٔ موبایل">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        <Field
+          label={
+            <span className="flex items-center gap-2">
+              <Phone aria-hidden className="size-4 text-brand" />
+              شمارهٔ موبایل
+            </span>
+          }
+        >
           <Input
             name="phone"
             type="tel"
@@ -128,11 +140,17 @@ export function LoginForm({
             placeholder="09123456789"
             dir="ltr"
             invalid={invalid}
+            className="min-h-12.5 w-full bg-[color-mix(in_srgb,var(--sh-surface)_72%,var(--sh-elev))] px-4 shadow-[0_1px_0_rgba(255,255,255,.6)_inset]"
           />
         </Field>
 
         <Field
-          label="گذرواژه"
+          label={
+            <span className="flex items-center gap-2">
+              <LockKeyhole aria-hidden className="size-4 text-brand" />
+              گذرواژه
+            </span>
+          }
           // No self-service reset exists without SMS, so this says who can
           // actually help instead of linking to a page that cannot.
           hint="گذرواژه را فراموش کرده‌اید؟ پشتیبانی آن را برایتان بازنشانی می‌کند."
@@ -143,34 +161,44 @@ export function LoginForm({
             required
             placeholder="••••••••"
             invalid={invalid}
+            className="min-h-12.5 bg-[color-mix(in_srgb,var(--sh-surface)_72%,var(--sh-elev))] ps-4 shadow-[0_1px_0_rgba(255,255,255,.6)_inset]"
           />
         </Field>
 
-        <label className="flex items-center gap-2.5 text-[13.5px] text-muted">
+        <label className="flex items-center gap-2.5 rounded-2xl border border-transparent bg-[color-mix(in_srgb,var(--sh-elev)_58%,transparent)] px-3.5 py-2.5 text-[13px] text-muted transition-colors hover:border-border">
           <input
             type="checkbox"
             name="remember"
             defaultChecked
-            className="size-[17px] accent-[var(--sh-primary)]"
+            className="size-[17px] rounded accent-[var(--sh-primary)]"
           />
           مرا به خاطر بسپار
         </label>
 
-        <SubmitButton loading={loading} loadingLabel="در حال ورود…">
-          ورود
+        <SubmitButton
+          loading={loading}
+          loadingLabel="در حال ورود…"
+          className="public-cta mt-0.5 min-h-13 shadow-[0_14px_30px_color-mix(in_srgb,var(--sh-primary)_22%,transparent)]"
+        >
+          <LogIn aria-hidden className="size-4.5" />
+          <span>ورود</span>
         </SubmitButton>
       </form>
 
-      <p className="mt-6 text-center text-[13px] text-muted">
-        حساب ندارید؟{' '}
-        <Link href="/register" className="font-bold">
-          ساخت حساب
-        </Link>{' '}
-        ·{' '}
-        <Link href="/contact" className="font-bold">
-          تماس با پشتیبانی
+      <div className="mt-6 border-t border-border pt-5 text-center">
+        <p className="m-0 text-[13px] text-muted">
+          هنوز حساب ندارید؟{' '}
+          <Link href="/register" className="font-bold text-brand">
+            حساب رایگان بسازید
+          </Link>
+        </p>
+        <Link
+          href="/contact"
+          className="mt-2 inline-block text-[12.5px] font-semibold text-muted"
+        >
+          نیاز به راهنمایی دارید؟ تماس با پشتیبانی
         </Link>
-      </p>
+      </div>
     </section>
   );
 }

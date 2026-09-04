@@ -139,6 +139,80 @@ export const jalaliMonthStart = (now = new Date()) => {
   return start;
 };
 
+/**
+ * Reads one instant's wall clock in Tehran, for {@link iranDayBound}.
+ *
+ * `hour12: false` still emits "24" for midnight on some ICU builds, which is
+ * why the hour is taken modulo twenty-four rather than trusted.
+ */
+const tehranClockFmt = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'Asia/Tehran',
+  hour12: false,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+});
+
+/** How far Tehran is ahead of UTC at one instant, in milliseconds. */
+const tehranOffset = (at: Date) => {
+  const part = (type: string) =>
+    Number(
+      tehranClockFmt.formatToParts(at).find((p) => p.type === type)?.value ?? 0,
+    );
+  const asUtc = Date.UTC(
+    part('year'),
+    part('month') - 1,
+    part('day'),
+    part('hour') % 24,
+    part('minute'),
+    part('second'),
+    // Intl formats no milliseconds, and every zone offset is a whole number
+    // of minutes — so they are carried across rather than read back, or the
+    // offset comes out short by however far into the second the instant was.
+    at.getUTCMilliseconds(),
+  );
+  return asUtc - at.getTime();
+};
+
+/**
+ * Turns one calendar day into the instant that bounds it in Iran.
+ *
+ * The panel's date filters name a *day* — «از ۱۳ شهریور» — while the API
+ * filters by instants. Which instant a day starts at depends on where the
+ * operator is, and they are in Tehran while the servers run on UTC: reading
+ * the day in the process's own zone put every bound three and a half hours
+ * out, so a filtered range quietly excluded the first hours of its first day.
+ *
+ * @param day - A civil day as `YYYY-MM-DD`.
+ * @param edge - Whether to return the day's first or last instant.
+ * @returns The bounding instant as ISO-8601, or '' when the day is not one.
+ */
+export const iranDayBound = (day: string, edge: 'start' | 'end') => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(day.trim());
+  if (!match) return '';
+
+  const [hour, minute, second, ms] =
+    edge === 'start' ? [0, 0, 0, 0] : [23, 59, 59, 999];
+  const naive = Date.UTC(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    hour,
+    minute,
+    second,
+    ms,
+  );
+  if (Number.isNaN(naive)) return '';
+
+  // Subtracting the offset at the naive instant lands within an hour of the
+  // answer even across a transition; applying it again from there settles it.
+  const first = new Date(naive - tehranOffset(new Date(naive)));
+  return new Date(naive - tehranOffset(first)).toISOString();
+};
+
 if (process.env.NODE_ENV !== 'production') {
   // ponytail: the separators are the whole point of this module — assert the
   // ones the design specifies rather than trusting the ICU build.
@@ -160,4 +234,15 @@ if (process.env.NODE_ENV !== 'production') {
     Number(persianDayFmt.format(jalaliMonthStart())) === 1,
     'jalaliMonthStart lands on day 1',
   );
+  // Iran is UTC+03:30 and has not observed daylight saving since 2022, so a
+  // day there begins at 20:30 UTC on the day before.
+  console.assert(
+    iranDayBound('2026-09-04', 'start') === '2026-09-03T20:30:00.000Z',
+    'iranDayBound start',
+  );
+  console.assert(
+    iranDayBound('2026-09-04', 'end') === '2026-09-04T20:29:59.999Z',
+    'iranDayBound end',
+  );
+  console.assert(iranDayBound('nope', 'start') === '', 'iranDayBound rejects');
 }

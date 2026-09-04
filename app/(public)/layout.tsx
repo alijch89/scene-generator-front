@@ -1,12 +1,22 @@
-import { Heart, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  BookOpenText,
+  Heart,
+  LifeBuoy,
+  Scale,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Logo } from '@/components/logo';
+import { BackToTopButton } from '@/components/public/back-to-top';
 import { SiteMobileNav, SiteNav } from '@/components/public/site-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const FOOTER_COLUMNS = [
   {
     title: 'محصول',
+    Icon: BookOpenText,
     links: [
       { href: '/features', label: 'ویژگی‌ها' },
       { href: '/how', label: 'چطور کار می‌کند' },
@@ -15,6 +25,7 @@ const FOOTER_COLUMNS = [
   },
   {
     title: 'پشتیبانی',
+    Icon: LifeBuoy,
     links: [
       { href: '/faq', label: 'پرسش‌ها' },
       { href: '/contact', label: 'تماس' },
@@ -23,6 +34,7 @@ const FOOTER_COLUMNS = [
   },
   {
     title: 'قانونی',
+    Icon: Scale,
     links: [
       { href: '/privacy', label: 'حریم خصوصی' },
       { href: '/terms', label: 'شرایط استفاده' },
@@ -78,46 +90,89 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
 
       <div className="relative z-[1] flex-1">{children}</div>
 
-      <footer className="relative z-[1] mt-auto border-t border-border bg-[color-mix(in_srgb,var(--sh-bg2)_88%,transparent)]">
-        <div className="mx-auto grid max-w-[1180px] grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-7 px-5 py-10">
-          <div className="max-w-[260px]">
-            <div className="mb-3 flex items-center gap-2.5">
-              <Logo className="size-9 shadow-card" />
-              <strong className="font-display text-[17px]">
-                شهرزاد قصه‌گو
-              </strong>
+      <footer className="relative z-[1] mt-auto overflow-hidden border-t border-border bg-[linear-gradient(180deg,color-mix(in_srgb,var(--sh-bg2)_72%,var(--sh-bg)),var(--sh-bg2))] text-ink">
+        <span
+          aria-hidden
+          className="absolute inset-y-0 start-0 w-[38%] bg-[radial-gradient(circle_at_center,color-mix(in_srgb,var(--sh-primary)_10%,transparent),transparent_68%)]"
+        />
+        <span
+          aria-hidden
+          className="absolute -end-24 bottom-[-60%] size-80 rounded-full bg-[color-mix(in_srgb,var(--sh-accent)_9%,transparent)] blur-3xl"
+        />
+
+        <div className="relative mx-auto max-w-[1180px] px-5">
+          <div className="grid grid-cols-2 gap-x-7 gap-y-10 py-11 md:grid-cols-[1.55fr_repeat(3,1fr)] md:gap-x-10 md:py-14">
+            <div className="col-span-2 max-w-[390px] md:col-span-1">
+              <Link
+                href="/"
+                className="group mb-4 flex w-fit items-center gap-3 text-ink hover:no-underline"
+              >
+                <Logo className="size-11 rounded-[15px] shadow-card ring-2 ring-[color-mix(in_srgb,var(--sh-border)_78%,transparent)] transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105" />
+                <span>
+                  <strong className="block font-display text-xl leading-7">
+                    شهرزاد قصه‌گو
+                  </strong>
+                  <span className="text-[10.5px] text-muted">
+                    جایی برای قصه‌های خودِ شما
+                  </span>
+                </span>
+              </Link>
+              <p className="max-w-[37ch] text-[13px] leading-7 text-muted">
+                هر کودک دنیایی برای گفتن دارد؛ ما آن را به قصه‌ای دیدنی و
+                شنیدنی برای شب‌های خانوادگی تبدیل می‌کنیم.
+              </p>
+              <Link
+                href="/register"
+                className="public-cta gradient-brand group mt-5 inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-[13px] font-extrabold text-white hover:no-underline"
+              >
+                <Sparkles aria-hidden className="size-4" />
+                ساخت حساب رایگان
+                <ArrowLeft
+                  aria-hidden
+                  className="size-4 transition-transform group-hover:-translate-x-1"
+                />
+              </Link>
             </div>
-            <p className="text-[13px] leading-[1.9] text-muted">
-              هر کودک دنیایی برای گفتن دارد؛ ما آن را به قصه‌ای دیدنی و شنیدنی
-              تبدیل می‌کنیم.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-[10.5px] font-semibold text-muted">
-              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1.5">
-                <ShieldCheck className="size-3.5 text-teal" /> خصوصی
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-1.5">
-                <Heart className="size-3.5 text-pink" /> ساخته‌شده برای خانواده
-              </span>
-            </div>
+
+            {FOOTER_COLUMNS.map((column) => (
+              <div
+                key={column.title}
+                className="flex flex-col items-start gap-2.5 last:col-span-2 sm:last:col-span-1"
+              >
+                <span className="mb-1.5 flex items-center gap-2 text-[12px] font-extrabold text-brand">
+                  <span className="grid size-7 place-items-center rounded-lg border border-border bg-surface text-brand shadow-sm">
+                    <column.Icon aria-hidden className="size-3.5" />
+                  </span>
+                  {column.title}
+                </span>
+                {column.links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="group flex items-center gap-2 text-[13px] text-muted transition-colors hover:text-ink hover:no-underline"
+                  >
+                    <span className="h-px w-2 bg-border transition-[width,background-color] duration-200 group-hover:w-4 group-hover:bg-warm" />
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            ))}
           </div>
 
-          {FOOTER_COLUMNS.map((column) => (
-            <div key={column.title} className="flex flex-col items-start gap-2">
-              <span className="text-[12.5px] font-bold text-muted">
-                {column.title}
+          <div className="flex flex-col gap-4 border-t border-border py-5 text-[11px] text-muted sm:flex-row sm:items-center">
+            <p className="m-0">© شهرزاد قصه‌گو؛ همهٔ حقوق محفوظ است.</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:ms-auto">
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck aria-hidden className="size-3.5 text-teal" />
+                حریم امن خانواده
               </span>
-              {column.links.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="group flex items-center gap-1 text-[13.5px] text-ink hover:text-warm"
-                >
-                  <span className="h-px w-0 bg-warm transition-[width] duration-200 group-hover:w-3" />
-                  {link.label}
-                </Link>
-              ))}
+              <span className="inline-flex items-center gap-1.5">
+                <Heart aria-hidden className="size-3.5 text-pink" />
+                ساخته‌شده برای شب‌های قصه
+              </span>
+              <BackToTopButton />
             </div>
-          ))}
+          </div>
         </div>
       </footer>
     </div>

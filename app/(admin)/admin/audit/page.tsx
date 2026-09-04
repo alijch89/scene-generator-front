@@ -11,6 +11,7 @@ import {
   tdClass,
   thClass,
 } from '@/components/admin/ui';
+import { JalaliDateField } from '@/components/admin/jalali-date-field';
 import {
   auditEventLabel,
   auditTargetHref,
@@ -20,7 +21,7 @@ import {
 } from '@/lib/admin';
 import { API_URL } from '@/lib/api';
 import { requireAdmin, sapi } from '@/lib/dal';
-import { faDateTime, faNum } from '@/lib/fa';
+import { faDateTime, faNum, iranDayBound } from '@/lib/fa';
 import type { AdminAuditFacetsDto, AdminAuditPageDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'گزارش رخدادها' };
@@ -30,17 +31,6 @@ const PER_PAGE = 40;
 /** Reads one string search param, or '' when it is absent or repeated. */
 const one = (value: string | string[] | undefined) =>
   typeof value === 'string' ? value.trim() : '';
-
-/**
- * `<input type="date">` submits `YYYY-MM-DD`; the API takes ISO instants.
- * The bound is widened to the whole local day so that «تا» includes it.
- */
-const dayBound = (value: string, edge: 'start' | 'end') => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return '';
-  const time = edge === 'start' ? '00:00:00.000' : '23:59:59.999';
-  const at = new Date(`${value}T${time}`);
-  return Number.isNaN(at.getTime()) ? '' : at.toISOString();
-};
 
 /** Server page that retrieves retained audit events using URL-driven filters. */
 export default async function AdminAuditPage({
@@ -70,8 +60,13 @@ export default async function AdminAuditPage({
   }
   if (actorId) filters.actorId = actorId;
   if (ip) filters.ip = ip;
-  if (dayBound(from, 'start')) filters.from = dayBound(from, 'start');
-  if (dayBound(to, 'end')) filters.to = dayBound(to, 'end');
+  // The picker names a day on the Jalali calendar; the API takes instants.
+  // Both bounds are read in Tehran, so «تا» includes the whole day an
+  // operator picked rather than stopping at half past three that morning.
+  const fromAt = iranDayBound(from, 'start');
+  const toAt = iranDayBound(to, 'end');
+  if (fromAt) filters.from = fromAt;
+  if (toAt) filters.to = toAt;
 
   const query = new URLSearchParams({
     ...filters,
@@ -98,13 +93,28 @@ export default async function AdminAuditPage({
     return qs ? `/admin/audit?${qs}` : '/admin/audit';
   };
 
-  const exportHref = `${API_URL}/admin/audit/export?${new URLSearchParams(filters)}`;
+  // The API builds the workbook; this is a plain navigation to it, so the
+  // session cookie rides along and the file never passes through the page.
+  // The same filters go with it, which is what makes «خروجی اکسل» export the
+  // rows on screen rather than the whole trail.
+  const exportHref = `${API_URL}/admin/audit/export?${new URLSearchParams({
+    ...filters,
+    format: 'xlsx',
+  })}`;
 
   return (
     <section className="animate-[pageIn_.35s_ease_both]">
       <AdminHeader
         title="گزارش رخدادها"
-        count={`نگهداری ${faNum(audit.retentionDays)} روزه · فقط افزودنی`}
+        count={`${faNum(audit.total)} رخداد · نگهداری ${faNum(audit.retentionDays)} روزه`}
+        actions={
+          <a
+            href={exportHref}
+            className="rounded-lg border border-border bg-surface px-3.25 py-2 text-[12.5px] font-semibold text-ink hover:no-underline"
+          >
+            خروجی اکسل
+          </a>
+        }
       >
         <FilterBar action="/admin/audit" filtered={filtered}>
           <SearchInput
@@ -153,19 +163,19 @@ export default async function AdminAuditPage({
               </option>
             ))}
           </FilterSelect>
-          <input
-            type="date"
+          <JalaliDateField
             name="from"
+            label="از تاریخ"
+            placeholder="از تاریخ"
             defaultValue={from}
-            aria-label="از تاریخ"
-            className="rounded-lg border border-border bg-surface px-2.75 py-2 text-[12.5px] text-ink"
+            key={`from-${from}`}
           />
-          <input
-            type="date"
+          <JalaliDateField
             name="to"
+            label="تا تاریخ"
+            placeholder="تا تاریخ"
             defaultValue={to}
-            aria-label="تا تاریخ"
-            className="rounded-lg border border-border bg-surface px-2.75 py-2 text-[12.5px] text-ink"
+            key={`to-${to}`}
           />
           {/* Set by the «همهٔ رخدادهای این حساب» link, not by an operator. */}
           {actorId ? (
@@ -173,12 +183,6 @@ export default async function AdminAuditPage({
           ) : null}
           {ip ? <input type="hidden" name="ip" value={ip} /> : null}
         </FilterBar>
-        <a
-          href={exportHref}
-          className="rounded-lg border border-border px-3 py-2 text-[12.5px]"
-        >
-          خروجی CSV
-        </a>
       </AdminHeader>
 
       <TableCard>
@@ -268,14 +272,12 @@ export default async function AdminAuditPage({
         ) : null}
       </TableCard>
 
-      <Pagination page={audit.page} pageCount={audit.pageCount} href={hrefFor} />
-
-      <p className="mt-3 text-[11.5px] leading-[1.9] text-muted">
-        این گزارش روی یک دیتابیس جدا نگهداری می‌شود و هیچ بخشی از پنل آن را
-        ویرایش یا پاک نمی‌کند؛ تنها چیزی که سطر برمی‌دارد، همان بازهٔ نگهداری
-        است که در تنظیمات سیستم تعیین می‌شود. نام و شمارهٔ عامل، همان چیزی است
-        که در لحظهٔ رخداد ثبت شده.
-      </p>
+      <Pagination
+        page={audit.page}
+        pageCount={audit.pageCount}
+        total={audit.total}
+        href={hrefFor}
+      />
     </section>
   );
 }

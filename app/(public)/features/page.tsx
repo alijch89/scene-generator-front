@@ -64,7 +64,7 @@ export default function FeaturesPage() {
   return (
     <main className="mx-auto max-w-[1080px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
-        eyebrow="هر چیزی برای یک قصهٔ بهتر"
+        eyebrow="شخصی‌سازی، تصویر و روایت در یک‌جا"
         title="ویژگی‌ها"
         lead="هر چیزی که برای ساختن یک شب قصهٔ به‌یادماندنی لازم است — و نه بیشتر."
       />

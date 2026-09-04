@@ -140,17 +140,45 @@ export const AUDIT_EVENT_LABEL: Record<string, string> = {
   'payment.paid': 'پرداخت تأیید شد',
   'payment.failed': 'بانک پرداخت را رد کرد',
   'payment.cancelled': 'پرداخت لغو شد',
+  'payment.amount_mismatch': 'مبلغ درگاه با سفارش نخواند',
+  'payment.refund_pending': 'در انتظار بازگرداندن وجه',
+  'payment.refund_failed': 'بازگرداندن وجه ناموفق بود',
+  'payment.refunded': 'وجه بازگردانده شد',
   'admin.user.viewed': 'مشاهدهٔ پروندهٔ کاربر',
   'admin.user.suspended': 'غیرفعال کردن حساب کاربر',
   'admin.user.reactivated': 'فعال کردن دوبارهٔ حساب کاربر',
+  'admin.user.password_reset': 'بازنشانی گذرواژهٔ کاربر',
+  'admin.admin_created': 'ساخت حساب مدیر',
   'admin.story.retried': 'اجرای دوبارهٔ ساخت قصه',
+  'admin.payment.refunded': 'بازگرداندن وجه توسط مدیر',
+  'admin.export.downloaded': 'دریافت خروجی گزارش',
   'admin.setting.reset': 'بازگردانی تنظیمات به پیش‌فرض',
   'moderation.approved': 'تأیید محتوای گزارش‌شده',
   'moderation.rejected': 'رد و حذف محتوای گزارش‌شده',
+  'auth.register': 'ثبت‌نام حساب تازه',
   'auth.login': 'ورود به حساب',
-  'auth.logout': 'خروج از حساب',
-  'auth.password.reset': 'بازنشانی گذرواژه',
-  'auth.account.deleted': 'حذف حساب به‌خواست کاربر',
+  'auth.login_locked': 'قفل شدن حساب پس از تلاش‌های ناموفق',
+  'auth.password_changed': 'تغییر گذرواژه',
+  'auth.account_deleted': 'حذف حساب به‌خواست کاربر',
+};
+
+/** The «دسته» filter, matching the backend's event-prefix groupings. */
+export const AUDIT_CATEGORY_LABEL: Record<string, string> = {
+  auth: 'ورود و حساب',
+  payment: 'پرداخت',
+  moderation: 'بازبینی محتوا',
+  admin: 'کنش مدیر',
+  setting: 'تغییر تنظیمات',
+};
+
+/** The «نوع هدف» filter. */
+export const AUDIT_TARGET_TYPE_LABEL: Record<string, string> = {
+  user: 'کاربر',
+  order: 'سفارش',
+  story: 'قصه',
+  child_photo: 'عکس کودک',
+  setting: 'تنظیمات',
+  export: 'خروجی گزارش',
 };
 
 /**

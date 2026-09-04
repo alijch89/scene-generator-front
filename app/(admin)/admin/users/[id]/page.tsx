@@ -187,7 +187,7 @@ export default async function AdminUserDetailPage({
             </ul>
           )}
           <Link
-            href={`/admin/audit?q=${encodeURIComponent(user.id)}`}
+            href={`/admin/audit?actorId=${encodeURIComponent(user.id)}`}
             className="mt-3.5 block text-[12.5px] font-bold"
           >
             همهٔ رخدادهای این حساب ←

@@ -514,18 +514,43 @@ export interface AdminAuditRow {
   targetType: string | null;
   targetId: string | null;
   ip: string | null;
+  /** Structured detail; only some events carry it. */
+  meta: Record<string, unknown> | null;
   createdAt: string;
-  /** Null means the system itself acted — «سامانه» in the table. */
+  /**
+   * Null means the system itself acted — «سامانه» in the table.
+   *
+   * The audit trail is on its own database with no users table, so this is
+   * the copy taken when the event was written, not a live join. It is what
+   * the account was called *then*, and it survives the account's deletion.
+   */
   actor: {
     id: string;
-    fullName: string;
-    role: "SuperAdmin" | "Admin" | "User";
+    fullName: string | null;
+    phone: string | null;
+    role: "SuperAdmin" | "Admin" | "User" | null;
   } | null;
 }
 
 /** Paginated audit response with the effective retention period. */
 export interface AdminAuditPageDto extends AdminPage<AdminAuditRow> {
   retentionDays: number;
+}
+
+/** One filter option with the number of rows it would match. */
+export interface AdminAuditFacet {
+  value: string;
+  count: number;
+}
+
+/**
+ * GET /admin/audit/facets — the filter vocabulary actually present in the
+ * trail, so a dropdown never offers an option that matches nothing.
+ */
+export interface AdminAuditFacetsDto {
+  events: AdminAuditFacet[];
+  targetTypes: AdminAuditFacet[];
+  categories: AdminAuditFacet[];
 }
 
 /** GET /admin/settings — every key, as the stored string. */

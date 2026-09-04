@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
   return (
     <main className="mx-auto max-w-[920px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
-        eyebrow="از یک عکس تا یک کتاب شنیدنی"
+        eyebrow="چهار قدم از عکس تا قصهٔ آماده"
         title="چطور کار می‌کند"
         lead="کل مسیر حدود سه دقیقه وقت می‌گیرد؛ ساخت قصه حدود یک دقیقه."
       />

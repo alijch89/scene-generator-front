@@ -1,7 +1,6 @@
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
-import { ParentFooter } from '@/components/app/footer';
 import { HeaderTitle, MobileNav, SidebarNav } from '@/components/app/nav';
 import { DisplayFontPreload } from '@/components/display-font-preload';
 import { Logo } from '@/components/logo';
@@ -101,8 +100,6 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
         <main className="relative z-10 mx-auto w-full max-w-295 flex-1 px-4 py-6 sm:px-6">
           {children}
         </main>
-
-        <ParentFooter />
       </div>
     </div>
   );

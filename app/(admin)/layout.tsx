@@ -57,7 +57,7 @@ export default async function AdminLayout({ children }: LayoutProps<'/'>) {
           <span className="ms-auto text-[12px] font-semibold">
             {user.fullName} · مدیر
           </span>
-          <ThemeToggle className="size-8.5 rounded-lg" />
+          <ThemeToggle className="size-8.5" />
           <LogoutButton />
         </header>
         <main className="mx-auto w-full max-w-[1320px] px-4 py-6 sm:px-6">

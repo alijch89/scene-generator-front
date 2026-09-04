@@ -39,6 +39,7 @@ export default function ContactPage() {
   return (
     <main className="mx-auto max-w-[960px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
+        eyebrow="پاسخ‌گوی خانواده‌ها هستیم"
         title="تماس با ما"
         lead="پاسخ‌ها معمولاً در یک روز کاری فرستاده می‌شوند."
       />

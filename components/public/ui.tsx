@@ -7,6 +7,31 @@ import { ArrowUpLeft, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 
+/** A lightweight editorial label used above public-page headings. */
+export function Eyebrow({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center gap-2 text-[11.5px] font-extrabold tracking-[.035em] text-warm',
+        className,
+      )}
+    >
+      <Sparkles aria-hidden className="size-3.5" strokeWidth={1.9} />
+      <span>{children}</span>
+      <span
+        aria-hidden
+        className="h-px w-9 bg-[linear-gradient(to_left,var(--sh-accent),transparent)]"
+      />
+    </div>
+  );
+}
+
 /** The surface card the marketing pages repeat ~25 times. */
 export function Card({
   className,
@@ -36,19 +61,16 @@ export function PageHeader({
   title,
   lead,
   className,
-  eyebrow = 'دنیای قصه‌های شخصی',
+  eyebrow,
 }: {
   title: string;
   lead: React.ReactNode;
   className?: string;
-  eyebrow?: string;
+  eyebrow: string;
 }) {
   return (
     <header className={cn('motion-hero-reveal relative mb-10', className)}>
-      <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/75 px-3 py-1.5 text-[11.5px] font-bold text-warm shadow-card backdrop-blur-sm">
-        <Sparkles className="size-3.5" strokeWidth={1.8} />
-        {eyebrow}
-      </div>
+      <Eyebrow className="mb-3">{eyebrow}</Eyebrow>
       <h1 className="mb-3 font-display text-[clamp(30px,4.8vw,46px)] leading-[1.35]">
         {title}
       </h1>

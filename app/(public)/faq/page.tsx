@@ -44,6 +44,7 @@ export default function FaqPage() {
   return (
     <main className="mx-auto max-w-[820px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
+        eyebrow="پاسخ کوتاه به سؤال‌های مهم"
         title="پرسش‌های پرتکرار"
         lead={
           <>

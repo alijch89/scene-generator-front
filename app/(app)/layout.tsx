@@ -1,3 +1,4 @@
+import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { HeaderTitle, MobileNav, SidebarNav } from '@/components/app/nav';
@@ -58,14 +59,20 @@ export default async function ParentLayout({ children }: LayoutProps<'/'>) {
               aria-label={
                 count > 0 ? `اعلان‌ها، ${faDigits(count)} خوانده‌نشده` : 'اعلان‌ها'
               }
-              className="relative grid size-10 place-items-center rounded-[13px] border border-border bg-surface text-[15px] text-ink hover:no-underline"
+              className="group relative inline-grid size-10 place-items-center rounded-full border border-border bg-surface p-0 leading-none text-muted transition-[transform,color,border-color] duration-200 hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--sh-primary)_28%,var(--sh-border))] hover:text-brand hover:no-underline active:translate-y-0 active:scale-[.985]"
             >
-              ✦
+              <Bell
+                aria-hidden
+                className="block size-[18px]"
+                strokeWidth={1.8}
+              />
               {count > 0 ? (
                 <span
                   aria-hidden
-                  className="absolute end-1.5 top-1.5 size-2 rounded-full bg-warm"
-                />
+                  className="absolute -end-1 -top-1 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-warm px-1 text-[8px] leading-none font-extrabold text-white ring-2 ring-bg"
+                >
+                  {count > 99 ? `${faDigits(99)}+` : faDigits(count)}
+                </span>
               ) : null}
             </Link>
 

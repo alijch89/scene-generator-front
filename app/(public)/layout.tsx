@@ -57,7 +57,7 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
           {/* Below sm the links and both calls to action move into the
               hamburger; only the theme toggle stays out in the bar. */}
           <div className="ms-auto flex items-center gap-2.5 sm:ms-0">
-            <ThemeToggle className="size-[38px] rounded-xl" />
+            <ThemeToggle className="size-[38px]" />
             <Link
               href="/login"
               className="hidden rounded-xl px-3.5 py-2.5 text-[13.5px] font-semibold text-ink hover:bg-elev hover:no-underline sm:block"

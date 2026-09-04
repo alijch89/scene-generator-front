@@ -67,6 +67,7 @@ export default function PricingPage() {
   return (
     <main className="mx-auto max-w-[1080px] px-5 pt-[clamp(46px,7vw,82px)] pb-20">
       <PageHeader
+        eyebrow="شفاف، ساده و بدون اشتراک"
         title="قیمت متناسب با طول ویدیو"
         lead="نه اشتراک ماهانه، نه بستهٔ اعتبار. فقط طول ویدیوی قصه را انتخاب می‌کنید و یک بار پرداخت می‌کنید."
       />

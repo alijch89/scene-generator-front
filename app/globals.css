@@ -447,12 +447,6 @@
   }
 }
 
-@keyframes topicMarquee {
-  to {
-    transform: translateX(50%);
-  }
-}
-
 @keyframes menuPop {
   from {
     opacity: 0;
@@ -569,11 +563,6 @@
   animation: playhead 5.4s linear infinite;
 }
 
-.topic-marquee-track {
-  width: max-content;
-  animation: topicMarquee 28s linear infinite;
-}
-
 .public-site details[open] > div {
   animation: menuPop 180ms ease-out both;
 }
@@ -615,12 +604,6 @@
 
 .faq-item[open] .faq-chevron {
   transform: rotate(180deg);
-}
-
-@media (max-width: 639px) {
-  .topic-marquee-track {
-    animation-duration: 22s;
-  }
 }
 
 /* The soft moving glow behind the parent-facing pages. Admin has none. */

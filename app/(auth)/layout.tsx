@@ -49,7 +49,7 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
         {/* Stacked below ~680px the marketing header is gone, so the way back
             out to the public site rides in the hamburger. */}
         <div className="mb-auto flex items-center gap-2.5">
-          <ThemeToggle className="size-[38px] rounded-xl" />
+          <ThemeToggle className="size-[38px]" />
           <SiteMobileNav className="ms-auto" />
         </div>
 

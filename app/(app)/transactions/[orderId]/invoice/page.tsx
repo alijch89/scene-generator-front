@@ -7,7 +7,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { ApiError } from '@/lib/api';
 import { sapi, verifySession } from '@/lib/dal';
 import { faDate, faDigits, faPrice } from '@/lib/fa';
-import { ORDER_STATUS } from '@/lib/orders';
+import { getOrderStatus } from '@/lib/orders';
 import type { OrderDto } from '@/lib/types';
 import { PrintButton } from './print-button';
 
@@ -47,7 +47,11 @@ export default async function InvoicePage({
   // An unpaid order has no invoice to give — say so, and offer the thing the
   // parent actually wants next.
   if (order.status !== 'PAID') {
-    const status = ORDER_STATUS[order.status];
+    const status = getOrderStatus(order.status);
+    const canRetryPayment =
+      order.status === 'PENDING' ||
+      order.status === 'FAILED' ||
+      order.status === 'CANCELLED';
     return (
       <section className="mx-auto max-w-130 py-[5vh]">
         <EmptyState
@@ -55,9 +59,13 @@ export default async function InvoicePage({
           title="برای این سفارش هنوز فاکتوری صادر نشده است."
           action={
             <div className="flex flex-wrap justify-center gap-2.75">
-              <PrimaryLink href={`/stories/${order.storyId}/pay`}>
-                {order.status === 'PENDING' ? 'ادامهٔ پرداخت' : 'پرداخت دوباره'}
-              </PrimaryLink>
+              {canRetryPayment ? (
+                <PrimaryLink href={`/stories/${order.storyId}/pay`}>
+                  {order.status === 'PENDING'
+                    ? 'ادامهٔ پرداخت'
+                    : 'پرداخت دوباره'}
+                </PrimaryLink>
+              ) : null}
               <SecondaryLink href="/transactions">صورت‌حساب</SecondaryLink>
             </div>
           }
@@ -69,7 +77,7 @@ export default async function InvoicePage({
     );
   }
 
-  const status = ORDER_STATUS[order.status];
+  const status = getOrderStatus(order.status);
 
   return (
     <section className="mx-auto max-w-160 animate-[pageIn_.4s_ease_both]">

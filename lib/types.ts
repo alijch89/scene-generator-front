@@ -89,7 +89,13 @@ export interface StoryDto {
 }
 
 /** Payment order lifecycle states. */
-export type OrderStatus = "PENDING" | "PAID" | "FAILED" | "CANCELLED";
+export type OrderStatus =
+  | "PENDING"
+  | "PAID"
+  | "FAILED"
+  | "CANCELLED"
+  | "REFUND_PENDING"
+  | "REFUNDED";
 
 /** Persisted stages in the generation pipeline. */
 export type JobStage =

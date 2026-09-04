@@ -6,7 +6,7 @@ import { StatusBadge } from '@/components/status-badge';
 import { ApiError } from '@/lib/api';
 import { requireAdmin, sapi } from '@/lib/dal';
 import { faDateNumeric, faDateTime, faDigits, faPrice } from '@/lib/fa';
-import { ORDER_STATUS, PAYMENT_EVENT_LABEL } from '@/lib/orders';
+import { getOrderStatus, PAYMENT_EVENT_LABEL } from '@/lib/orders';
 import type { AdminPaymentDetailDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'جزئیات تراکنش' };
@@ -51,7 +51,7 @@ export default async function AdminPaymentDetailPage({
 
   if (!payment) notFound();
 
-  const status = ORDER_STATUS[payment.status];
+  const status = getOrderStatus(payment.status);
 
   return (
     <section className="animate-[pageIn_.35s_ease_both]">

@@ -13,13 +13,22 @@ import type {
 export const metadata: Metadata = { title: 'سفارش‌ها' };
 
 /** The order of the lifecycle, not the enum. */
-const STATUS_ORDER: OrderStatus[] = ['PAID', 'PENDING', 'FAILED', 'CANCELLED'];
+const STATUS_ORDER: OrderStatus[] = [
+  'PAID',
+  'REFUND_PENDING',
+  'REFUNDED',
+  'PENDING',
+  'FAILED',
+  'CANCELLED',
+];
 
 const STATUS_COLOR: Record<OrderStatus, string> = {
   PAID: 'var(--sh-success)',
   PENDING: 'var(--sh-warning)',
   FAILED: 'var(--sh-error)',
   CANCELLED: 'var(--sh-muted)',
+  REFUND_PENDING: 'var(--sh-warning)',
+  REFUNDED: 'var(--sh-muted)',
 };
 
 /** A story's whole journey, in the order it travels it. */
@@ -198,6 +207,17 @@ export default async function AdminOrdersPage() {
             <Line
               label="لغوشده توسط کاربر"
               value={faPrice(statuses.CANCELLED.amount)}
+            />
+            <Line
+              label="در انتظار بازپرداخت"
+              value={faPrice(statuses.REFUND_PENDING.amount)}
+              tone={
+                statuses.REFUND_PENDING.count > 0 ? 'warning' : undefined
+              }
+            />
+            <Line
+              label="بازپرداخت‌شده"
+              value={faPrice(statuses.REFUNDED.amount)}
             />
             <Line
               label="قصه‌های آمادهٔ تحویل‌شده"

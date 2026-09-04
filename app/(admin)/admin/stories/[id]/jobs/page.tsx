@@ -8,7 +8,7 @@ import { JOB_STATUS, STAGE_ADMIN_LABEL, STORY_STATUS } from '@/lib/admin';
 import { ApiError } from '@/lib/api';
 import { requireAdmin, sapi } from '@/lib/dal';
 import { faDate, faDigits, faElapsed } from '@/lib/fa';
-import { ORDER_STATUS } from '@/lib/orders';
+import { getOrderStatus } from '@/lib/orders';
 import { LENGTH_SHORT_LABEL, THEME_LABEL } from '@/lib/story-art';
 import type { AdminStoryJobsDto } from '@/lib/types';
 
@@ -141,7 +141,7 @@ export default async function AdminStoryJobsPage({
               <span className="ms-auto font-semibold">
                 {order ? (
                   <Link href={`/admin/payments/${order.id}`}>
-                    {ORDER_STATUS[order.status].admin}
+                    {getOrderStatus(order.status).admin}
                   </Link>
                 ) : (
                   'ثبت نشده'

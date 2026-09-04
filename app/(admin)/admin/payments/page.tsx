@@ -21,7 +21,7 @@ import {
   faRate,
   jalaliMonthStart,
 } from '@/lib/fa';
-import { ORDER_STATUS } from '@/lib/orders';
+import { getOrderStatus } from '@/lib/orders';
 import type {
   AdminPaymentStatsDto,
   AdminPaymentsPageDto,
@@ -36,6 +36,8 @@ const STATUS_FILTER: { value: string; label: string }[] = [
   { value: 'PENDING', label: 'در انتظار' },
   { value: 'FAILED', label: 'ناموفق' },
   { value: 'CANCELLED', label: 'لغو شده' },
+  { value: 'REFUND_PENDING', label: 'در انتظار بازپرداخت' },
+  { value: 'REFUNDED', label: 'بازپرداخت‌شده' },
 ];
 
 /** Narrows arbitrary URL text to a supported payment status. */
@@ -183,7 +185,7 @@ export default async function AdminPaymentsPage({
           </thead>
           <tbody>
             {payments.items.map((payment) => {
-              const status = ORDER_STATUS[payment.status];
+              const status = getOrderStatus(payment.status);
               return (
                 <tr key={payment.id}>
                   <td className={`${tdClass} font-mono`}>

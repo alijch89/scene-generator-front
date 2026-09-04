@@ -4,7 +4,7 @@ import { EmptyState, PageTitle, PrimaryLink } from '@/components/app/ui';
 import { StatusBadge } from '@/components/status-badge';
 import { sapi } from '@/lib/dal';
 import { faDate, faDigits, faPrice } from '@/lib/fa';
-import { ORDER_STATUS, orderAction } from '@/lib/orders';
+import { getOrderStatus, orderAction } from '@/lib/orders';
 import type { TransactionsDto } from '@/lib/types';
 
 export const metadata: Metadata = { title: 'صورت‌حساب' };
@@ -85,7 +85,7 @@ export default async function TransactionsPage() {
               </thead>
               <tbody>
                 {items.map((order) => {
-                  const status = ORDER_STATUS[order.status];
+                  const status = getOrderStatus(order.status);
                   const action = orderAction(order.status);
 
                   return (
@@ -107,16 +107,20 @@ export default async function TransactionsPage() {
                         </StatusBadge>
                       </td>
                       <td className="px-4 py-3.5 text-left">
-                        <Link
-                          href={
-                            action.kind === 'invoice'
-                              ? `/transactions/${order.id}/invoice`
-                              : `/stories/${order.storyId}/pay`
-                          }
-                          className="text-[12.5px] font-bold whitespace-nowrap"
-                        >
-                          {action.label}
-                        </Link>
+                        {action ? (
+                          <Link
+                            href={
+                              action.kind === 'invoice'
+                                ? `/transactions/${order.id}/invoice`
+                                : `/stories/${order.storyId}/pay`
+                            }
+                            className="text-[12.5px] font-bold whitespace-nowrap"
+                          >
+                            {action.label}
+                          </Link>
+                        ) : (
+                          <span className="text-muted">—</span>
+                        )}
                       </td>
                     </tr>
                   );

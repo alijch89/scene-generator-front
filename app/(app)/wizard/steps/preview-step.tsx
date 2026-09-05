@@ -179,9 +179,7 @@ export function PreviewStep({
                   <li key={`${character.name}-${index}`}>
                     {character.name}
                     {character.relation ? ` · ${character.relation}` : ""}
-                    {character.photo || character.hasSavedPhoto
-                      ? " · همراه عکس"
-                      : ""}
+                    {character.hasSavedPhoto ? " · همراه عکس" : ""}
                   </li>
                 ))}
               </ul>

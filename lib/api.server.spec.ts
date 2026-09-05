@@ -20,11 +20,13 @@ const response = (payload: unknown, status = 200) =>
 describe("request, running on the server", () => {
   beforeEach(() => {
     delete process.env.INTERNAL_API_TOKEN;
+    delete process.env.NEXT_PUBLIC_SITE_URL;
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
     delete process.env.INTERNAL_API_TOKEN;
+    delete process.env.NEXT_PUBLIC_SITE_URL;
   });
 
   it("marks itself as the first-party caller when a token is configured", async () => {
@@ -60,5 +62,26 @@ describe("request, running on the server", () => {
       string
     >;
     expect(headers["x-internal-token"]).toBeUndefined();
+  });
+
+  it("supplies the configured site Origin for a server-side mutation", async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://app.example.test/path";
+    const fetchMock = jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(response({ ok: true }));
+
+    await request("/auth/logout", { method: "POST" });
+
+    const lastCall = fetchMock.mock.calls.at(-1);
+    const headers = (lastCall?.[1] as RequestInit).headers as Record<
+      string,
+      string
+    >;
+    expect(headers).toEqual(
+      expect.objectContaining({
+        origin: "https://app.example.test",
+        "x-csrf-protection": "1",
+      }),
+    );
   });
 });

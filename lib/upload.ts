@@ -3,7 +3,11 @@
  * @description Validates and uploads private child photos while reporting browser progress.
  */
 
-import { API_URL } from './api';
+import {
+  API_URL,
+  CSRF_PROTECTION_HEADER,
+  CSRF_PROTECTION_VALUE,
+} from './api';
 
 /** «حداکثر ۱۰ مگابایت، JPG یا PNG» — checked here so the drawer can say so
  *  before spending the upload, and again by the API which is the real limit. */
@@ -35,6 +39,7 @@ export function uploadChildPhoto(
     const xhr = new XMLHttpRequest();
     xhr.open('PUT', `${API_URL}/children/${childId}/photo`);
     xhr.withCredentials = true;
+    xhr.setRequestHeader(CSRF_PROTECTION_HEADER, CSRF_PROTECTION_VALUE);
 
     xhr.upload.onprogress = (event) => {
       if (event.lengthComputable) onProgress(event.loaded / event.total);

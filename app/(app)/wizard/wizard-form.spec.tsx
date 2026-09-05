@@ -79,7 +79,7 @@ describe("WizardForm supporting characters", () => {
     );
   });
 
-  it("shows the character editor after age settings and supports relation choices, custom text, and photo preview", async () => {
+  it("supports relation choices while new character photos are safely disabled", async () => {
     const user = userEvent.setup();
     const { container } = render(
       <WizardForm childProfiles={[child]} prices={prices} />,
@@ -115,16 +115,10 @@ describe("WizardForm supporting characters", () => {
     const fileInput =
       container.querySelector<HTMLInputElement>('input[type="file"]');
     expect(fileInput).not.toBeNull();
-    await user.upload(
-      fileInput!,
-      new File(["photo"], "relative.jpg", { type: "image/jpeg" }),
-    );
-
-    const preview = await screen.findByRole("img", {
-      name: "پیش‌نمایش عکس شخصیت",
-    });
-    expect(preview).toBeInTheDocument();
-    expect(preview.getAttribute("style")).toContain("data:image/jpeg;base64");
+    expect(fileInput).toBeDisabled();
+    expect(
+      screen.getByText("بارگذاری عکس تازه موقتاً غیرفعال است"),
+    ).toBeInTheDocument();
   });
 
   it("updates the payable preview when the selected video length changes", async () => {

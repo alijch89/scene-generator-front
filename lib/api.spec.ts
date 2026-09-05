@@ -35,6 +35,7 @@ describe("request", () => {
         headers: expect.objectContaining({
           "content-type": "application/json",
           cookie: "sid=session-token",
+          "x-csrf-protection": "1",
         }),
       }),
     );
@@ -58,8 +59,24 @@ describe("request", () => {
 
     const init = fetchMock.mock.lastCall?.[1] as RequestInit;
     expect(init.body).toBe(form);
+    expect(init.headers).toEqual(
+      expect.objectContaining({ "x-csrf-protection": "1" }),
+    );
     expect(init.headers).not.toEqual(
       expect.objectContaining({ "content-type": "application/json" }),
+    );
+  });
+
+  it("does not add mutation proof to a safe request", async () => {
+    const fetchMock = jest
+      .spyOn(global, "fetch")
+      .mockResolvedValue(response({ ok: true }, 200));
+
+    await request("/auth/me", { method: "GET" });
+
+    const init = fetchMock.mock.lastCall?.[1] as RequestInit;
+    expect(init.headers).not.toEqual(
+      expect.objectContaining({ "x-csrf-protection": expect.anything() }),
     );
   });
 

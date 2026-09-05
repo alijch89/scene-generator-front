@@ -36,15 +36,12 @@ export function CustomizeStep({
   prices,
   savedRelations,
   dispatch,
-  onPhoto,
 }: {
   draft: WizardDraft;
   hero: string;
   prices: Record<StoryLength, number>;
   savedRelations: ChildRelationDto[];
   dispatch: (action: WizardAction) => void;
-  /** Photo selection writes the shared error slot, which lives in the shell. */
-  onPhoto: (index: number, file?: File) => void;
 }) {
   return (
     <section className="max-w-190 animate-[pageIn_.4s_ease_both]">
@@ -293,7 +290,6 @@ export function CustomizeStep({
             dispatch({ type: 'character/update', index, patch })
           }
           onRemove={(index) => dispatch({ type: 'character/remove', index })}
-          onPhoto={onPhoto}
         />
       </div>
     </section>

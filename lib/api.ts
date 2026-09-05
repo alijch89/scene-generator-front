@@ -20,6 +20,12 @@ export const API_URL =
  */
 const SERVER_API_URL = process.env.INTERNAL_API_URL || API_URL;
 
+/** Non-simple header required by the API for every state-changing request. */
+export const CSRF_PROTECTION_HEADER = "x-csrf-protection";
+export const CSRF_PROTECTION_VALUE = "1";
+
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
 /** Picks the base for the current execution context. */
 const baseUrl = () =>
   typeof window === "undefined" ? SERVER_API_URL : API_URL;
@@ -41,6 +47,31 @@ const internalHeaders = (): Record<string, string> => {
   if (typeof window !== "undefined") return {};
   const token = process.env.INTERNAL_API_TOKEN;
   return token ? { "x-internal-token": token } : {};
+};
+
+/**
+ * Adds the browser-intent proof required by the API's global mutation guard.
+ *
+ * Browsers supply their own immutable Origin. Node fetch has no page context,
+ * so server-side actions provide the configured site origin as a fallback to
+ * the stronger internal token (which remains mandatory in production).
+ */
+const intentHeaders = (method?: string): Record<string, string> => {
+  if (SAFE_METHODS.has((method ?? "GET").toUpperCase())) return {};
+
+  const proof: Record<string, string> = {
+    [CSRF_PROTECTION_HEADER]: CSRF_PROTECTION_VALUE,
+  };
+  if (typeof window === "undefined") {
+    try {
+      proof.origin = new URL(
+        process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+      ).origin;
+    } catch {
+      // INTERNAL_API_TOKEN is the production proof when the public URL is bad.
+    }
+  }
+  return proof;
 };
 
 /** HTTP error that preserves response status and the parsed backend payload. */
@@ -87,8 +118,9 @@ export async function request<T>(
         ? {}
         : { "content-type": "application/json" }),
       ...(cookie ? { cookie } : {}),
-      ...internalHeaders(),
       ...headers,
+      ...internalHeaders(),
+      ...intentHeaders(init.method),
     },
     // The browser must supply FormData's boundary; JSON keeps the old client contract.
     body:

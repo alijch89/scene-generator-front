@@ -9,7 +9,6 @@ import { useReducer, useState } from 'react';
 import { Alert } from '@/components/form';
 import { ApiError, api } from '@/lib/api';
 import { faDigits } from '@/lib/fa';
-import { photoError } from '@/lib/upload';
 import type {
   ChildDto,
   ChildRelationDto,
@@ -69,21 +68,6 @@ export function WizardForm({
   const blocked = isBlocked(draft);
   const savedRelations = relationsByChild[draft.childId] ?? [];
 
-  /** Keeps a selected supporting-character photo only when it is uploadable. */
-  function selectCharacterPhoto(index: number, file?: File) {
-    if (!file) {
-      dispatch({ type: 'character/update', index, patch: { photo: null } });
-      return;
-    }
-    const problem = photoError(file);
-    if (problem) {
-      setError(problem);
-      return;
-    }
-    setError(null);
-    dispatch({ type: 'character/update', index, patch: { photo: file } });
-  }
-
   /** Validates the final selection, creates the story/order, and starts payment. */
   async function submit() {
     setBusy(true);
@@ -115,9 +99,6 @@ export function WizardForm({
             `additional_character_${slot}_relation_id`,
             character.savedRelationId,
           );
-        }
-        if (character.photo) {
-          form.append(`additional_character_${slot}_photo`, character.photo);
         }
       });
 
@@ -188,7 +169,6 @@ export function WizardForm({
           prices={prices}
           savedRelations={savedRelations}
           dispatch={dispatch}
-          onPhoto={selectCharacterPhoto}
         />
       ) : null}
 

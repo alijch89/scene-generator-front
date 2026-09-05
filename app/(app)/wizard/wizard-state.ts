@@ -92,7 +92,6 @@ export interface CharacterDraft {
   savedRelationId: string | null;
   name: string;
   relation: string;
-  photo: File | null;
   hasSavedPhoto: boolean;
 }
 
@@ -101,7 +100,6 @@ export const newCharacter = (): CharacterDraft => ({
   savedRelationId: null,
   name: '',
   relation: '',
-  photo: null,
   hasSavedPhoto: false,
 });
 
@@ -247,7 +245,6 @@ export function wizardReducer(
             savedRelationId: relation.id,
             name: relation.name,
             relation: relation.relation,
-            photo: null,
             hasSavedPhoto: relation.hasPhoto,
           },
         ],
@@ -275,14 +272,14 @@ export function wizardReducer(
 }
 
 /**
- * A character with a relation or a photo but no name cannot be submitted —
- * the API's slots are keyed by name.
+ * A character with a relation but no name cannot be submitted; the API's
+ * slots are keyed by name.
  */
 export const charactersAreValid = (characters: CharacterDraft[]) =>
   characters.every(
     (character) =>
       Boolean(character.name.trim()) ||
-      (!character.relation.trim() && !character.photo),
+      !character.relation.trim(),
   );
 
 /** Whether the current step still has something wrong with it. */

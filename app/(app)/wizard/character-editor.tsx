@@ -5,7 +5,6 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import { API_URL } from '@/lib/api';
 import { faDigits } from '@/lib/fa';
 import type { ChildRelationDto } from '@/lib/types';
@@ -42,45 +41,6 @@ export function Suggestions({
   );
 }
 
-/** Reads the selected local file directly so the preview does not depend on blob URLs. */
-function CharacterPhotoPreview({ file, name }: { file: File; name: string }) {
-  const [source, setSource] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    const reader = new FileReader();
-
-    reader.addEventListener("load", () => {
-      if (active && typeof reader.result === "string") {
-        setSource(reader.result);
-      }
-    });
-    reader.readAsDataURL(file);
-
-    return () => {
-      active = false;
-      if (reader.readyState === FileReader.LOADING) reader.abort();
-    };
-  }, [file]);
-
-  if (!source) {
-    return (
-      <span className="grid size-20 flex-none animate-pulse place-items-center rounded-xl border border-border bg-elev text-[11px] text-muted">
-        آماده‌سازی…
-      </span>
-    );
-  }
-
-  return (
-    <span
-      role="img"
-      aria-label={`پیش‌نمایش عکس ${name || "شخصیت"}`}
-      style={{ backgroundImage: `url("${source}")` }}
-      className="size-20 flex-none rounded-xl border border-border bg-cover bg-center bg-no-repeat"
-    />
-  );
-}
-
 /** Always-visible editor for the four supporting-character multipart slots. */
 export function CharacterEditor({
   characters,
@@ -91,7 +51,6 @@ export function CharacterEditor({
   onReuse,
   onUpdate,
   onRemove,
-  onPhoto,
 }: {
   characters: CharacterDraft[];
   savedRelations: ChildRelationDto[];
@@ -101,7 +60,6 @@ export function CharacterEditor({
   onReuse: (relation: ChildRelationDto) => void;
   onUpdate: (index: number, patch: Partial<CharacterDraft>) => void;
   onRemove: (index: number) => void;
-  onPhoto: (index: number, file?: File) => void;
 }) {
   return (
     <fieldset className="rounded-[20px] border border-border bg-surface p-[18px_20px_20px] shadow-card">
@@ -109,9 +67,9 @@ export function CharacterEditor({
         شخصیت‌های جانبی و نزدیکان (اختیاری)
       </legend>
       <p className="mb-4 text-[12.5px] leading-[1.8] text-muted">
-        تا چهار نفر را با نام، نسبت با کودک و عکس معرفی کنید. نسبت‌های پیشنهادی
-        قابل انتخاب‌اند و می‌توانید عبارت خودتان را هم بنویسید. شخصیت تازه برای
-        قصه‌های بعدی ذخیره می‌شود.
+        تا چهار نفر را با نام و نسبت با کودک معرفی کنید. عکس‌های از قبل
+        ذخیره‌شده قابل استفاده‌اند؛ بارگذاری عکس تازه تا تکمیل سهمیه‌بندی امن
+        رسانه موقتاً غیرفعال است.
       </p>
       {savedRelations.length ? (
         <div className="mb-4 rounded-[14px] border border-border bg-elev p-3.5">
@@ -229,16 +187,10 @@ export function CharacterEditor({
                   className="rounded-[11px] border border-border bg-surface px-3 py-2.5 text-[13.5px] text-ink"
                 />
               </div>
-              <label className="flex cursor-pointer flex-col gap-1.5 text-[12px] text-muted">
+              <label className="flex cursor-not-allowed flex-col gap-1.5 text-[12px] text-muted">
                 عکس شخصیت
-                <span className="flex min-h-24 items-center gap-3 rounded-[11px] border border-dashed border-border bg-surface px-3 py-2.5 text-[12.5px] text-ink">
-                  {character.photo ? (
-                    <CharacterPhotoPreview
-                      key={`${character.photo.name}-${character.photo.size}-${character.photo.lastModified}`}
-                      file={character.photo}
-                      name={character.name}
-                    />
-                  ) : character.savedRelationId && character.hasSavedPhoto ? (
+                <span className="flex min-h-24 items-center gap-3 rounded-[11px] border border-dashed border-border bg-surface px-3 py-2.5 text-[12.5px] text-ink opacity-75">
+                  {character.savedRelationId && character.hasSavedPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={`${API_URL}/children/${childId}/relations/${character.savedRelationId}/photo`}
@@ -252,32 +204,19 @@ export function CharacterEditor({
                     </span>
                   )}
                   <span className="min-w-0 break-all">
-                    {character.photo
-                      ? `${character.photo.name} · برای تغییر عکس کلیک کنید`
-                      : character.savedRelationId && character.hasSavedPhoto
-                        ? "عکس ذخیره‌شده"
-                        : character.savedRelationId
-                          ? "بدون عکس"
-                          : "انتخاب عکس JPG، PNG یا WebP"}
+                    {character.savedRelationId && character.hasSavedPhoto
+                      ? "عکس ذخیره‌شده"
+                      : "بارگذاری عکس تازه موقتاً غیرفعال است"}
                   </span>
                 </span>
                 <input
                   type="file"
-                  disabled={Boolean(character.savedRelationId)}
+                  aria-label={`بارگذاری عکس شخصیت ${index + 1}`}
+                  disabled
                   accept="image/jpeg,image/png,image/webp"
                   className="sr-only"
-                  onChange={(event) => onPhoto(index, event.target.files?.[0])}
                 />
               </label>
-              {character.photo ? (
-                <button
-                  type="button"
-                  onClick={() => onUpdate(index, { photo: null })}
-                  className="self-start text-[12px] text-error"
-                >
-                  حذف عکس
-                </button>
-              ) : null}
               <button
                 type="button"
                 onClick={() => onRemove(index)}
@@ -296,7 +235,7 @@ export function CharacterEditor({
       ) : null}
       {!valid ? (
         <p className="mt-3 text-[12.5px] text-error">
-          برای شخصیتی که نسبت یا عکس دارد، نام را هم وارد کنید.
+          برای شخصیتی که نسبت دارد، نام را هم وارد کنید.
         </p>
       ) : null}
     </fieldset>

@@ -77,7 +77,7 @@ flowchart LR
 ```text
 scene-generator-front/
 ├── app/
-│   ├── (public)/          # سایت معرفی و پرداخت mock
+│   ├── (public)/          # سایت معرفی
 │   ├── (auth)/            # ورود، ثبت‌نام و تغییر گذرواژه
 │   ├── (app)/             # پنل والدین
 │   └── (admin)/           # پنل مدیریت
@@ -155,7 +155,6 @@ npm run start
 | --- | --- | --- | --- |
 | `NEXT_PUBLIC_API_URL` | build و مرورگر | آدرس عمومی REST API با پیشوند `/api` | `http://localhost:3001/api` |
 | `INTERNAL_API_URL` | runtime سمت سرور | آدرس داخلی API برای Server Componentها؛ Compose آن را روی `http://backend:3001/api` می‌گذارد | همان API یا نام سرویس Docker |
-| `NEXT_PUBLIC_PAYMENT_MODE` | build | با مقدار `link` صفحه پرداخت mock را غیرفعال می‌کند؛ باید با `PAYMENT_MODE` بک‌اند هماهنگ باشد | `mock` |
 | `NEXT_PUBLIC_SITE_URL` | build | مبدأ عمومی سایت برای لینک کامل تصویر اشتراک‌گذاری اجتماعی | آدرس production سایت |
 | `NEXT_PUBLIC_S3_URL` | build | در نمونه env و build args نگه داشته شده، اما کد فعلی رسانه خصوصی را از API stream می‌کند و مستقیماً از این مقدار استفاده نمی‌کند | `http://localhost:9000/shahrzad` |
 
@@ -227,7 +226,6 @@ Dockerfile چهار بخش منطقی دارد: نصب dependencyها با `npm 
 ```bash
 docker build \
   --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001/api \
-  --build-arg NEXT_PUBLIC_PAYMENT_MODE=mock \
   -t shahrzad-front .
 
 docker run --rm \
@@ -245,6 +243,5 @@ build فرانت به‌دلیل استفاده از `next/font/google` برای
 
 - خطای CORS یا عدم ماندگاری ورود: `WEB_ORIGIN` بک‌اند باید دقیقاً origin فرانت باشد و درخواست‌ها باید با credentials ارسال شوند.
 - redirect پی‌درپی به ورود: در DevTools وجود کوکی `sid` را بررسی کنید و مطمئن شوید `INTERNAL_API_URL` از داخل پردازش Next به API می‌رسد.
-- پرداخت mock با 404: مقدار `NEXT_PUBLIC_PAYMENT_MODE` احتمالاً `link` است یا با `PAYMENT_MODE` بک‌اند هماهنگ نیست.
 - صفحه در حال ساخت بدون پیشرفت: endpoint پیشرفت را بررسی کنید؛ orchestration تولید در بک‌اند انجام می‌شود و فرانت فقط polling می‌کند.
 - تصویر یا ویدیو باز نمی‌شود: رسانه‌ها خصوصی‌اند و از endpointهای API با کنترل مالکیت stream می‌شوند؛ دسترسی مستقیم به bucket مسیر اصلی برنامه نیست.

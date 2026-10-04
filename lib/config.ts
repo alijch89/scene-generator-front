@@ -25,6 +25,3 @@ export const STORY_PRICE_RIAL_BY_LENGTH: Record<StoryLength, number> = {
   MEDIUM: STORY_PRICE_BY_LENGTH.MEDIUM * 10,
   LONG: STORY_PRICE_BY_LENGTH.LONG * 10,
 };
-
-/** Safe fallback for a malformed development payment URL. */
-export const DEFAULT_STORY_PRICE_RIAL = STORY_PRICE_RIAL_BY_LENGTH.MEDIUM;

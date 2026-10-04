@@ -26,14 +26,9 @@ COPY . .
 # server's own path to the API is INTERNAL_API_URL, set at runtime.
 ARG NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
 ARG NEXT_PUBLIC_S3_URL=http://localhost:9000/shahrzad
-# Defaults to the real-gateway mode on purpose: an image built without this
-# arg must not ship the development checkout page. docker-compose passes the
-# value explicitly, so local stacks still get the simulator.
-ARG NEXT_PUBLIC_PAYMENT_MODE=link
 ARG NEXT_PUBLIC_SITE_URL=
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL} \
     NEXT_PUBLIC_S3_URL=${NEXT_PUBLIC_S3_URL} \
-    NEXT_PUBLIC_PAYMENT_MODE=${NEXT_PUBLIC_PAYMENT_MODE} \
     NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL} \
     NEXT_TELEMETRY_DISABLED=1 \
     NODE_ENV=production

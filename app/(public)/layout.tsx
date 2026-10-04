@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { DisplayFontPreload } from '@/components/display-font-preload';
 import { Logo } from '@/components/logo';
 import { BackToTopButton } from '@/components/public/back-to-top';
+import { EnamadSeal } from '@/components/public/enamad-seal';
 import { SiteMobileNav, SiteNav } from '@/components/public/site-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -164,6 +165,7 @@ export default function PublicLayout({ children }: LayoutProps<'/'>) {
           <div className="flex flex-col gap-4 border-t border-border py-5 text-[11px] text-muted sm:flex-row sm:items-center">
             <p className="m-0">© شهرزاد قصه‌گو؛ همهٔ حقوق محفوظ است.</p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:ms-auto">
+              <EnamadSeal />
               <span className="inline-flex items-center gap-1.5">
                 <ShieldCheck aria-hidden className="size-3.5 text-teal" />
                 حریم امن خانواده

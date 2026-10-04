@@ -55,7 +55,9 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       `connect-src 'self' ${apiOrigin}`,
-      `img-src 'self' data: blob: ${apiOrigin}`,
+      // The eNAMAD trust seal has to load from eNAMAD's own host (see
+      // components/public/enamad-seal.tsx); it is the one image not vendored.
+      `img-src 'self' data: blob: ${apiOrigin} https://trustseal.enamad.ir`,
       `media-src 'self' blob: ${apiOrigin}`,
       // Both families are served out of public/fonts now; no third-party
       // origin has to be allowed for type any more.

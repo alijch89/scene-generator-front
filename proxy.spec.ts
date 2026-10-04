@@ -1,5 +1,7 @@
 import { proxy } from './proxy';
 
+const mockDeleteCookie = jest.fn();
+
 jest.mock('next/server', () => ({
   NextResponse: {
     redirect: (url: URL) => ({
@@ -8,11 +10,19 @@ jest.mock('next/server', () => ({
         get: (name: string) => (name === 'location' ? url.toString() : null),
       },
     }),
-    next: () => ({ status: 200, headers: { get: () => null } }),
+    next: () => ({
+      status: 200,
+      headers: { get: () => null },
+      cookies: { delete: mockDeleteCookie },
+    }),
   },
 }));
 
-const requestFor = (path: string, cookies: Record<string, string> = {}) => {
+const requestFor = (
+  path: string,
+  cookies: Record<string, string> = {},
+  headers: Record<string, string> = {},
+) => {
   const nextUrl = new URL(`http://localhost${path}`) as URL & {
     clone: () => URL;
   };
@@ -23,6 +33,9 @@ const requestFor = (path: string, cookies: Record<string, string> = {}) => {
   };
   return {
     nextUrl,
+    headers: {
+      has: (name: string) => name.toLowerCase() in headers,
+    },
     cookies: {
       get: (name: string) =>
         cookies[name] ? { value: cookies[name] } : undefined,
@@ -31,6 +44,8 @@ const requestFor = (path: string, cookies: Record<string, string> = {}) => {
 };
 
 describe('route proxy', () => {
+  beforeEach(() => mockDeleteCookie.mockClear());
+
   it('redirects an anonymous visitor from protected parent routes to login', () => {
     const response = proxy(requestFor('/library'));
     expect(response.headers.get('location')).toBe(
@@ -73,4 +88,67 @@ describe('route proxy', () => {
       ).toBe(200);
     },
   );
+  describe('the expired-login URL', () => {
+    const signedIn = { sid: 'session', role: 'User' };
+
+    it('sends a signed-in visitor on to where an earlier anonymous redirect was heading', () => {
+      // Next.js prefetches the public header's «ساخت قصه» link while logged
+      // out, the browser keeps the redirect, and replays it after login.
+      const response = proxy(
+        requestFor('/login?reason=expired&next=%2Fwizard', signedIn),
+      );
+      expect(response.headers.get('location')).toBe('http://localhost/wizard');
+    });
+
+    it('never logs a visitor out when that replay is only a prefetch', () => {
+      // The incident: the replayed prefetch carried the fresh session cookie
+      // and the proxy deleted it two seconds after every login.
+      const response = proxy(
+        requestFor(
+          '/login?reason=expired&next=%2Fwizard&_rsc=IOe_mmh6jQxP6_Ru',
+          signedIn,
+          { rsc: '1', 'next-router-prefetch': '1' },
+        ),
+      );
+      expect(response.headers.get('location')).toBe('http://localhost/wizard');
+      expect(mockDeleteCookie).not.toHaveBeenCalled();
+    });
+
+    it('does not follow a next that points back at the auth pages', () => {
+      const response = proxy(
+        requestFor('/login?reason=expired&next=%2Flogin', signedIn),
+      );
+      expect(response.headers.get('location')).toBe(
+        'http://localhost/dashboard',
+      );
+    });
+
+    it('ignores a next that leaves the app', () => {
+      const response = proxy(
+        requestFor('/login?reason=expired&next=%2F%2Fevil.example', signedIn),
+      );
+      expect(response.status).toBe(200);
+      expect(response.headers.get('location')).toBeNull();
+    });
+
+    it('clears a stale session cookie when the page itself found it stale', () => {
+      // lib/dal.ts redirects here without `next` after the API said 401.
+      const response = proxy(requestFor('/login?reason=expired', signedIn));
+      expect(response.status).toBe(200);
+      expect(mockDeleteCookie).toHaveBeenCalledWith('sid');
+      expect(mockDeleteCookie).toHaveBeenCalledWith('role');
+    });
+
+    it.each([
+      ['an RSC fetch', { rsc: '1' }],
+      ['a prefetch', { 'next-router-prefetch': '1' }],
+      ['a segment prefetch', { 'next-router-segment-prefetch': '/login' }],
+    ])('leaves the cookie alone on %s', (_name, headers) => {
+      const response = proxy(
+        requestFor('/login?reason=expired', signedIn, headers),
+      );
+      expect(response.status).toBe(200);
+      expect(mockDeleteCookie).not.toHaveBeenCalled();
+    });
+  });
 });

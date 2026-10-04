@@ -45,7 +45,7 @@ const FOOTER_COLUMNS = [
 ];
 
 /** Sticky blurred header + footer from Public Site.dc.html, over the aurora. */
-/** Shared marketing layout for public product, policy, contact, and mock-payment routes. */
+/** Shared marketing layout for public product, policy, and contact routes. */
 export default function PublicLayout({ children }: LayoutProps<'/'>) {
   return (
     <div className="public-site aurora flex min-h-full flex-col">

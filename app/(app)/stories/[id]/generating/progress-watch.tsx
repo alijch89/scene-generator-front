@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { ChildAvatar } from '@/components/app/ui';
 import { API_URL, api } from '@/lib/api';
 import { faDigits, faPercent } from '@/lib/fa';
+import { generationFailureMessage } from '@/lib/generation-errors';
 import { STAGE_LABEL, VOICE_LABEL } from '@/lib/story-art';
 import type { ChildDto, StoryDto, StoryProgressDto } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -66,8 +67,7 @@ export function ProgressWatch({
     source.onmessage = (event: MessageEvent<string>) => {
       try {
         const data = JSON.parse(event.data) as
-          | StoryProgressDto
-          | { heartbeat: true };
+          StoryProgressDto | { heartbeat: true };
         if ('heartbeat' in data) return;
         apply(data);
       } catch {
@@ -109,8 +109,7 @@ export function ProgressWatch({
         </span>
         <h1 className="mb-2.5 font-display text-[25px]">ساخت قصه متوقف شد.</h1>
         <p className="mb-5.5 text-[14.5px] leading-[1.95] text-muted">
-          {progress.failureReason ??
-            'در میانهٔ کار مشکلی پیش آمد. مبلغی دوباره از شما گرفته نمی‌شود.'}
+          {generationFailureMessage(progress.failureCode)}
         </p>
         <div className="flex flex-wrap justify-center gap-2.75">
           <Link
@@ -169,8 +168,8 @@ export function ProgressWatch({
         aria-live="polite"
         aria-atomic="true"
       >
-        {faPercent(progress.percent)} انجام شد · حدود {faDigits(remaining)} ثانیه
-        دیگر
+        {faPercent(progress.percent)} انجام شد · حدود {faDigits(remaining)}{' '}
+        ثانیه دیگر
       </p>
 
       <div className="rounded-[22px] border border-border bg-surface p-[8px_8px_12px] text-right shadow-card">

@@ -14,9 +14,9 @@ import type { StoryLength } from '@/lib/types';
 
 /** تومان — what the marketing pages print for each requested video length. */
 export const STORY_PRICE_BY_LENGTH: Record<StoryLength, number> = {
-  SHORT: 499_000,
-  MEDIUM: 699_000,
-  LONG: 999_000,
+  SHORT: 1_500,
+  MEDIUM: 1_500,
+  LONG: 1_500,
 };
 
 /** ریال — the unit the API stores and `faPrice` expects. */

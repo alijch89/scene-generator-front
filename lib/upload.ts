@@ -15,13 +15,36 @@ export const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 /** MIME types accepted by both browser validation and the upload endpoint. */
 export const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
+/** Extensions whose type is known when the browser leaves `File.type` empty. */
+const EXTENSION_TYPES: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+};
+
+/**
+ * Gives a photo the content type its extension implies when the browser sent
+ * none. Some browsers and file managers leave `type` empty for a perfectly
+ * good .jpg, and the API judges the upload by the type the browser declares —
+ * so without this the file would be refused for a reason the parent cannot see.
+ */
+export function normalizePhoto(file: File): File {
+  if (file.type) return file;
+  const type = EXTENSION_TYPES[file.name.split('.').pop()?.toLowerCase() ?? ''];
+  return type ? new File([file], file.name, { type }) : file;
+}
+
 /** Returns a localized validation message, or null when a photo is uploadable. */
 export function photoError(file: File): string | null {
   if (!PHOTO_TYPES.includes(file.type)) {
-    return 'فقط JPG یا PNG بفرستید.';
+    const heic = /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+    return heic
+      ? 'عکس‌های HEIC آیفون پشتیبانی نمی‌شوند. آن را به JPG تبدیل کنید یا در تنظیمات دوربین «Most Compatible» را روشن کنید.'
+      : `نوع این فایل${file.type ? ` (${file.type})` : ''} پشتیبانی نمی‌شود. فقط JPG، PNG یا WebP بفرستید.`;
   }
   if (file.size > MAX_PHOTO_BYTES) {
-    return 'حجم فایل بیشتر از ۱۰ مگابایت است. عکس کوچک‌تری انتخاب کنید.';
+    return `حجم این فایل ${faMegabytes(file.size)} است و از ۱۰ مگابایت بیشتر است. عکس کوچک‌تری انتخاب کنید.`;
   }
   return null;
 }
@@ -66,3 +89,14 @@ export function uploadChildPhoto(
 /** ۲٫۱ مگابایت */
 export const faMegabytes = (bytes: number) =>
   `${(bytes / 1024 / 1024).toFixed(1).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]).replace('.', '٫')} مگابایت`;
+
+/**
+ * Private, credentialed photo URL for a child.
+ *
+ * The API lets browsers cache the image, so the photo's version is part of
+ * the URL: a replaced photo is then fetched fresh instead of served stale.
+ */
+export const childPhotoUrl = (childId: string, version?: string | null) =>
+  `${API_URL}/children/${childId}/photo${
+    version ? `?v=${encodeURIComponent(version)}` : ''
+  }`;

@@ -33,6 +33,8 @@ export interface ChildDto {
   age: number;
   interests: string[];
   hasPhoto: boolean;
+  /** Changes with every new photo; used to refresh cached images. */
+  photoVersion?: string | null;
   photoStatus: "NONE" | "PENDING" | "READY" | "FLAGGED" | "DELETED";
   prefLength: StoryLength;
   prefVoice: NarratorVoice;
@@ -50,6 +52,8 @@ export interface ChildRelationDto {
   relation: string;
   hasPhoto: boolean;
   createdAt: string;
+  /** Changes whenever the photo or details do; used to refresh cached images. */
+  updatedAt: string;
 }
 
 /** Parent-facing story summary without internal prompts or storage keys. */

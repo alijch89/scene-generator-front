@@ -7,6 +7,7 @@ import {
   DeleteChildButton,
   DeletePhotoButton,
 } from '@/components/app/child-actions';
+import { ChildCharacters } from '@/components/app/child-characters';
 import { EditChildButton } from '@/components/app/child-form';
 import { StoryCardCompact } from '@/components/app/story-card';
 import {
@@ -19,10 +20,11 @@ import {
 import { API_URL, ApiError } from '@/lib/api';
 import { sapi } from '@/lib/dal';
 import { faDate, faDigits } from '@/lib/fa';
-import type { ChildDto, StoryDto } from '@/lib/types';
+import type { ChildDto, ChildRelationDto, StoryDto } from '@/lib/types';
 
 const TABS = [
   { id: 'stories', label: 'قصه‌ها' },
+  { id: 'characters', label: 'شخصیت‌ها' },
   { id: 'interests', label: 'علاقه‌ها' },
   { id: 'prefs', label: 'ترجیح‌های قصه' },
   { id: 'privacy', label: 'داده و حریم خصوصی' },
@@ -54,6 +56,11 @@ export default async function ChildPage({
     active === 'stories'
       ? await sapi.get<{ items: StoryDto[] }>(`/stories?childId=${id}`)
       : { items: [] };
+
+  const relations =
+    active === 'characters'
+      ? await sapi.get<ChildRelationDto[]>(`/children/${id}/relations`)
+      : [];
 
   return (
     <section className="animate-[pageIn_.4s_ease_both]">
@@ -121,6 +128,10 @@ export default async function ChildPage({
             علاقه‌ها و ترجیح‌های این پرونده به قصه شکل می‌دهند.
           </EmptyState>
         )
+      ) : null}
+
+      {active === 'characters' ? (
+        <ChildCharacters child={child} relations={relations} />
       ) : null}
 
       {active === 'interests' ? <ChildInterestsEditor child={child} /> : null}

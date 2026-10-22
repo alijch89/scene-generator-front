@@ -4,9 +4,9 @@
  */
 
 import Link from 'next/link';
-import { API_URL } from '@/lib/api';
 import { faDigits } from '@/lib/fa';
 import { AVATAR_GRADIENT } from '@/lib/story-art';
+import { childPhotoUrl } from '@/lib/upload';
 import { cn } from '@/lib/utils';
 
 /** The surface card the whole parent app is built out of. */
@@ -152,7 +152,12 @@ export function ChildAvatar({
   size = 54,
   className,
 }: {
-  child: { id: string; firstName: string; hasPhoto: boolean };
+  child: {
+    id: string;
+    firstName: string;
+    hasPhoto: boolean;
+    photoVersion?: string | null;
+  };
   size?: number;
   className?: string;
 }) {
@@ -164,7 +169,7 @@ export function ChildAvatar({
       // never a public URL — which rules out next/image here.
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={`${API_URL}/children/${child.id}/photo`}
+        src={childPhotoUrl(child.id, child.photoVersion)}
         alt={`عکس ${child.firstName}`}
         crossOrigin="use-credentials"
         style={style}

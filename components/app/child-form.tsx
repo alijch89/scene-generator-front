@@ -6,15 +6,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { InterestsPicker } from '@/components/app/interests-picker';
 import { Modal, ModalHeader } from '@/components/app/dialog';
+import { PhotoPicker } from '@/components/app/photo-picker';
 import { Alert, Field, Input, Select, SubmitButton } from '@/components/form';
 import { ApiError, api } from '@/lib/api';
-import { faDigits, faPercent } from '@/lib/fa';
-import { AVATAR_GRADIENT } from '@/lib/story-art';
+import { faDigits } from '@/lib/fa';
 import type { ChildDto } from '@/lib/types';
-import { faMegabytes, photoError, uploadChildPhoto } from '@/lib/upload';
+import { childPhotoUrl, uploadChildPhoto } from '@/lib/upload';
 
 const AGES = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -32,37 +32,30 @@ function ChildForm({
   onCancel: () => void;
 }) {
   const router = useRouter();
-  const fileInput = useRef<HTMLInputElement>(null);
-
   const [firstName, setFirstName] = useState(child?.firstName ?? '');
   const [age, setAge] = useState(child?.age ?? 7);
   const [interests, setInterests] = useState<string[]>(child?.interests ?? []);
   const [photo, setPhoto] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  /** Validates a selected local photo before retaining its preview. */
-  function pickPhoto(file: File | undefined) {
-    if (!file) return;
-    const problem = photoError(file);
-    if (problem) {
-      setError(problem);
-      setPhoto(null);
-      setPreview(null);
-      return;
-    }
-    setError(null);
-    setPhoto(file);
-    setPreview(URL.createObjectURL(file));
-  }
-
   /** Creates or updates the profile, then uploads a selected photo with progress. */
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSaving(true);
     setError(null);
+
+    // A story needs the child's photo, and a profile saved without one only
+    // fails later, after the parent has paid. A new profile therefore starts
+    // with a photo; an older one without it is warned about rather than blocked,
+    // so fixing a typo in the name is still possible.
+    if (!child && !photo) {
+      setError(
+        'عکس کودک را انتخاب کنید؛ بدون عکس نمی‌توان برای او ویدیو ساخت. اگر عکس را انتخاب کرده‌اید و این پیام را می‌بینید، دوباره «انتخاب فایل» را بزنید.',
+      );
+      return;
+    }
+    setSaving(true);
 
     try {
       const body = { firstName: firstName.trim(), age, interests };
@@ -101,77 +94,18 @@ function ChildForm({
         </Alert>
       ) : null}
 
-      <div>
-        <p className="mb-2 text-[13.5px] font-bold">عکس کودک</p>
-        <div className="flex items-center gap-3.5">
-          {preview ? (
-            // Local object URL for the file the parent just picked.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={preview}
-              alt=""
-              className="size-22 flex-none rounded-full border border-border object-cover"
-            />
-          ) : (
-            <span
-              aria-hidden
-              style={{ backgroundImage: AVATAR_GRADIENT }}
-              className="grid size-22 flex-none place-items-center rounded-full font-display text-[30px] text-brand-fg"
-            >
-              {initial}
-            </span>
-          )}
-
-          <div className="flex-1">
-            <p className="mb-2 text-[12.5px] leading-[1.8] text-muted">
-              صورت رو به دوربین، حداکثر ۱۰ مگابایت، JPG یا PNG.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <input
-                ref={fileInput}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={(event) => pickPhoto(event.target.files?.[0])}
-              />
-              <button
-                type="button"
-                onClick={() => fileInput.current?.click()}
-                className="rounded-[10px] border border-border bg-elev px-3 py-2 text-[12.5px] font-semibold"
-              >
-                انتخاب فایل
-              </button>
-              {photo ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPhoto(null);
-                    setPreview(null);
-                    if (fileInput.current) fileInput.current.value = '';
-                  }}
-                  className="rounded-[10px] border border-border bg-elev px-3 py-2 text-[12.5px] text-error"
-                >
-                  حذف
-                </button>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        {progress !== null && photo ? (
-          <div className="mt-3 flex items-center gap-2.5">
-            <span className="h-1.5 flex-1 overflow-hidden rounded bg-border">
-              <span
-                className="block h-full bg-brand transition-[width]"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
-            </span>
-            <span className="text-xs text-muted">
-              {faPercent(progress * 100)} · {faMegabytes(photo.size)}
-            </span>
-          </div>
-        ) : null}
-      </div>
+      <PhotoPicker
+        title="عکس کودک"
+        inputLabel="عکس کودک"
+        required={!child?.hasPhoto}
+        badge={child ? '(برای ساخت ویدیو لازم است)' : '(الزامی)'}
+        currentSrc={
+          child?.hasPhoto ? childPhotoUrl(child.id, child.photoVersion) : null
+        }
+        placeholder={<span className="font-display text-[30px]">{initial}</span>}
+        progress={progress}
+        onChange={setPhoto}
+      />
 
       <Field label="نام کودک">
         <Input

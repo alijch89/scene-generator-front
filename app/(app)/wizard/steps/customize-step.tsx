@@ -282,12 +282,8 @@ export function CustomizeStep({
           savedRelations={savedRelations}
           childId={draft.childId}
           valid={charactersAreValid(draft.characters)}
-          onAdd={() => dispatch({ type: 'character/add' })}
           onReuse={(relation) =>
             dispatch({ type: 'character/reuse', relation })
-          }
-          onUpdate={(index, patch) =>
-            dispatch({ type: 'character/update', index, patch })
           }
           onRemove={(index) => dispatch({ type: 'character/remove', index })}
         />

@@ -23,6 +23,7 @@ import { ThemeStep } from './steps/theme-step';
 import {
   HINTS,
   STEPS,
+  castProblem,
   initialDraft,
   isBlocked,
   topicOf,
@@ -65,7 +66,11 @@ export function WizardForm({
   const child = childProfiles.find((profile) => profile.id === draft.childId);
   const hero = child?.firstName ?? 'کودک شما';
   const topic = topicOf(draft);
-  const blocked = isBlocked(draft);
+  const blocked = isBlocked(draft, child);
+  // Why the cast keeps this step from continuing, when that is the reason: an
+  // unphotographed child or an incomplete character. Said out loud, because a
+  // dimmed button alone does not tell the parent what to fix.
+  const castIssue = blocked && draft.step !== 2 ? castProblem(draft, child) : null;
   const savedRelations = relationsByChild[draft.childId] ?? [];
 
   /** Validates the final selection, creates the story/order, and starts payment. */
@@ -193,8 +198,13 @@ export function WizardForm({
           >
             → مرحلهٔ قبل
           </button>
-          <p className="min-w-0 flex-1 truncate text-[13px] text-muted">
-            {HINTS[draft.step - 1]}
+          <p
+            className={cn(
+              'min-w-0 flex-1 text-[13px]',
+              castIssue ? 'font-semibold text-error' : 'truncate text-muted',
+            )}
+          >
+            {castIssue ?? HINTS[draft.step - 1]}
           </p>
           <button
             type="button"

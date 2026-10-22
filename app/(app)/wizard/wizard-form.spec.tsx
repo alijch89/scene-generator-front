@@ -31,7 +31,14 @@ const savedRelation: ChildRelationDto = {
   relation: "مادر",
   hasPhoto: true,
   createdAt: new Date(0).toISOString(),
+  updatedAt: new Date(1_000).toISOString(),
 };
+
+/** Walks the wizard from the hero step to the customise step. */
+async function toCustomise(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: "ادامه" }));
+  await user.click(screen.getByRole("button", { name: "ادامه" }));
+}
 
 describe("WizardForm supporting characters", () => {
   it("shows the public topic images on the theme-selection step", async () => {
@@ -79,48 +86,6 @@ describe("WizardForm supporting characters", () => {
     );
   });
 
-  it("supports relation choices while new character photos are safely disabled", async () => {
-    const user = userEvent.setup();
-    const { container } = render(
-      <WizardForm childProfiles={[child]} prices={prices} />,
-    );
-
-    await user.click(screen.getByRole("button", { name: "ادامه" }));
-    await user.click(screen.getByRole("button", { name: "ادامه" }));
-
-    const ageSettings = screen.getByRole("group", {
-      name: "بازهٔ سنی و نوع خروجی",
-    });
-    const characterSettings = screen.getByRole("group", {
-      name: "شخصیت‌های جانبی و نزدیکان (اختیاری)",
-    });
-    expect(
-      ageSettings.compareDocumentPosition(characterSettings) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-
-    await user.click(screen.getByRole("button", { name: "+ افزودن شخصیت" }));
-    await user.selectOptions(
-      screen.getByLabelText("نسبت پیشنهادی شخصیت 1"),
-      "دایی",
-    );
-    expect(screen.getByLabelText("نسبت دلخواه شخصیت 1")).toHaveValue("دایی");
-
-    await user.clear(screen.getByLabelText("نسبت دلخواه شخصیت 1"));
-    await user.type(screen.getByLabelText("نسبت دلخواه شخصیت 1"), "مربی نقاشی");
-    expect(screen.getByLabelText("نسبت دلخواه شخصیت 1")).toHaveValue(
-      "مربی نقاشی",
-    );
-
-    const fileInput =
-      container.querySelector<HTMLInputElement>('input[type="file"]');
-    expect(fileInput).not.toBeNull();
-    expect(fileInput).toBeDisabled();
-    expect(
-      screen.getByText("بارگذاری عکس تازه موقتاً غیرفعال است"),
-    ).toBeInTheDocument();
-  });
-
   it("updates the payable preview when the selected video length changes", async () => {
     const user = userEvent.setup();
     render(<WizardForm childProfiles={[child]} prices={prices} />);
@@ -148,7 +113,24 @@ describe("WizardForm supporting characters", () => {
     expect(screen.getByText("۹۹۹٬۰۰۰ تومان")).toBeInTheDocument();
   });
 
-  it("lets the parent add a previously saved character for this child", async () => {
+  it("never lets a character be started inside the wizard", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <WizardForm childProfiles={[child]} prices={prices} />,
+    );
+    await toCustomise(user);
+
+    // Characters are made whole on the profile; the wizard only picks them.
+    expect(
+      screen.queryByRole("button", { name: "+ افزودن شخصیت" }),
+    ).not.toBeInTheDocument();
+    expect(container.querySelector('input[type="file"]')).toBeNull();
+    expect(
+      screen.getByRole("link", { name: /افزودن یا ویرایش شخصیت‌ها/ }),
+    ).toHaveAttribute("href", `/children/${child.id}?tab=characters`);
+  });
+
+  it("lets the parent pick a complete saved character and shows it whole", async () => {
     const user = userEvent.setup();
     render(
       <WizardForm
@@ -157,19 +139,61 @@ describe("WizardForm supporting characters", () => {
         prices={prices}
       />,
     );
-
-    await user.click(screen.getByRole("button", { name: "ادامه" }));
-    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    await toCustomise(user);
     await user.click(screen.getByRole("button", { name: /سارا · مادر/ }));
 
-    expect(screen.getByDisplayValue("سارا")).toBeDisabled();
-    expect(screen.getByLabelText("نسبت دلخواه شخصیت 1")).toBeDisabled();
+    expect(screen.getByText("سارا", { selector: "p" })).toBeInTheDocument();
     expect(screen.getByAltText("عکس سارا")).toHaveAttribute(
       "src",
       expect.stringContaining(
-        `/children/${child.id}/relations/${savedRelation.id}/photo`,
+        `/children/${child.id}/relations/${savedRelation.id}/photo?v=`,
       ),
     );
     expect(screen.getByRole("button", { name: /سارا · مادر/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "ادامه" })).toBeEnabled();
+  });
+
+  it.each([
+    ["a photo", { hasPhoto: false }, "عکس"],
+    ["a relation", { relation: "" }, "نسبت"],
+  ])(
+    "will not pick a saved character that is missing %s",
+    async (_label, gap, missing) => {
+      const user = userEvent.setup();
+      render(
+        <WizardForm
+          childProfiles={[child]}
+          relationsByChild={{ [child.id]: [{ ...savedRelation, ...gap }] }}
+          prices={prices}
+        />,
+      );
+      await toCustomise(user);
+
+      const pick = screen.getByRole("button", { name: /سارا/ });
+      expect(pick).toBeDisabled();
+      expect(pick).toHaveAttribute("title", expect.stringContaining(missing));
+      expect(pick).toHaveTextContent("ناقص");
+    },
+  );
+
+  it("stops a child without a photo at the first step and says why", async () => {
+    const user = userEvent.setup();
+    render(
+      <WizardForm
+        childProfiles={[{ ...child, hasPhoto: false, photoStatus: "NONE" }]}
+        prices={prices}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "ادامه" })).toBeDisabled();
+    expect(screen.getAllByText(/عکس «آیناز» لازم است/).length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      screen.getByRole("link", { name: /رفتن به پروفایل آیناز/ }),
+    ).toHaveAttribute("href", `/children/${child.id}`);
+
+    await user.click(screen.getByRole("button", { name: "ادامه" }));
+    expect(screen.getByText("گام ۱ از ۴")).toBeInTheDocument();
   });
 });

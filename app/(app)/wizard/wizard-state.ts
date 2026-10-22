@@ -6,6 +6,7 @@ import type {
   StoryTheme,
   StoryTone,
 } from '@/lib/types';
+import { relationMissing } from '@/lib/relations';
 
 /** The four labelled steps of the rail, in order. */
 export const STEPS = ['قهرمان', 'موضوع', 'سفارشی‌سازی', 'پیش‌نمایش'] as const;
@@ -61,19 +62,7 @@ export const MORAL_EXAMPLES = [
 
 export const AGE_RANGE_EXAMPLES = ['3-5', '5-8', '9-12'];
 
-export const RELATION_EXAMPLES = [
-  'مادر',
-  'پدر',
-  'خواهر',
-  'برادر',
-  'مادربزرگ',
-  'پدربزرگ',
-  'خاله',
-  'عمه',
-  'دایی',
-  'عمو',
-  'دوست',
-];
+export { RELATION_EXAMPLES } from '@/lib/relations';
 
 /** One line of guidance under the footer, per step. */
 export const HINTS = [
@@ -87,21 +76,21 @@ export const HINTS = [
 export const ring = (on: boolean) =>
   on ? 'outline outline-3 outline-brand outline-offset-[3px]' : '';
 
-/** One of the four optional supporting-character slots the API accepts. */
+/**
+ * One of the four optional supporting-character slots the API accepts.
+ *
+ * Characters are chosen from the ones saved on the child's profile, where they
+ * are made complete — name, relation and photo — in one step. Nothing is typed
+ * into the wizard itself, so a half-filled character cannot be started here.
+ */
 export interface CharacterDraft {
   savedRelationId: string | null;
   name: string;
   relation: string;
   hasSavedPhoto: boolean;
+  /** Version of the saved photo, so a replaced one is not served from cache. */
+  photoVersion: string | null;
 }
-
-/** An empty character card. */
-export const newCharacter = (): CharacterDraft => ({
-  savedRelationId: null,
-  name: '',
-  relation: '',
-  hasSavedPhoto: false,
-});
 
 /** The provider's age bucket for a child's actual age. */
 export const ageRangeFor = (age: number) =>
@@ -141,9 +130,7 @@ export type WizardAction =
   | { type: 'length'; length: StoryLength }
   | { type: 'style'; style: IllustrationStyle }
   | { type: 'set'; patch: Partial<WizardDraft> }
-  | { type: 'character/add' }
   | { type: 'character/reuse'; relation: ChildRelationDto }
-  | { type: 'character/update'; index: number; patch: Partial<CharacterDraft> }
   | { type: 'character/remove'; index: number };
 
 /** The API accepts four supporting characters; the UI must not offer a fifth. */
@@ -220,11 +207,6 @@ export function wizardReducer(
     case 'set':
       return { ...draft, ...action.patch };
 
-    case 'character/add':
-      return draft.characters.length >= MAX_CHARACTERS
-        ? draft
-        : { ...draft, characters: [...draft.characters, newCharacter()] };
-
     case 'character/reuse': {
       const { relation } = action;
       const alreadyUsed = draft.characters.some(
@@ -232,6 +214,9 @@ export function wizardReducer(
       );
       if (
         relation.childId !== draft.childId ||
+        // A saved person who is missing anything cannot be used until the
+        // profile completes them.
+        relationMissing(relation).length > 0 ||
         alreadyUsed ||
         draft.characters.length >= MAX_CHARACTERS
       ) {
@@ -246,20 +231,11 @@ export function wizardReducer(
             name: relation.name,
             relation: relation.relation,
             hasSavedPhoto: relation.hasPhoto,
+            photoVersion: relation.updatedAt,
           },
         ],
       };
     }
-
-    case 'character/update':
-      return {
-        ...draft,
-        characters: draft.characters.map((character, index) =>
-          index === action.index
-            ? { ...character, ...action.patch }
-            : character,
-        ),
-      };
 
     case 'character/remove':
       return {
@@ -272,21 +248,48 @@ export function wizardReducer(
 }
 
 /**
- * A character with a relation but no name cannot be submitted; the API's
- * slots are keyed by name.
+ * What is still missing from a supporting character, or null when it is
+ * complete.
+ *
+ * The story service takes a character with all three of name, relation and
+ * photo, or not at all. One that has two of them is not a smaller character,
+ * it is a story that fails after the parent has paid, so it is stopped here
+ * instead. Characters only come from the profile, where they are saved whole,
+ * so this is the backstop for a row that was saved before that was the rule.
  */
+export function characterProblem(character: CharacterDraft): string | null {
+  const missing = [
+    !character.name.trim() && 'نام',
+    !character.relation.trim() && 'نسبت',
+    !(character.savedRelationId && character.hasSavedPhoto) && 'عکس',
+  ].filter(Boolean);
+  return missing.length
+    ? `ناقص است (${missing.join('، ')}). آن را در پروفایل کودک کامل کنید یا از این قصه حذفش کنید.`
+    : null;
+}
+
+/** Whether every supporting character on the draft is complete. */
 export const charactersAreValid = (characters: CharacterDraft[]) =>
-  characters.every(
-    (character) =>
-      Boolean(character.name.trim()) ||
-      !character.relation.trim(),
-  );
+  characters.every((character) => characterProblem(character) === null);
+
+/** Why this child cannot star in a video yet, or null. */
+export const childPhotoProblem = (child?: ChildDto) =>
+  child && !child.hasPhoto
+    ? `برای ساخت ویدیو، عکس «${child.firstName}» لازم است. ابتدا از پروفایل او عکس را بارگذاری کنید.`
+    : null;
+
+/** The first thing keeping the cast from being complete, or null. */
+export const castProblem = (draft: WizardDraft, child?: ChildDto) =>
+  childPhotoProblem(child) ??
+  (charactersAreValid(draft.characters)
+    ? null
+    : 'یکی از شخصیت‌ها ناقص است؛ آن را کامل یا حذف کنید.');
 
 /** Whether the current step still has something wrong with it. */
-export function isBlocked(draft: WizardDraft): boolean {
+export function isBlocked(draft: WizardDraft, child?: ChildDto): boolean {
   switch (draft.step) {
     case 1:
-      return !draft.childId;
+      return !draft.childId || childPhotoProblem(child) !== null;
     case 2:
       // The one place a step can be wrong: «ایدهٔ خودم» with nothing written.
       return draft.theme === 'OWN' && draft.ownIdea.trim().length < 10;
@@ -299,7 +302,9 @@ export function isBlocked(draft: WizardDraft): boolean {
         !charactersAreValid(draft.characters)
       );
     default:
-      return false;
+      // The last step is the one that goes to the gateway; it re-checks the
+      // whole cast so nothing incomplete can slip through a back-and-forth.
+      return castProblem(draft, child) !== null;
   }
 }
 

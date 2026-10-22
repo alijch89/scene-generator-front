@@ -5,12 +5,18 @@
 
 'use client';
 
+import Link from 'next/link';
 import { AddChildButton } from '@/components/app/child-form';
 import { ChildAvatar } from '@/components/app/ui';
 import { faDigits } from '@/lib/fa';
 import type { ChildDto } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { ring, type WizardAction, type WizardDraft } from '../wizard-state';
+import {
+  childPhotoProblem,
+  ring,
+  type WizardAction,
+  type WizardDraft,
+} from '../wizard-state';
 
 /** «قهرمان» — picks whose story this is. */
 export function HeroStep({
@@ -22,6 +28,9 @@ export function HeroStep({
   childProfiles: ChildDto[];
   dispatch: (action: WizardAction) => void;
 }) {
+  const selected = childProfiles.find((c) => c.id === draft.childId);
+  const photoProblem = childPhotoProblem(selected);
+
   return (
     <section className="animate-[pageIn_.4s_ease_both]">
       <h1 className="mb-2.5 font-display text-[clamp(26px,4.6vw,40px)] leading-[1.35]">
@@ -55,6 +64,11 @@ export function HeroStep({
               <span className="text-[12.5px] font-semibold text-brand">
                 {faDigits(c.storyCount)} قصه ساخته شده
               </span>
+              {c.hasPhoto ? null : (
+                <span className="text-[12px] font-semibold text-error">
+                  بدون عکس
+                </span>
+              )}
             </span>
             {draft.childId === c.id ? (
               <span aria-hidden className="ms-auto text-[18px] text-brand">
@@ -76,6 +90,26 @@ export function HeroStep({
           </span>
         </AddChildButton>
       </div>
+
+      {photoProblem && selected ? (
+        <div
+          role="alert"
+          className="mt-5 flex max-w-160 flex-wrap items-center gap-3 rounded-[18px] border border-error/50 bg-elev px-4.5 py-4"
+        >
+          <span aria-hidden className="font-bold text-error">
+            !
+          </span>
+          <p className="min-w-0 flex-1 basis-60 text-[13.5px] leading-[1.85]">
+            {photoProblem}
+          </p>
+          <Link
+            href={`/children/${selected.id}`}
+            className="rounded-[12px] border border-brand bg-surface px-4 py-2.5 text-[13px] font-semibold text-brand hover:no-underline"
+          >
+            رفتن به پروفایل {selected.firstName}
+          </Link>
+        </div>
+      ) : null}
 
       <div className="mt-6.5 flex max-w-160 items-start gap-3 rounded-[18px] border border-border bg-elev px-4.5 py-4">
         <span aria-hidden className="text-[17px] text-success">

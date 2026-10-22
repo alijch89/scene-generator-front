@@ -14,6 +14,17 @@ export type StoryTone = "CALM" | "FUNNY" | "BRAVE";
 /** Story lifecycle states returned by parent and administrator endpoints. */
 export type StoryStatus =
   "DRAFT" | "AWAITING_PAYMENT" | "GENERATING" | "READY" | "FAILED";
+
+/** Stable public failure categories; technical provider text is administrator-only. */
+export type GenerationFailureCode =
+  | "CONTENT_RESTRICTED"
+  | "PHOTO_MULTIPLE_FACES"
+  | "PHOTO_FACE_NOT_FOUND"
+  | "PHOTO_REQUIRED"
+  | "PHOTO_INVALID"
+  | "TIMEOUT"
+  | "SERVICE_UNAVAILABLE"
+  | "GENERATION_FAILED";
 /** Moral topics accepted by the story wizard. */
 export type StoryTheme =
   | "HONESTY"
@@ -88,6 +99,7 @@ export interface StoryDto {
   lastReadPage: number;
   lastReadAt: string | null;
   failureReason: string | null;
+  failureCode?: GenerationFailureCode | null;
   createdAt: string;
   readyAt: string | null;
 }
@@ -202,6 +214,7 @@ export interface StoryPageDto {
 export interface StoryProgressDto {
   status: StoryStatus;
   failureReason: string | null;
+  failureCode?: GenerationFailureCode | null;
   orderId: string | null;
   percent: number;
   stages: { stage: JobStage; status: JobStatus; error: string | null }[];
@@ -458,8 +471,26 @@ export interface AdminStoryJobsDto {
     createdAt: string;
     childName: string | null;
     user: AdminUserRef | null;
+    child: {
+      id: string;
+      firstName: string;
+      age: number;
+      interests: string[];
+      hasPhoto: boolean;
+    } | null;
+    input: Record<string, unknown>;
   };
-  order: { id: string; status: OrderStatus; paidAt: string | null } | null;
+  order: {
+    id: string;
+    status: OrderStatus;
+    paidAt: string | null;
+    amount: number;
+    currency: string;
+    paymentRef: string | null;
+    createdAt: string;
+    refundRef: string | null;
+    refundedAt: string | null;
+  } | null;
   jobs: {
     id: string;
     stage: JobStage;
@@ -469,6 +500,28 @@ export interface AdminStoryJobsDto {
     startedAt: string | null;
     endedAt: string | null;
   }[];
+}
+
+/** One stored exchange with the external video provider, visible to administrators only. */
+export interface AdminGenerationApiCall {
+  id: string;
+  storyId: string;
+  runId: string;
+  userId: string;
+  childId: string;
+  orderId: string | null;
+  context: Record<string, unknown>;
+  operation: "submit" | "poll" | "assets" | "download";
+  providerJobRef: string | null;
+  method: string;
+  url: string;
+  requestBody: unknown;
+  responseBody: unknown;
+  responseStatus: number | null;
+  error: string | null;
+  startedAt: string;
+  endedAt: string | null;
+  durationMs: number | null;
 }
 
 /** Safe list summary for one moderation queue item. */

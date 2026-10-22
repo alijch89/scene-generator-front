@@ -44,7 +44,10 @@ export default async function AdminStoriesPage({
     ? (sp.theme as StoryTheme)
     : '';
   const q = typeof sp.q === 'string' ? sp.q.trim() : '';
-  const page = Math.max(1, Number(typeof sp.page === 'string' ? sp.page : 1) || 1);
+  const page = Math.max(
+    1,
+    Number(typeof sp.page === 'string' ? sp.page : 1) || 1,
+  );
 
   const query = new URLSearchParams({
     page: String(page),
@@ -177,7 +180,7 @@ export default async function AdminStoriesPage({
                       href={`/admin/stories/${story.id}/jobs`}
                       className="font-bold whitespace-nowrap"
                     >
-                      {story.status === 'FAILED' ? 'بررسی کار' : 'کارها'}
+                      جزئیات تولید
                     </Link>
                   </td>
                 </tr>

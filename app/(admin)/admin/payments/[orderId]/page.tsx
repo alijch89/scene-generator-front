@@ -103,6 +103,14 @@ export default async function AdminPaymentDetailPage({
         </Panel>
 
         <Panel title="خریدار و قصه">
+          {payment.storyId ? (
+            <Link
+              href={`/admin/stories/${payment.storyId}/jobs`}
+              className="mb-3 inline-block text-[12.5px] font-bold"
+            >
+              جزئیات تولید، درخواست و پاسخ سرویس ویدیو ←
+            </Link>
+          ) : null}
           {payment.user ? (
             <>
               <Field

@@ -138,6 +138,7 @@ export const moderationReason = (code: string) =>
  */
 export const AUDIT_EVENT_LABEL: Record<string, string> = {
   'payment.paid': 'پرداخت تأیید شد',
+  'story.generation_retried': 'ساخت دوبارهٔ قصه با پرداخت قبلی آغاز شد',
   'payment.failed': 'بانک پرداخت را رد کرد',
   'payment.cancelled': 'پرداخت لغو شد',
   'payment.amount_mismatch': 'مبلغ درگاه با سفارش نخواند',

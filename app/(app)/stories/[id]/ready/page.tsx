@@ -46,8 +46,8 @@ export default async function ReadyPage({
         </h1>
         <p className="text-[15px] text-muted">
           {faDigits(story.pageCount)} صفحه
-          {story.durationSec ? ` · ${faDuration(story.durationSec)}` : ''} · روایت{' '}
-          {VOICE_LABEL[story.voice]} · سبک {STYLE_LABEL[story.style]}
+          {story.durationSec ? ` · ${faDuration(story.durationSec)}` : ''} ·
+          روایت {VOICE_LABEL[story.voice]} · سبک {STYLE_LABEL[story.style]}
         </p>
       </div>
 
@@ -73,7 +73,9 @@ export default async function ReadyPage({
                 </p>
                 <p className="text-[12px] text-[rgba(255,246,230,.82)]">
                   {faDigits(story.pageCount)} صفحه
-                  {story.durationSec ? ` · ${faDuration(story.durationSec)}` : ''}
+                  {story.durationSec
+                    ? ` · ${faDuration(story.durationSec)}`
+                    : ''}
                 </p>
               </div>
             </div>
@@ -82,17 +84,11 @@ export default async function ReadyPage({
 
         <div className="flex flex-col gap-3">
           <PrimaryLink
-            href={`/stories/${story.id}/read`}
+            href={`/stories/${story.id}/read?play=1`}
             className="w-full rounded-[18px] px-6 py-4.25 text-[16.5px] shadow-card-lg"
           >
-            شروع خواندن
+            تماشای آنلاین
           </PrimaryLink>
-          <Link
-            href={`/stories/${story.id}/read?play=1`}
-            className="w-full rounded-[18px] border border-border bg-surface px-6 py-3.75 text-center text-[15px] font-bold text-ink hover:no-underline"
-          >
-            ▶ گوش دادن به قصه
-          </Link>
 
           <div className="flex flex-wrap gap-2.5">
             <DownloadButton

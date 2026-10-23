@@ -100,18 +100,15 @@ export interface StoryDto {
   lastReadAt: string | null;
   failureReason: string | null;
   failureCode?: GenerationFailureCode | null;
+  /** Eligible for another generation attempt using the original payment. */
+  canRetry?: boolean;
   createdAt: string;
   readyAt: string | null;
 }
 
 /** Payment order lifecycle states. */
 export type OrderStatus =
-  | "PENDING"
-  | "PAID"
-  | "FAILED"
-  | "CANCELLED"
-  | "REFUND_PENDING"
-  | "REFUNDED";
+  "PENDING" | "PAID" | "FAILED" | "CANCELLED" | "REFUNDED";
 
 /** Persisted stages in the generation pipeline. */
 export type JobStage =
@@ -215,6 +212,7 @@ export interface StoryProgressDto {
   status: StoryStatus;
   failureReason: string | null;
   failureCode?: GenerationFailureCode | null;
+  canRetry?: boolean;
   orderId: string | null;
   percent: number;
   stages: { stage: JobStage; status: JobStatus; error: string | null }[];

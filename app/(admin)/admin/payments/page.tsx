@@ -36,7 +36,6 @@ const STATUS_FILTER: { value: string; label: string }[] = [
   { value: 'PENDING', label: 'در انتظار' },
   { value: 'FAILED', label: 'ناموفق' },
   { value: 'CANCELLED', label: 'لغو شده' },
-  { value: 'REFUND_PENDING', label: 'در انتظار بازپرداخت' },
   { value: 'REFUNDED', label: 'بازپرداخت‌شده' },
 ];
 

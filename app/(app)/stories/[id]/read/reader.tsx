@@ -37,13 +37,14 @@ export function Reader({
 
   // Tell the API where the child stopped, so «ادامهٔ خواندن» is truthful.
   useEffect(() => {
+    if (!pages.length) return;
     const timer = setTimeout(() => {
       void api.post(`/stories/${story.id}/read`, { page }).catch(() => {
         // Losing a bookmark is not worth interrupting the reading.
       });
     }, 800);
     return () => clearTimeout(timer);
-  }, [page, story.id]);
+  }, [page, story.id, pages.length]);
 
   useEffect(() => {
     if (video.current) video.current.playbackRate = speed;
@@ -72,9 +73,11 @@ export function Reader({
         <strong className="font-display text-[17px]">
           {story.title ?? 'قصهٔ بی‌نام'}
         </strong>
-        <span className="ms-auto text-[13px] text-muted">
-          صفحهٔ {faDigits(page + 1)} از {faDigits(pages.length)}
-        </span>
+        {pages.length > 0 ? (
+          <span className="ms-auto text-[13px] text-muted">
+            صفحهٔ {faDigits(page + 1)} از {faDigits(pages.length)}
+          </span>
+        ) : null}
       </div>
 
       <div className="overflow-hidden rounded-[26px] border border-border bg-surface shadow-card-lg">
@@ -101,27 +104,31 @@ export function Reader({
           <track kind="captions" />
         </video>
 
-        <div className="px-[clamp(20px,4vw,44px)] pt-6.5 pb-7.5">
-          <p className="max-w-[60ch] text-[clamp(16px,2.2vw,21px)] leading-[2.15] text-pretty">
-            {pages[page]?.text ?? 'این صفحه متنی ندارد.'}
-          </p>
-          <p className="mt-5.5 text-[12.5px] text-muted">
-            صفحهٔ {faDigits(page + 1)} از {faDigits(pages.length)}
-          </p>
-        </div>
+        {pages.length > 0 ? (
+          <div className="px-[clamp(20px,4vw,44px)] pt-6.5 pb-7.5">
+            <p className="max-w-[60ch] text-[clamp(16px,2.2vw,21px)] leading-[2.15] text-pretty">
+              {pages[page]?.text ?? 'این صفحه متنی ندارد.'}
+            </p>
+            <p className="mt-5.5 text-[12.5px] text-muted">
+              صفحهٔ {faDigits(page + 1)} از {faDigits(pages.length)}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="sticky bottom-4 z-20 mt-4.5 flex flex-wrap items-center gap-3 rounded-[20px] border border-border bg-[color-mix(in_srgb,var(--sh-surface)_92%,transparent)] px-3.5 py-3 shadow-card-lg backdrop-blur-lg">
         {/* RTL: → is the previous page, ← is the next. */}
-        <button
-          type="button"
-          aria-label="صفحهٔ قبل"
-          disabled={page === 0}
-          onClick={() => setPage((p) => Math.max(0, p - 1))}
-          className="size-10.5 rounded-[14px] border border-border bg-elev text-[15px] disabled:opacity-40"
-        >
-          →
-        </button>
+        {pages.length > 0 ? (
+          <button
+            type="button"
+            aria-label="صفحهٔ قبل"
+            disabled={page === 0}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+            className="size-10.5 rounded-[14px] border border-border bg-elev text-[15px] disabled:opacity-40"
+          >
+            →
+          </button>
+        ) : null}
 
         <button
           type="button"
@@ -132,15 +139,17 @@ export function Reader({
           {playing ? 'توقف روایت' : 'پخش روایت'}
         </button>
 
-        <button
-          type="button"
-          aria-label="صفحهٔ بعد"
-          disabled={page >= last}
-          onClick={() => setPage((p) => Math.min(last, p + 1))}
-          className="size-10.5 rounded-[14px] border border-border bg-elev text-[15px] disabled:opacity-40"
-        >
-          ←
-        </button>
+        {pages.length > 0 ? (
+          <button
+            type="button"
+            aria-label="صفحهٔ بعد"
+            disabled={page >= last}
+            onClick={() => setPage((p) => Math.min(last, p + 1))}
+            className="size-10.5 rounded-[14px] border border-border bg-elev text-[15px] disabled:opacity-40"
+          >
+            ←
+          </button>
+        ) : null}
 
         <div className="flex min-w-30 flex-1 basis-40 flex-col gap-1.25">
           <div className="h-1.5 overflow-hidden rounded bg-border">
@@ -158,7 +167,9 @@ export function Reader({
         <button
           type="button"
           aria-label={`سرعت پخش ${SPEED_LABEL[SPEEDS.indexOf(speed)]}`}
-          onClick={() => setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])}
+          onClick={() =>
+            setSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])
+          }
           className="min-w-15.5 rounded-[14px] border border-border bg-elev px-3.5 py-2.5 text-[13px] font-bold"
         >
           {SPEED_LABEL[SPEEDS.indexOf(speed)]}

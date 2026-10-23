@@ -15,7 +15,6 @@ export const metadata: Metadata = { title: 'سفارش‌ها' };
 /** The order of the lifecycle, not the enum. */
 const STATUS_ORDER: OrderStatus[] = [
   'PAID',
-  'REFUND_PENDING',
   'REFUNDED',
   'PENDING',
   'FAILED',
@@ -27,7 +26,6 @@ const STATUS_COLOR: Record<OrderStatus, string> = {
   PENDING: 'var(--sh-warning)',
   FAILED: 'var(--sh-error)',
   CANCELLED: 'var(--sh-muted)',
-  REFUND_PENDING: 'var(--sh-warning)',
   REFUNDED: 'var(--sh-muted)',
 };
 
@@ -207,13 +205,6 @@ export default async function AdminOrdersPage() {
             <Line
               label="لغوشده توسط کاربر"
               value={faPrice(statuses.CANCELLED.amount)}
-            />
-            <Line
-              label="در انتظار بازپرداخت"
-              value={faPrice(statuses.REFUND_PENDING.amount)}
-              tone={
-                statuses.REFUND_PENDING.count > 0 ? 'warning' : undefined
-              }
             />
             <Line
               label="بازپرداخت‌شده"

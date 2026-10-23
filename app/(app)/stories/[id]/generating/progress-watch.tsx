@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ChildAvatar } from '@/components/app/ui';
+import { RetryStoryButton } from '@/components/app/story-actions';
 import { API_URL, api } from '@/lib/api';
 import { faDigits, faPercent } from '@/lib/fa';
 import { generationFailureMessage } from '@/lib/generation-errors';
@@ -112,12 +113,34 @@ export function ProgressWatch({
           {generationFailureMessage(progress.failureCode)}
         </p>
         <div className="flex flex-wrap justify-center gap-2.75">
-          <Link
-            href={`/wizard?child=${story.childId}`}
-            className="rounded-[15px] bg-linear-to-br from-brand to-warm px-6 py-3.75 text-[15px] font-bold text-brand-fg hover:no-underline"
-          >
-            ساخت دوباره
-          </Link>
+          {progress.canRetry ? (
+            <RetryStoryButton
+              storyId={story.id}
+              onStarted={() => {
+                setElapsed(0);
+                setProgress({
+                  ...progress,
+                  status: 'GENERATING',
+                  failureReason: null,
+                  failureCode: null,
+                  canRetry: false,
+                  percent: 0,
+                  stages: progress.stages.map((stage) => ({
+                    ...stage,
+                    status: 'QUEUED',
+                    error: null,
+                  })),
+                });
+              }}
+            />
+          ) : (
+            <Link
+              href={`/wizard?child=${story.childId}`}
+              className="rounded-[15px] bg-linear-to-br from-brand to-warm px-6 py-3.75 text-[15px] font-bold text-brand-fg hover:no-underline"
+            >
+              ساخت قصهٔ جدید
+            </Link>
+          )}
           <Link
             href="/help"
             className="rounded-[15px] border border-border bg-elev px-5.5 py-3.75 text-[14.5px] font-bold text-ink hover:no-underline"

@@ -4,7 +4,11 @@
  */
 
 import Link from 'next/link';
-import { FavoriteButton, StoryMenu } from '@/components/app/story-actions';
+import {
+  FavoriteButton,
+  RetryStoryButton,
+  StoryMenu,
+} from '@/components/app/story-actions';
 import { DownloadButton } from '@/components/app/story-media';
 import { faDateShort, faDigits, faDuration } from '@/lib/fa';
 import { STATUS_LABEL, THEME_LABEL, coverFor } from '@/lib/story-art';
@@ -81,7 +85,7 @@ export function StoryCardCompact({ story }: { story: StoryDto }) {
   );
 }
 
-/** The full library card, with its three status shapes. */
+/** The full library card, with deletion available in every lifecycle state. */
 export function StoryCard({ story }: { story: StoryDto }) {
   const ready = story.status === 'READY';
 
@@ -97,26 +101,38 @@ export function StoryCard({ story }: { story: StoryDto }) {
           {STATUS_LABEL[story.status]}
         </span>
         {ready ? (
-          <FavoriteButton story={story} className="absolute inset-s-2.5 top-2.5" />
+          <FavoriteButton
+            story={story}
+            className="absolute inset-s-2.5 top-2.5"
+          />
         ) : null}
       </Cover>
 
       <div className="p-[14px_16px_16px]">
-        <strong className="mb-1.5 block text-[15px]">
-          {story.title ?? 'قصهٔ بی‌نام'}
-        </strong>
+        <div className="mb-1.5 flex items-start justify-between gap-2">
+          <strong className="min-w-0 text-[15px]">
+            {story.title ?? 'قصهٔ بی‌نام'}
+          </strong>
+          <StoryMenu story={story} />
+        </div>
 
         {story.status === 'FAILED' ? (
           <>
             <span className="mb-3 block text-[12px] text-muted">
-              ساخت متوقف شد · مبلغی کم نشد
+              {story.canRetry
+                ? 'ساخت متوقف شد · پرداخت شما ثبت شده است'
+                : 'ساخت قصه متوقف شد'}
             </span>
-            <Link
-              href={`/wizard?child=${story.childId}`}
-              className="block w-full rounded-xl border border-border bg-elev p-2.5 text-center text-[12.5px] font-bold text-ink hover:no-underline"
-            >
-              ساخت دوباره
-            </Link>
+            {story.canRetry ? (
+              <RetryStoryButton storyId={story.id} />
+            ) : (
+              <Link
+                href={`/wizard?child=${story.childId}`}
+                className="block w-full rounded-xl border border-border bg-elev p-2.5 text-center text-[12.5px] font-bold text-ink hover:no-underline"
+              >
+                ساخت قصهٔ جدید
+              </Link>
+            )}
           </>
         ) : story.status === 'READY' ? (
           <>
@@ -125,17 +141,10 @@ export function StoryCard({ story }: { story: StoryDto }) {
             </span>
             <div className="flex gap-1.5">
               <Link
-                href={`/stories/${story.id}/read`}
+                href={`/stories/${story.id}/read?play=1`}
                 className="flex-1 rounded-xl bg-brand p-2.5 text-center text-[12.5px] font-bold text-brand-fg hover:no-underline"
               >
-                خواندن
-              </Link>
-              <Link
-                href={`/stories/${story.id}/read?play=1`}
-                aria-label="پخش روایت"
-                className="rounded-xl border border-border bg-elev px-3 py-2.5 text-[12.5px] text-ink hover:no-underline"
-              >
-                ▶
+                تماشای آنلاین
               </Link>
               <DownloadButton
                 storyId={story.id}
@@ -145,7 +154,6 @@ export function StoryCard({ story }: { story: StoryDto }) {
                   ⤓
                 </span>
               </DownloadButton>
-              <StoryMenu story={story} />
             </div>
           </>
         ) : story.status === 'AWAITING_PAYMENT' || story.status === 'DRAFT' ? (

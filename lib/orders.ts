@@ -19,10 +19,7 @@ export interface OrderStatusPresentation {
  * Every entry carries a glyph as well as a tone — the design's rule is that
  * status is never conveyed by colour alone.
  */
-export const ORDER_STATUS: Record<
-  OrderStatus,
-  OrderStatusPresentation
-> = {
+export const ORDER_STATUS: Record<OrderStatus, OrderStatusPresentation> = {
   PAID: { icon: '✓', parent: 'پرداخت شد', admin: 'موفق', tone: 'success' },
   PENDING: {
     icon: '⏳',
@@ -32,12 +29,6 @@ export const ORDER_STATUS: Record<
   },
   FAILED: { icon: '✕', parent: 'ناموفق', admin: 'ناموفق', tone: 'error' },
   CANCELLED: { icon: '↺', parent: 'لغو شد', admin: 'لغو شده', tone: 'neutral' },
-  REFUND_PENDING: {
-    icon: '↺',
-    parent: 'در انتظار بازگشت وجه',
-    admin: 'در انتظار بازپرداخت',
-    tone: 'warning',
-  },
   REFUNDED: {
     icon: '↩',
     parent: 'وجه بازگردانده شد',
@@ -79,6 +70,7 @@ export const orderAction = (status: OrderStatus) => {
 /** The audit events the callback writes, in the words an admin reads them. */
 export const PAYMENT_EVENT_LABEL: Record<string, string> = {
   'payment.paid': 'پرداخت تأیید شد',
+  'story.generation_retried': 'ساخت دوبارهٔ قصه با پرداخت قبلی آغاز شد',
   'payment.failed': 'بانک پرداخت را رد کرد',
   'payment.cancelled': 'پرداخت لغو شد',
   'payment.refund_pending': 'سفارش در انتظار بازپرداخت قرار گرفت',

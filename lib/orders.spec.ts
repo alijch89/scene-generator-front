@@ -10,10 +10,6 @@ describe('order presentation rules', () => {
     });
     expect(ORDER_STATUS.FAILED.tone).toBe('error');
     expect(ORDER_STATUS.PENDING.tone).toBe('warning');
-    expect(ORDER_STATUS.REFUND_PENDING).toMatchObject({
-      admin: 'در انتظار بازپرداخت',
-      tone: 'warning',
-    });
     expect(ORDER_STATUS.REFUNDED).toMatchObject({
       parent: 'وجه بازگردانده شد',
       tone: 'neutral',
@@ -29,7 +25,7 @@ describe('order presentation rules', () => {
     expect(orderAction(status)).toEqual(action);
   });
 
-  it.each(['REFUND_PENDING', 'REFUNDED'] as const)(
+  it.each(['REFUNDED'] as const)(
     'does not offer another charge while an order is %s',
     (status) => {
       expect(orderAction(status)).toBeNull();
